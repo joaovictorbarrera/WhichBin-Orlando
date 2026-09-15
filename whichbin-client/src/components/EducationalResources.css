@@ -1,0 +1,72 @@
+.resources-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  background-color: #f7faf8;
+  min-height: 100vh;
+}
+
+.resources-page h1 {
+  margin-bottom: 8px;
+  color: #123d32;
+  font-size: 28px;
+}
+
+.resources-intro {
+  margin-top: 0;
+  margin-bottom: 25px;
+  color: #4f625d;
+  line-height: 1.5;
+}
+
+.resources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.resource-card {
+  display: flex;
+  align-items: center;
+  padding: 18px;
+  background-color: white;
+  border-radius: 14px;
+  border: 1px solid #e1e7e4;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.resource-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  border-radius: 50%;
+  background-color: #e8f5ed;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.resource-content {
+  flex: 1;
+}
+
+.resource-content h2 {
+  margin: 0 0 5px;
+  color: #173d35;
+  font-size: 17px;
+}
+
+.resource-content p {
+  margin: 0;
+  color: #61716c;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.resource-arrow {
+  margin-left: 10px;
+  color: #55716a;
+  font-size: 28px;
+}
