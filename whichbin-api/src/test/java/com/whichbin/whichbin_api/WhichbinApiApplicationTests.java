@@ -1,4 +1,4 @@
-package com.p1g2.whichbin_api;
+package com.whichbin.whichbin_api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
