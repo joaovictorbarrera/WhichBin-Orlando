@@ -57,20 +57,146 @@ const resources: Record<string, Resource> = {
     ]
   },
 
-  'prepare-items': {
-    title: 'How to Prepare Items',
-    description: 'Learn how to prepare your recyclable items before placing them in the bin.'
-  },
+'prepare-items': {
+  title: 'How to Prepare Items',
+  description: 'Simple steps to prepare your recyclable items before placing them in the recycling cart.',
+  sections: [
+    {
+      heading: 'Plastic Containers',
+      items: [
+        'Empty the container.',
+        'Rinse the container and let it dry.',
+        'Plastic caps can stay on.'
+      ]
+    },
+    {
+      heading: 'Glass Containers',
+      items: [
+        'Empty and clean the container.',
+        'Remove metal lids.',
+        'Place glass bottles and jars loose in the recycling cart.'
+      ]
+    },
+    {
+      heading: 'Cans',
+      items: [
+        'Empty the can.',
+        'Rinse the can and let it dry.',
+        'Recycle aluminum, steel, and tin cans.'
+      ]
+    },
+    {
+      heading: 'Cardboard',
+      items: [
+        'Flatten cardboard boxes.',
+        'Keep cardboard clean and dry.',
+        'Do not recycle greasy or food-soiled cardboard.'
+      ]
+    },
+    {
+      heading: 'One Important Rule',
+      items: [
+        'Keep recyclables loose.',
+        'Do not put recyclables inside plastic bags.'
+      ]
+    }
+  ]
+},
 
-  'common-mistakes': {
-    title: 'Common Mistakes',
-    description: 'Learn about common recycling mistakes and how to avoid them.'
-  },
+'common-mistakes': {
+  title: 'Common Mistakes',
+  description: 'Avoid common recycling mistakes that can contaminate the recycling cart or cause problems for recycling equipment.',
+  sections: [
+    {
+      heading: 'Putting Recyclables in Bags',
+      items: [
+        'Do not put recyclables inside plastic bags.',
+        'Place recyclable items directly into the recycling cart.',
+        'Plastic bags can get tangled in recycling equipment.'
+      ]
+    },
+    {
+      heading: 'Recycling Food Waste',
+      items: [
+        'Food waste does not belong in the recycling cart.',
+        'Empty food and drink containers before recycling them.',
+        'Keep food and other household garbage out of the recycling cart.'
+      ]
+    },
+    {
+      heading: 'Recycling Plastic Bags and Wrap',
+      items: [
+        'Plastic bags do not belong in the recycling cart.',
+        'Plastic wrap and film plastic should not be placed in the recycling cart.'
+      ]
+    },
+    {
+      heading: 'Recycling Styrofoam',
+      items: [
+        'Styrofoam cups and containers do not belong in the recycling cart.',
+        'Keep foam packing materials out of the recycling cart.'
+      ]
+    },
+    {
+      heading: 'Recycling Contaminated Items',
+      items: [
+        'Empty and clean recyclable containers before placing them in the cart.',
+        'Do not put household garbage in the recycling cart.',
+        'When in doubt, check the item before putting it in the recycling cart.'
+      ]
+    }
+  ]
+},
 
-  'orlando-guide': {
-    title: 'Orlando Recycling Guide',
-    description: 'Learn more about recycling guidelines for residents of Orlando.'
-  }
+'orlando-guide': {
+  title: 'Orlando Recycling Guide',
+  description: 'A quick guide to recycling in the City of Orlando.',
+  sections: [
+    {
+      heading: 'What Goes in the Recycling Cart?',
+      items: [
+        'Plastic bottles and containers',
+        'Glass bottles and jars',
+        'Aluminum, steel, and tin cans',
+        'Flattened cardboard',
+        'Paper and drink cartons'
+      ]
+    },
+    {
+      heading: 'Keep It Clean',
+      items: [
+        'Empty containers before recycling them.',
+        'Rinse containers when needed and let them dry.',
+        'Keep food and other garbage out of the recycling cart.'
+      ]
+    },
+    {
+      heading: 'Keep It Loose',
+      items: [
+        'Place recyclable items directly into the recycling cart.',
+        'Do not put recyclables inside plastic bags.',
+        'Plastic bags and plastic film do not belong in the recycling cart.'
+      ]
+    },
+    {
+      heading: 'Items to Keep Out',
+      items: [
+        'Food waste',
+        'Plastic bags and film',
+        'Polystyrene foam',
+        'Aluminum food pans',
+        'Household garbage'
+      ]
+    },
+    {
+      heading: 'When You Are Not Sure',
+      items: [
+        'Check the item before putting it in the recycling cart.',
+        'Use the WhichBin Orlando item search to help decide where an item belongs.'
+      ]
+    }
+  ]
+},
 }
 
 function ResourceDetails() {
