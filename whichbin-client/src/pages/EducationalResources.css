@@ -33,6 +33,12 @@
   border-radius: 14px;
   border: 1px solid #e1e7e4;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  text-decoration: none;
+  color: inherit;
+}
+
+.resource-card:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
 }
 
 .resource-icon {
