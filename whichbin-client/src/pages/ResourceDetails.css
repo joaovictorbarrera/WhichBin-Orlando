@@ -1,12 +1,14 @@
 .resource-details-page {
   max-width: 900px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 40px 20px 110px;
+  background-color: #f7faf8;
+  min-height: 100vh;
 }
 
 .resource-back-link {
   display: inline-block;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
   color: #2e7d32;
   text-decoration: none;
   font-weight: 600;
@@ -18,17 +20,96 @@
 
 .resource-details-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 40px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #dce7e1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
 }
 
 .resource-details-card h1 {
-  margin-top: 0;
-  margin-bottom: 20px;
+  margin: 0 0 12px;
+  color: #123d32;
+  font-size: 32px;
 }
 
-.resource-details-card p {
+.resource-details-card > p {
+  margin: 0 0 32px;
+  color: #4f625d;
   line-height: 1.7;
   font-size: 18px;
+}
+
+.resource-details-card section {
+  margin-top: 24px;
+  padding: 24px;
+  border-radius: 12px;
+  border-left: 5px solid;
+}
+
+.resource-section-green {
+  background: #f1f7f3;
+  border-left-color: #4caf50;
+}
+
+.resource-section-blue {
+  background: #f1f7f9;
+  border-left-color: #2196a3;
+}
+
+.resource-section-orange {
+  background: #fff7ed;
+  border-left-color: #f59e0b;
+}
+
+.resource-section-red {
+  background: #fff2f2;
+  border-left-color: #e05a5a;
+}
+
+.resource-details-card section h2 {
+  margin: 0 0 16px;
+  color: #173d35;
+  font-size: 22px;
+}
+
+.resource-details-card ul {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.resource-details-card li {
+  margin-bottom: 10px;
+  color: #40534d;
+  line-height: 1.6;
+}
+
+.resource-details-card li:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 600px) {
+  .resource-details-page {
+    padding: 30px 16px 110px;
+  }
+
+  .resource-details-card {
+    padding: 24px 20px;
+    border-radius: 14px;
+  }
+
+  .resource-details-card h1 {
+    font-size: 28px;
+  }
+
+  .resource-details-card > p {
+    font-size: 16px;
+  }
+
+  .resource-details-card section {
+    padding: 20px;
+  }
+
+  .resource-details-card section h2 {
+    font-size: 20px;
+  }
 }
