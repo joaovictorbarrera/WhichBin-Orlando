@@ -22,12 +22,9 @@ function ResourceDetails() {
 
   const [resource, setResource] = useState<Resource | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
 
   useEffect(() => {
     if (!resourceId) {
-      setError('Resource not found.')
-      setLoading(false)
       return
     }
 
@@ -44,12 +41,12 @@ function ResourceDetails() {
         setLoading(false)
       })
       .catch(() => {
-        setError('We could not find the resource you selected.')
+        setResource(null)
         setLoading(false)
       })
   }, [resourceId])
 
-  if (loading) {
+  if (loading && resourceId) {
     return (
       <main className="resource-details-page">
         <Link to="/resources" className="resource-back-link">
@@ -63,7 +60,7 @@ function ResourceDetails() {
     )
   }
 
-  if (error || !resource) {
+  if (!resource || !resourceId) {
     return (
       <main className="resource-details-page">
         <Link to="/resources" className="resource-back-link">
@@ -72,7 +69,7 @@ function ResourceDetails() {
 
         <div className="resource-details-card">
           <h1>Resource Not Found</h1>
-          <p>{error}</p>
+          <p>Resource not found.</p>
         </div>
       </main>
     )
