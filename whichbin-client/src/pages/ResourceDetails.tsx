@@ -1,21 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import {
+  getResourceById,
+  type Resource,
+} from '../services/resourceService'
 import './ResourceDetails.css'
-
-type ResourceSection = {
-  heading: string
-  styleType: string
-  items: string
-}
-
-type Resource = {
-  id: number
-  title: string
-  description: string
-  content: string
-  styleType: string
-  sections: ResourceSection[]
-}
 
 function ResourceDetails() {
   const { resourceId } = useParams()
@@ -28,22 +17,25 @@ function ResourceDetails() {
       return
     }
 
-    fetch(`http://localhost:5000/api/resources/${resourceId}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Resource not found')
-        }
+    let isMounted = true
 
-        return response.json()
-      })
+    getResourceById(resourceId)
       .then((data) => {
-        setResource(data)
-        setLoading(false)
+        if (isMounted) {
+          setResource(data)
+          setLoading(false)
+        }
       })
       .catch(() => {
-        setResource(null)
-        setLoading(false)
+        if (isMounted) {
+          setResource(null)
+          setLoading(false)
+        }
       })
+
+    return () => {
+      isMounted = false
+    }
   }, [resourceId])
 
   if (loading && resourceId) {
