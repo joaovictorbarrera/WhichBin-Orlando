@@ -1,55 +1,44 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import {
+  getResourceById,
+  type Resource,
+} from '../services/resourceService'
 import './ResourceDetails.css'
-
-type ResourceSection = {
-  heading: string
-  styleType: string
-  items: string
-}
-
-type Resource = {
-  id: number
-  title: string
-  description: string
-  content: string
-  styleType: string
-  sections: ResourceSection[]
-}
 
 function ResourceDetails() {
   const { resourceId } = useParams()
 
   const [resource, setResource] = useState<Resource | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
 
   useEffect(() => {
     if (!resourceId) {
-      setError('Resource not found.')
-      setLoading(false)
       return
     }
 
-    fetch(`http://localhost:5000/api/resources/${resourceId}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Resource not found')
-        }
+    let isMounted = true
 
-        return response.json()
-      })
+    getResourceById(resourceId)
       .then((data) => {
-        setResource(data)
-        setLoading(false)
+        if (isMounted) {
+          setResource(data)
+          setLoading(false)
+        }
       })
       .catch(() => {
-        setError('We could not find the resource you selected.')
-        setLoading(false)
+        if (isMounted) {
+          setResource(null)
+          setLoading(false)
+        }
       })
+
+    return () => {
+      isMounted = false
+    }
   }, [resourceId])
 
-  if (loading) {
+  if (loading && resourceId) {
     return (
       <main className="resource-details-page">
         <Link to="/resources" className="resource-back-link">
@@ -63,7 +52,7 @@ function ResourceDetails() {
     )
   }
 
-  if (error || !resource) {
+  if (!resource || !resourceId) {
     return (
       <main className="resource-details-page">
         <Link to="/resources" className="resource-back-link">
@@ -72,7 +61,7 @@ function ResourceDetails() {
 
         <div className="resource-details-card">
           <h1>Resource Not Found</h1>
-          <p>{error}</p>
+          <p>Resource not found.</p>
         </div>
       </main>
     )
