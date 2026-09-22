@@ -1,0 +1,66 @@
+.top-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.app-title {
+  color: #2e7d32;
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.menu-button {
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.bottom-navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 4px;
+  color: #555;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.nav-item span:first-child {
+  font-size: 22px;
+}
+
+.nav-item:hover {
+  color: #2e7d32;
+}
+
+@media (min-width: 768px) {
+  .bottom-navigation {
+    max-width: 700px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    border-radius: 14px 14px 0 0;
+  }
+}
