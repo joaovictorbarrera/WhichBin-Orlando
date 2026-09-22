@@ -1,4 +1,4 @@
-package com.p1g2.whichbin_api.model;
+package com.whichbin.whichbin_api.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
