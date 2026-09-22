@@ -78,7 +78,7 @@ function ResourceDetails() {
 
         <p>{resource.description}</p>
 
-        {resource.sections.map((section, index) => (
+        {(resource.sections ?? []).map((section, index) => (
           <section
             className={`resource-section ${section.styleType}`}
             key={index}

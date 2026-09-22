@@ -2,38 +2,33 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FiSettings, FiAlertTriangle, FiFileText, FiChevronRight } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
+import { getResources, type Resource } from '../services/resourceService'
 import './EducationalResources.css'
-
-type Resource = {
-  id: number
-  title: string
-  description: string
-  content: string
-  styleType: string
-}
 
 function EducationalResources() {
   const [resources, setResources] = useState<Resource[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/resources')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to load resources')
-        }
+    let isMounted = true
 
-        return response.json()
-      })
+    getResources()
       .then((data) => {
-        setResources(data)
-        setLoading(false)
+        if (isMounted) {
+          setResources(data ?? [])
+          setLoading(false)
+        }
       })
       .catch(() => {
-        setError('Unable to load educational resources.')
-        setLoading(false)
+        if (isMounted) {
+          setResources([])
+          setLoading(false)
+        }
       })
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   function getIcon(resource: Resource) {
@@ -65,11 +60,11 @@ function EducationalResources() {
     )
   }
 
-  if (error) {
+  if (!resources.length) {
     return (
       <main className="resources-page">
         <h1>Educational Resources</h1>
-        <p className="resources-intro">{error}</p>
+        <p className="resources-intro">No educational resources are available right now.</p>
       </main>
     )
   }

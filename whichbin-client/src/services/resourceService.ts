@@ -12,7 +12,21 @@ export type Resource = {
   description: string
   content: string
   styleType: string
-  sections: ResourceSection[]
+  sections?: ResourceSection[]
+}
+
+export async function getResources(): Promise<Resource[] | null> {
+  try {
+    const response = await fetch(`${API_URL}resources`)
+
+    if (!response.ok) {
+      return null
+    }
+
+    return (await response.json()) as Resource[]
+  } catch {
+    return null
+  }
 }
 
 export async function getResourceById(resourceId: string): Promise<Resource | null> {
