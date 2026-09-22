@@ -7,18 +7,23 @@ type Resource = {
   sections?: {
     heading: string
     items: string[]
-    type: 'green' | 'blue' | 'orange' | 'red'
+    styleType:
+      | 'resource-section-green'
+      | 'resource-section-blue'
+      | 'resource-section-orange'
+      | 'resource-section-red'
   }[]
 }
 
 const resources: Record<string, Resource> = {
   'recycling-basics': {
     title: 'Recycling Basics',
-    description: 'Learn what can and cannot be recycled in the City of Orlando.',
+    description:
+      'Learn what can and cannot be recycled in the City of Orlando.',
     sections: [
       {
         heading: 'What Can Be Recycled?',
-        type: 'green',
+        styleType: 'resource-section-green',
         items: [
           'Plastic bottles and containers',
           'Glass bottles and jars',
@@ -29,7 +34,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'Before You Recycle',
-        type: 'blue',
+        styleType: 'resource-section-blue',
         items: [
           'Empty and clean plastic containers',
           'Rinse the container and let it dry.',
@@ -42,7 +47,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'What Does Not Belong?',
-        type: 'red',
+        styleType: 'resource-section-red',
         items: [
           'Food waste',
           'Plastic bags',
@@ -54,7 +59,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'Remember',
-        type: 'green',
+        styleType: 'resource-section-green',
         items: [
           'Do not put recyclables inside plastic bags.',
           'Place recyclables directly into the recycling cart.'
@@ -65,11 +70,12 @@ const resources: Record<string, Resource> = {
 
   'prepare-items': {
     title: 'How to Prepare Items',
-    description: 'Simple steps to prepare your recyclable items before placing them in the recycling cart.',
+    description:
+      'Simple steps to prepare your recyclable items before placing them in the recycling cart.',
     sections: [
       {
         heading: 'Plastic Containers',
-        type: 'blue',
+        styleType: 'resource-section-blue',
         items: [
           'Empty the container.',
           'Rinse the container and let it dry.',
@@ -78,7 +84,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'Glass Containers',
-        type: 'blue',
+        styleType: 'resource-section-blue',
         items: [
           'Empty and clean the container.',
           'Remove metal lids.',
@@ -87,7 +93,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'Cans',
-        type: 'blue',
+        styleType: 'resource-section-blue',
         items: [
           'Empty the can.',
           'Rinse the can and let it dry.',
@@ -96,7 +102,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'Cardboard',
-        type: 'blue',
+        styleType: 'resource-section-blue',
         items: [
           'Flatten cardboard boxes.',
           'Keep cardboard clean and dry.',
@@ -105,7 +111,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'One Important Rule',
-        type: 'green',
+        styleType: 'resource-section-green',
         items: [
           'Keep recyclables loose.',
           'Do not put recyclables inside plastic bags.'
@@ -116,11 +122,12 @@ const resources: Record<string, Resource> = {
 
   'common-mistakes': {
     title: 'Common Mistakes',
-    description: 'Avoid common recycling mistakes that can contaminate the recycling cart or cause problems for recycling equipment.',
+    description:
+      'Avoid common recycling mistakes that can contaminate the recycling cart or cause problems for recycling equipment.',
     sections: [
       {
         heading: 'Putting Recyclables in Bags',
-        type: 'orange',
+        styleType: 'resource-section-orange',
         items: [
           'Do not put recyclables inside plastic bags.',
           'Place recyclable items directly into the recycling cart.',
@@ -129,7 +136,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'Recycling Food Waste',
-        type: 'red',
+        styleType: 'resource-section-red',
         items: [
           'Food waste does not belong in the recycling cart.',
           'Empty food and drink containers before recycling them.',
@@ -138,7 +145,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'Recycling Plastic Bags and Wrap',
-        type: 'red',
+        styleType: 'resource-section-red',
         items: [
           'Plastic bags do not belong in the recycling cart.',
           'Plastic wrap and film plastic should not be placed in the recycling cart.'
@@ -146,7 +153,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'Recycling Styrofoam',
-        type: 'red',
+        styleType: 'resource-section-red',
         items: [
           'Styrofoam cups and containers do not belong in the recycling cart.',
           'Keep foam packing materials out of the recycling cart.'
@@ -154,7 +161,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'Recycling Contaminated Items',
-        type: 'orange',
+        styleType: 'resource-section-orange',
         items: [
           'Empty and clean recyclable containers before placing them in the cart.',
           'Do not put household garbage in the recycling cart.',
@@ -170,7 +177,7 @@ const resources: Record<string, Resource> = {
     sections: [
       {
         heading: 'What Goes in the Recycling Cart?',
-        type: 'green',
+        styleType: 'resource-section-green',
         items: [
           'Plastic bottles and containers',
           'Glass bottles and jars',
@@ -181,7 +188,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'Keep It Clean',
-        type: 'blue',
+        styleType: 'resource-section-blue',
         items: [
           'Empty containers before recycling them.',
           'Rinse containers when needed and let them dry.',
@@ -190,7 +197,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'Keep It Loose',
-        type: 'blue',
+        styleType: 'resource-section-blue',
         items: [
           'Place recyclable items directly into the recycling cart.',
           'Do not put recyclables inside plastic bags.',
@@ -199,7 +206,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'Items to Keep Out',
-        type: 'red',
+        styleType: 'resource-section-red',
         items: [
           'Food waste',
           'Plastic bags and film',
@@ -210,7 +217,7 @@ const resources: Record<string, Resource> = {
       },
       {
         heading: 'When You Are Not Sure',
-        type: 'orange',
+        styleType: 'resource-section-orange',
         items: [
           'Check the item before putting it in the recycling cart.',
           'Use the WhichBin Orlando item search to help decide where an item belongs.'
@@ -254,7 +261,7 @@ function ResourceDetails() {
         {resource.sections?.map((section) => (
           <section
             key={section.heading}
-            className={`resource-section resource-section-${section.type}`}
+            className={`resource-section ${section.styleType}`}
           >
             <h2>{section.heading}</h2>
 
