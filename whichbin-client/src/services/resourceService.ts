@@ -1,4 +1,4 @@
-import { API_URL } from '../api/config'
+import { apiFetch } from './apiClient'
 
 export type ResourceSection = {
   heading: string
@@ -17,7 +17,7 @@ export type Resource = {
 
 export async function getResources(): Promise<Resource[] | null> {
   try {
-    const response = await fetch(`${API_URL}resources`)
+    const response = await apiFetch('resources')
 
     if (!response.ok) {
       return null
@@ -31,7 +31,7 @@ export async function getResources(): Promise<Resource[] | null> {
 
 export async function getResourceById(resourceId: string): Promise<Resource | null> {
   try {
-    const response = await fetch(`${API_URL}resources/${resourceId}`)
+    const response = await apiFetch(`resources/${resourceId}`)
 
     if (!response.ok) {
       return null

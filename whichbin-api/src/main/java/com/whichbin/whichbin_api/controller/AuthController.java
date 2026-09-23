@@ -1,7 +1,11 @@
 package com.whichbin.whichbin_api.controller;
 
+import com.whichbin.whichbin_api.auth.Authenticated;
+import com.whichbin.whichbin_api.auth.AuthorizationTokenService;
+import com.whichbin.whichbin_api.auth.CurrentUser;
 import com.whichbin.whichbin_api.dto.auth.LoginRequest;
 import com.whichbin.whichbin_api.dto.auth.LoginResponse;
+import com.whichbin.whichbin_api.dto.auth.MeResponse;
 import com.whichbin.whichbin_api.model.User;
 import com.whichbin.whichbin_api.repository.UserRepository;
 import jakarta.validation.Valid;
@@ -22,15 +26,19 @@ public class AuthController {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
+    private final AuthorizationTokenService authorizationTokenService;
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     public AuthController(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            AuthorizationTokenService authorizationTokenService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authorizationTokenService = authorizationTokenService;
     }
 
     @PostMapping("/login")
@@ -48,8 +56,8 @@ public class AuthController {
             );
         }
 
-        String authorization = generateAuthorizationToken();
-        String authorizationHash = sha256Hex(authorization);
+        String authorizationToken = authorizationTokenService.generateAuthorizationToken();
+        String authorizationHash = authorizationTokenService.hashAuthorizationToken(authorizationToken);
 
         user.setAuthorizationHash(authorizationHash);
         User savedUser = userRepository.save(user);
@@ -59,26 +67,18 @@ public class AuthController {
                 savedUser.getFirstName(),
                 savedUser.getLastName(),
                 savedUser.getEmail(),
-                authorization
+                authorizationToken
         );
     }
 
-    private static String generateAuthorizationToken() {
-        byte[] randomBytes = new byte[32];
-        SECURE_RANDOM.nextBytes(randomBytes);
-
-        return sha256Hex(HexFormat.of().formatHex(randomBytes));
-    }
-
-    private static String sha256Hex(String value) {
-        try {
-            byte[] hash = MessageDigest
-                    .getInstance("SHA-256")
-                    .digest(value.getBytes(StandardCharsets.UTF_8));
-
-            return HexFormat.of().formatHex(hash);
-        } catch (NoSuchAlgorithmException exception) {
-            throw new IllegalStateException("SHA-256 algorithm is not available", exception);
-        }
+    @Authenticated
+    @GetMapping("/me")
+    public MeResponse me(@CurrentUser User user) {
+        return new MeResponse(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail()
+        );
     }
 }

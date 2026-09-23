@@ -120,14 +120,24 @@
   border-radius: 0.5rem;
   background: var(--color-brand);
   color: var(--color-surface);
-  cursor: not-allowed;
+  cursor: pointer;
   font-weight: 800;
-  opacity: 0.55;
+  transition: background-color 160ms ease, transform 160ms ease;
 }
 
-.admin-login-note {
+.admin-login-form button:hover:not(:disabled) {
+  background: var(--color-brand-dark);
+  transform: translateY(-0.125rem);
+}
+
+.admin-login-form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.admin-login-error {
   margin: -0.25rem 0 0;
-  color: var(--color-text-subtle);
+  color: var(--color-danger);
   font-size: 0.75rem;
   line-height: 1.5;
   text-align: center;

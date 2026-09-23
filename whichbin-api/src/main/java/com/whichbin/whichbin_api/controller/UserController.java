@@ -1,5 +1,6 @@
 package com.whichbin.whichbin_api.controller;
 
+import com.whichbin.whichbin_api.auth.Authenticated;
 import com.whichbin.whichbin_api.dto.user.CreateUserRequest;
 import com.whichbin.whichbin_api.dto.user.UpdateUserRequest;
 import com.whichbin.whichbin_api.dto.user.UserResponse;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 import java.util.List;
 
+@Authenticated
 @RestController
 @RequestMapping("/users")
 public class UserController {
