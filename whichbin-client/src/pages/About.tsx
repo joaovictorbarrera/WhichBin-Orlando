@@ -6,7 +6,6 @@ import {
   FiDatabase,
   FiGitBranch,
   FiGithub,
-  FiLayers,
   FiMapPin,
   FiMonitor,
   FiSearch,
@@ -157,16 +156,6 @@ function About() {
               <h3>MySQL database</h3>
               <p>The data layer stores searchable items, instructions, resources, and announcements.</p>
             </article>
-          </div>
-          <div className="about-architecture-flow">
-            <FiLayers aria-hidden="true" />
-            <span>User</span>
-            <FiArrowRight aria-hidden="true" />
-            <span>React frontend</span>
-            <FiArrowRight aria-hidden="true" />
-            <span>Spring Boot API</span>
-            <FiArrowRight aria-hidden="true" />
-            <span>MySQL</span>
           </div>
         </div>
       </section>

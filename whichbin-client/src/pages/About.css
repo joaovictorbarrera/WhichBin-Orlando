@@ -402,28 +402,6 @@
   line-height: 1.6;
 }
 
-.about-architecture-flow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  padding-top: 24px;
-  color: var(--color-text-muted);
-  font-size: 13px;
-  font-weight: 700;
-  flex-wrap: wrap;
-}
-
-.about-architecture-flow > svg:first-child {
-  color: var(--color-brand);
-}
-
-.about-architecture-flow > svg {
-  width: 17px;
-  height: 17px;
-  flex-shrink: 0;
-}
-
 .about-cta {
   display: flex;
   align-items: end;
@@ -534,12 +512,6 @@
   .about-layer-number {
     top: 22px;
     right: 0;
-  }
-
-  .about-architecture-flow {
-    justify-content: flex-start;
-    gap: 10px;
-    line-height: 1.4;
   }
 
   .about-feature-links {
