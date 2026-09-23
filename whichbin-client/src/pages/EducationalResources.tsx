@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { FiSettings, FiAlertTriangle, FiFileText, FiChevronRight } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
 import { getResources, type Resource } from '../services/resourceService'
+import PageLayout from '../components/PageLayout'
 import './EducationalResources.css'
 
 function EducationalResources() {
@@ -53,24 +54,24 @@ function EducationalResources() {
 
   if (loading) {
     return (
-      <main className="resources-page">
+      <PageLayout className="resources-page" width="narrow">
         <h1>Educational Resources</h1>
         <p className="resources-intro">Loading resources...</p>
-      </main>
+      </PageLayout>
     )
   }
 
   if (!resources.length) {
     return (
-      <main className="resources-page">
+      <PageLayout className="resources-page" width="narrow">
         <h1>Educational Resources</h1>
         <p className="resources-intro">No educational resources are available right now.</p>
-      </main>
+      </PageLayout>
     )
   }
 
   return (
-    <main className="resources-page">
+    <PageLayout className="resources-page" width="narrow">
       <h1>Educational Resources</h1>
 
       <p className="resources-intro">
@@ -99,7 +100,7 @@ function EducationalResources() {
           </Link>
         ))}
       </div>
-    </main>
+    </PageLayout>
   )
 }
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FiActivity } from 'react-icons/fi';
 import { getApiInfo, type ApiInfo } from '../services/apiService';
+import PageLayout from '../components/PageLayout';
 import './ApiStatus.css';
 
 function ApiStatus() {
@@ -20,7 +21,7 @@ function ApiStatus() {
       : 'Offline';
 
   return (
-    <main className="api-status-page">
+    <PageLayout className="api-status-page">
       <section className="api-status-panel">
         <div className="api-status-icon" aria-hidden="true"><FiActivity /></div>
         <p className="api-status-eyebrow">System information</p>
@@ -37,7 +38,7 @@ function ApiStatus() {
           <span><strong>Connection:</strong> {status}</span>
         </div>
       </section>
-    </main>
+    </PageLayout>
   );
 }
 

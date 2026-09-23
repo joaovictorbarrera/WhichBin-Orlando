@@ -4,6 +4,7 @@ import {
   getResourceById,
   type Resource,
 } from '../services/resourceService'
+import PageLayout from '../components/PageLayout'
 import './ResourceDetails.css'
 
 function ResourceDetails() {
@@ -40,7 +41,7 @@ function ResourceDetails() {
 
   if (loading && resourceId) {
     return (
-      <main className="resource-details-page">
+      <PageLayout className="resource-details-page" width="wide">
         <Link to="/resources" className="resource-back-link">
           Back to Educational Resources
         </Link>
@@ -48,13 +49,13 @@ function ResourceDetails() {
         <div className="resource-details-card">
           <h1>Loading...</h1>
         </div>
-      </main>
+      </PageLayout>
     )
   }
 
   if (!resource || !resourceId) {
     return (
-      <main className="resource-details-page">
+      <PageLayout className="resource-details-page" width="wide">
         <Link to="/resources" className="resource-back-link">
           Back to Educational Resources
         </Link>
@@ -63,12 +64,12 @@ function ResourceDetails() {
           <h1>Resource Not Found</h1>
           <p>Resource not found.</p>
         </div>
-      </main>
+      </PageLayout>
     )
   }
 
   return (
-    <main className="resource-details-page">
+    <PageLayout className="resource-details-page" width="wide">
       <Link to="/resources" className="resource-back-link">
         Back to Educational Resources
       </Link>
@@ -93,7 +94,7 @@ function ResourceDetails() {
           </section>
         ))}
       </div>
-    </main>
+    </PageLayout>
   )
 }
 

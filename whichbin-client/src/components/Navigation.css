@@ -1,5 +1,6 @@
 .top-navigation {
   position: relative;
+  height: var(--top-navigation-height);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -86,6 +87,7 @@
 
 .bottom-navigation {
   position: fixed;
+  height: var(--bottom-navigation-height);
   bottom: 0;
   left: 0;
   right: 0;

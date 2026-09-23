@@ -1,11 +1,12 @@
 import { FiArrowRight, FiMapPin } from 'react-icons/fi';
 import { FaRecycle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import PageLayout from '../components/PageLayout';
 import './Home.css';
 
 function Home() {
   return (
-    <main className="home-page">
+    <PageLayout className="home-page">
       <section className="home-hero">
         <div className="home-copy">
           <p className="home-eyebrow"><FiMapPin /> Orlando, Florida</p>
@@ -47,7 +48,7 @@ function Home() {
           <p>Small sorting decisions add up to a healthier community.</p>
         </article>
       </section>
-    </main>
+    </PageLayout>
   );
 }
 

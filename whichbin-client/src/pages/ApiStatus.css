@@ -1,8 +1,7 @@
 .api-status-page {
-  min-height: calc(100vh - 65px);
   display: grid;
   place-items: center;
-  padding: 48px 24px 120px;
+  padding: 48px 24px calc(var(--bottom-navigation-height) + 24px);
   background: linear-gradient(135deg, #f7f9f5, #eaf3ed);
 }
 

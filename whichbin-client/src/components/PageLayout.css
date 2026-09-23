@@ -1,0 +1,29 @@
+:root {
+  --top-navigation-height: 59px;
+  --bottom-navigation-height: 61px;
+}
+
+.page-layout {
+  min-height: calc(100dvh - var(--top-navigation-height));
+  padding: 40px 20px calc(var(--bottom-navigation-height) + 24px);
+}
+
+.page-layout-narrow {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.page-layout-wide {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.page-layout-full {
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .page-layout {
+    padding: 30px 16px calc(var(--bottom-navigation-height) + 24px);
+  }
+}

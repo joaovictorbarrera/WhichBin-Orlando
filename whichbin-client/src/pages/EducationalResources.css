@@ -1,9 +1,5 @@
 .resources-page {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 40px 20px 110px;
   background-color: #f7faf8;
-  min-height: 100vh;
 }
 
 .resources-page h1 {
@@ -82,10 +78,6 @@
 }
 
 @media (max-width: 600px) {
-  .resources-page {
-    padding: 30px 16px 110px;
-  }
-
   .resources-page h1 {
     font-size: 28px;
   }

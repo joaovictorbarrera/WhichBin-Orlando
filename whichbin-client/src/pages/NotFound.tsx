@@ -1,10 +1,11 @@
 import { FiArrowLeft, FiMapPin } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+import PageLayout from '../components/PageLayout';
 import './NotFound.css';
 
 function NotFound() {
   return (
-    <main className="not-found-page">
+    <PageLayout className="not-found-page">
       <div className="not-found-art" aria-hidden="true">
         <span className="not-found-number">4</span>
         <FiMapPin className="not-found-pin" />
@@ -23,7 +24,7 @@ function NotFound() {
           Return to home
         </Link>
       </div>
-    </main>
+    </PageLayout>
   );
 }
 

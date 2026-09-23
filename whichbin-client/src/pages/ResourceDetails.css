@@ -1,9 +1,5 @@
 .resource-details-page {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 40px 20px 110px;
   background-color: #f7faf8;
-  min-height: 100vh;
 }
 
 .resource-back-link {
@@ -88,10 +84,6 @@
 }
 
 @media (max-width: 600px) {
-  .resource-details-page {
-    padding: 30px 16px 110px;
-  }
-
   .resource-details-card {
     padding: 24px 20px;
     border-radius: 14px;

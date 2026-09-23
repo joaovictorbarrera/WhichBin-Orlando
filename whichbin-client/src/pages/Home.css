@@ -1,6 +1,5 @@
 .home-page {
-  min-height: calc(100vh - 65px);
-  padding: 0 7vw 120px;
+  padding: 0 7vw calc(var(--bottom-navigation-height) + 24px);
   background: #f7f9f5;
   color: #263d31;
 }
