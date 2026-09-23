@@ -1,0 +1,27 @@
+.auth-loading-screen {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1rem;
+  min-height: 100dvh;
+  background: var(--color-page);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.auth-loading-screen p {
+  margin: 0;
+}
+
+.auth-loading-mark {
+  width: 2rem;
+  height: 2rem;
+  border: 0.19rem solid var(--color-surface-green);
+  border-top-color: var(--color-brand);
+  border-radius: 50%;
+  animation: auth-loading-spin 800ms linear infinite;
+}
+
+@keyframes auth-loading-spin {
+  to { transform: rotate(360deg); }
+}
