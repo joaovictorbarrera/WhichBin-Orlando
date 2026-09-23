@@ -47,7 +47,7 @@ function ResourceDetails() {
         </Link>
 
         <div className="resource-details-card">
-          <h1>Loading...</h1>
+          <h1 aria-live="polite">Loading resource...</h1>
         </div>
       </PageLayout>
     )
@@ -79,10 +79,10 @@ function ResourceDetails() {
 
         <p>{resource.description}</p>
 
-        {(resource.sections ?? []).map((section, index) => (
+        {(resource.sections ?? []).map((section) => (
           <section
             className={`resource-section ${section.styleType}`}
-            key={index}
+            key={`${section.heading}-${section.styleType}`}
           >
             <h2>{section.heading}</h2>
 

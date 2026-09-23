@@ -54,7 +54,7 @@ function EducationalResources() {
 
   if (loading) {
     return (
-      <PageLayout className="resources-page" width="narrow">
+      <PageLayout className="resources-page" width="wide">
         <h1>Educational Resources</h1>
         <p className="resources-intro">Loading resources...</p>
       </PageLayout>
@@ -63,7 +63,7 @@ function EducationalResources() {
 
   if (!resources.length) {
     return (
-      <PageLayout className="resources-page" width="narrow">
+      <PageLayout className="resources-page" width="wide">
         <h1>Educational Resources</h1>
         <p className="resources-intro">No educational resources are available right now.</p>
       </PageLayout>
@@ -71,7 +71,7 @@ function EducationalResources() {
   }
 
   return (
-    <PageLayout className="resources-page" width="narrow">
+    <PageLayout className="resources-page" width="wide">
       <h1>Educational Resources</h1>
 
       <p className="resources-intro">
@@ -85,7 +85,7 @@ function EducationalResources() {
             className="resource-card"
             key={resource.id}
           >
-            <div className="resource-icon">
+            <div className={`resource-icon ${resource.styleType ?? ''}`}>
               {getIcon(resource)}
             </div>
 
