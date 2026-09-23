@@ -1,5 +1,6 @@
 .resources-page {
   min-height: calc(100dvh - var(--top-navigation-height));
+  padding-top: 3.5rem;
   background: var(--color-page);
 }
 
@@ -118,6 +119,10 @@
 }
 
 @media (max-width: 600px) {
+  .resources-page {
+    padding-top: 2.5rem;
+  }
+
   .resources-list {
     grid-template-columns: 1fr;
     gap: 0.815rem;
