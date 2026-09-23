@@ -3,65 +3,65 @@
 }
 
 .resource-details-page.page-layout-wide {
-  max-width: 840px;
+  max-width: 52.5rem;
 }
 
 .resource-back-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 40px;
-  margin-bottom: 18px;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  margin-bottom: 1.125rem;
   color: var(--color-brand);
   text-decoration: none;
   font-weight: 600;
 }
 
 .resource-back-link svg {
-  width: 18px;
-  height: 18px;
+  width: 1.125rem;
+  height: 1.125rem;
   flex-shrink: 0;
 }
 
 .resource-back-link:hover {
   text-decoration: underline;
-  text-underline-offset: 4px;
+  text-underline-offset: 0.25rem;
 }
 
 .resource-back-link:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
-  outline-offset: 3px;
+  outline: 0.19rem solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  outline-offset: 0.19rem;
 }
 
 .resource-details-card {
   background: var(--color-surface);
-  border-radius: 14px;
-  padding: clamp(24px, 4vw, 34px);
-  border: 1px solid var(--color-border-soft);
+  border-radius: 0.875rem;
+  padding: clamp(1.5rem, 4vw, 2.125rem);
+  border: 0.065rem solid var(--color-border-soft);
   box-shadow: var(--shadow-details);
 }
 
 .resource-details-card h1 {
-  max-width: 680px;
-  margin: 0 0 10px;
+  max-width: 42.5rem;
+  margin: 0 0 0.625rem;
   color: var(--color-heading-deep);
-  font-size: clamp(30px, 4vw, 38px);
+  font-size: clamp(1.875rem, 4vw, 2.375rem);
   line-height: 1.1;
 }
 
 .resource-details-card > p {
-  max-width: 680px;
-  margin: 0 0 28px;
+  max-width: 42.5rem;
+  margin: 0 0 1.75rem;
   color: var(--color-text-muted);
   line-height: 1.7;
-  font-size: 17px;
+  font-size: 1.065rem;
 }
 
 .resource-details-card section {
-  margin-top: 12px;
-  padding: clamp(18px, 2.5vw, 22px);
-  border-radius: 10px;
-  border-left: 4px solid;
+  margin-top: 0.75rem;
+  padding: clamp(1.125rem, 2.5vw, 1.375rem);
+  border-radius: 0.625rem;
+  border-left: 0.25rem solid;
 }
 
 .resource-section-green {
@@ -85,19 +85,19 @@
 }
 
 .resource-details-card section h2 {
-  margin: 0 0 10px;
+  margin: 0 0 0.625rem;
   color: var(--color-heading-soft);
-  font-size: clamp(19px, 2.2vw, 21px);
+  font-size: clamp(1.19rem, 2.2vw, 1.315rem);
   line-height: 1.25;
 }
 
 .resource-details-card ul {
   margin: 0;
-  padding-left: 22px;
+  padding-left: 1.375rem;
 }
 
 .resource-details-card li {
-  margin-bottom: 9px;
+  margin-bottom: 0.565rem;
   color: var(--color-text);
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -109,12 +109,12 @@
 
 @media (max-width: 600px) {
   .resource-details-page {
-    padding-right: 16px;
-    padding-left: 16px;
+    padding-right: 1rem;
+    padding-left: 1rem;
   }
 
   .resource-details-card {
-    padding: 8px 0 0;
+    padding: 0.5rem 0 0;
     background: transparent;
     border: 0;
     border-radius: 0;
@@ -122,19 +122,19 @@
   }
 
   .resource-details-card h1 {
-    font-size: 30px;
+    font-size: 1.875rem;
   }
 
   .resource-details-card > p {
-    font-size: 16px;
+    font-size: 1rem;
   }
 
   .resource-details-card section {
-    margin-top: 14px;
-    padding: 18px 16px;
+    margin-top: 0.875rem;
+    padding: 1.125rem 1rem;
   }
 
   .resource-details-card section h2 {
-    font-size: 20px;
+    font-size: 1.25rem;
   }
 }

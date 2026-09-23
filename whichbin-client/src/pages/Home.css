@@ -1,5 +1,5 @@
 .home-page {
-  padding: 0 7vw calc(var(--bottom-navigation-height) + 24px);
+  padding: 0 7vw calc(var(--bottom-navigation-height) + 1.5rem);
   background: var(--color-page-warm);
   color: var(--color-home-ink);
 }
@@ -8,49 +8,49 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 48px;
-  max-width: 1180px;
-  min-height: 570px;
+  gap: 3rem;
+  max-width: 73.75rem;
+  min-height: 35.625rem;
   margin: 0 auto;
 }
 
 .home-copy {
-  max-width: 590px;
+  max-width: 36.875rem;
   animation: home-reveal 700ms ease both;
 }
 
 .home-eyebrow {
   display: flex;
   align-items: center;
-  gap: 7px;
-  margin: 0 0 20px;
+  gap: 0.44rem;
+  margin: 0 0 1.25rem;
   color: var(--color-accent);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.095rem;
   text-transform: uppercase;
 }
 
 .home-copy h1 {
-  max-width: 620px;
+  max-width: 38.75rem;
   margin: 0;
   color: var(--color-heading);
-  font-size: clamp(44px, 6vw, 78px);
+  font-size: clamp(2.75rem, 6vw, 4.875rem);
   line-height: 0.99;
 }
 
 .home-intro {
-  max-width: 480px;
-  margin: 27px 0 32px;
+  max-width: 30rem;
+  margin: 1.69rem 0 2rem;
   color: var(--color-text-api);
-  font-size: 19px;
+  font-size: 1.19rem;
   line-height: 1.6;
 }
 
 .home-actions {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 1.375rem;
   flex-wrap: wrap;
 }
 
@@ -63,9 +63,9 @@
 .home-primary-action {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 15px 19px;
-  border-radius: 8px;
+  gap: 0.625rem;
+  padding: 0.94rem 1.19rem;
+  border-radius: 0.5rem;
   background: var(--color-brand);
   color: var(--color-surface);
   transition: background-color 160ms ease, transform 160ms ease;
@@ -73,7 +73,7 @@
 
 .home-primary-action:hover {
   background: var(--color-brand-dark);
-  transform: translateY(-2px);
+  transform: translateY(-0.125rem);
 }
 
 .home-secondary-action {
@@ -87,7 +87,7 @@
 
 .home-illustration {
   position: relative;
-  width: min(37vw, 390px);
+  width: min(37vw, 24.375rem);
   aspect-ratio: 1;
   flex: 0 0 auto;
   animation: home-float 5s ease-in-out infinite;
@@ -95,7 +95,7 @@
 
 .illustration-ring {
   position: absolute;
-  border: 1px solid color-mix(in srgb, var(--color-brand) 22%, transparent);
+  border: 0.065rem solid color-mix(in srgb, var(--color-brand) 22%, transparent);
   border-radius: 50%;
 }
 
@@ -117,16 +117,16 @@
   border-radius: 50%;
   background: var(--color-brand);
   color: var(--color-page-warm);
-  font-size: clamp(54px, 8vw, 88px);
+  font-size: clamp(3.375rem, 8vw, 5.5rem);
   box-shadow: var(--shadow-brand);
 }
 
 .illustration-label {
   position: absolute;
   color: var(--color-text-subtle);
-  font-size: 13px;
+  font-size: 0.815rem;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.065rem;
   text-transform: uppercase;
 }
 
@@ -135,68 +135,68 @@
 .label-bottom { bottom: 5%; left: 37%; }
 
 .home-toolkit {
-  max-width: 980px;
-  margin: 54px auto 0;
-  padding-top: 38px;
-  border-top: 1px solid var(--color-border-highlight);
+  max-width: 61.25rem;
+  margin: 3.375rem auto 0;
+  padding-top: 2.375rem;
+  border-top: 0.065rem solid var(--color-border-highlight);
 }
 
 .home-toolkit-label {
-  margin-bottom: 13px;
+  margin-bottom: 0.815rem;
   color: var(--color-accent);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 800;
-  letter-spacing: 1.6px;
+  letter-spacing: 0.1rem;
   text-transform: uppercase;
 }
 
 .home-toolkit-links {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  border-top: 1px solid var(--color-border-highlight);
-  border-bottom: 1px solid var(--color-border-highlight);
+  border-top: 0.065rem solid var(--color-border-highlight);
+  border-bottom: 0.065rem solid var(--color-border-highlight);
 }
 
 .home-toolkit-link {
   display: grid;
-  grid-template-columns: 25px minmax(0, 1fr) 18px;
+  grid-template-columns: 1.565rem minmax(0, 1fr) 1.125rem;
   align-items: center;
-  gap: 10px;
-  min-height: 104px;
-  padding: 16px 14px 16px 0;
+  gap: 0.625rem;
+  min-height: 6.5rem;
+  padding: 1rem 0.875rem 1rem 0;
   color: var(--color-brand);
   text-decoration: none;
 }
 
 .home-toolkit-link + .home-toolkit-link {
-  padding-left: 14px;
-  border-left: 1px solid var(--color-border-highlight);
+  padding-left: 0.875rem;
+  border-left: 0.065rem solid var(--color-border-highlight);
 }
 
 .home-toolkit-link > svg {
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .home-toolkit-link > svg:last-child {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
 }
 
 .home-toolkit-link span {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .home-toolkit-link strong {
   color: var(--color-heading-soft);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .home-toolkit-link small {
   color: var(--color-text-faint);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.35;
 }
 
@@ -206,18 +206,18 @@
 }
 
 @keyframes home-reveal {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(0.875rem); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes home-float {
   0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-9px) rotate(2deg); }
+  50% { transform: translateY(-0.565rem) rotate(2deg); }
 }
 
 @media (max-width: 720px) {
   .home-page {
-    padding: 0 24px 120px;
+    padding: 0 1.5rem 7.5rem;
   }
 
   .home-hero {
@@ -225,26 +225,26 @@
     align-items: flex-start;
     justify-content: center;
     min-height: auto;
-    padding: 68px 0 74px;
+    padding: 4.25rem 0 4.625rem;
   }
 
   .home-illustration {
     align-self: center;
-    width: min(72vw, 300px);
+    width: min(72vw, 18.75rem);
     order: -1;
   }
 
   .home-copy h1 {
-    font-size: clamp(44px, 14vw, 64px);
+    font-size: clamp(2.75rem, 14vw, 4rem);
   }
 
   .home-intro {
-    font-size: 17px;
+    font-size: 1.065rem;
   }
 
   .home-toolkit {
-    margin-top: 45px;
-    padding-top: 31px;
+    margin-top: 2.815rem;
+    padding-top: 1.94rem;
   }
 
   .home-toolkit-links {
@@ -253,12 +253,12 @@
 
   .home-toolkit-link,
   .home-toolkit-link + .home-toolkit-link {
-    padding: 17px 0;
+    padding: 1.065rem 0;
     border-left: 0;
   }
 
   .home-toolkit-link + .home-toolkit-link {
-    border-top: 1px solid var(--color-border-highlight);
+    border-top: 0.065rem solid var(--color-border-highlight);
   }
 }
 

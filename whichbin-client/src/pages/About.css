@@ -1,5 +1,5 @@
 .about-page {
-  padding: 0 7vw calc(var(--bottom-navigation-height) + 44px);
+  padding: 0 7vw calc(var(--bottom-navigation-height) + 2.75rem);
   background: var(--color-page-warm);
   color: var(--color-ink);
 }
@@ -13,21 +13,21 @@
 .about-technology,
 .about-experience,
 .about-cta {
-  max-width: 980px;
+  max-width: 61.25rem;
   margin: 0 auto;
 }
 
 .about-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+  grid-template-columns: minmax(0, 1.05fr) minmax(17.5rem, 0.95fr);
   align-items: center;
-  gap: clamp(48px, 9vw, 130px);
-  min-height: 555px;
-  padding: 64px 0 72px;
+  gap: clamp(3rem, 9vw, 8.125rem);
+  min-height: 34.69rem;
+  padding: 4rem 0 4.5rem;
 }
 
 .about-hero-copy {
-  max-width: 620px;
+  max-width: 38.75rem;
   animation: about-reveal 650ms ease both;
 }
 
@@ -35,28 +35,28 @@
 .about-cta-kicker {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 0 20px;
+  gap: 0.5rem;
+  margin: 0 0 1.25rem;
   color: var(--color-accent);
-  font-size: 13px;
+  font-size: 0.815rem;
   font-weight: 800;
-  letter-spacing: 1.8px;
+  letter-spacing: 0.115rem;
   text-transform: uppercase;
 }
 
 .about-hero h1 {
-  max-width: 640px;
+  max-width: 40rem;
   margin: 0;
   color: var(--color-heading);
-  font-size: clamp(40px, 4.8vw, 60px);
+  font-size: clamp(2.5rem, 4.8vw, 3.75rem);
   line-height: 1.02;
 }
 
 .about-lede {
-  max-width: 515px;
-  margin: 25px 0 31px;
+  max-width: 32.19rem;
+  margin: 1.565rem 0 1.94rem;
   color: var(--color-text-api);
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 1.65;
 }
 
@@ -64,15 +64,15 @@
 .about-cta-link {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   color: var(--color-brand);
   font-weight: 800;
   text-decoration: none;
 }
 
 .about-primary-action {
-  padding: 15px 19px;
-  border-radius: 8px;
+  padding: 0.94rem 1.19rem;
+  border-radius: 0.5rem;
   background: var(--color-brand);
   color: var(--color-surface);
   transition: background-color 160ms ease, transform 160ms ease;
@@ -80,14 +80,14 @@
 
 .about-primary-action:hover {
   background: var(--color-brand-dark);
-  transform: translateY(-2px);
+  transform: translateY(-0.125rem);
 }
 
 .about-hero-mark {
   position: relative;
   display: grid;
   place-items: center;
-  width: min(100%, 410px);
+  width: min(100%, 25.625rem);
   aspect-ratio: 1;
   justify-self: end;
   animation: about-float 5s ease-in-out 300ms infinite;
@@ -100,7 +100,7 @@
 
 .about-mark-circle-back {
   inset: 3%;
-  border: 1px solid color-mix(in srgb, var(--color-brand) 24%, transparent);
+  border: 0.065rem solid color-mix(in srgb, var(--color-brand) 24%, transparent);
   background: color-mix(in srgb, var(--color-surface-green-soft) 70%, transparent);
 }
 
@@ -110,36 +110,36 @@
   place-items: center;
   background: var(--color-brand);
   color: var(--color-page-warm);
-  font-size: clamp(60px, 8vw, 92px);
+  font-size: clamp(3.75rem, 8vw, 5.75rem);
   box-shadow: var(--shadow-brand);
 }
 
 .about-story {
-  padding: 52px 0 58px;
+  padding: 3.25rem 0 3.625rem;
 }
 
 .about-story .about-section-label {
-  margin: 0 auto 16px;
+  margin: 0 auto 1rem;
 }
 
 .about-section-label {
-  max-width: 980px;
-  margin: 0 auto 16px;
-  padding-top: 7px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--color-border-highlight);
+  max-width: 61.25rem;
+  margin: 0 auto 1rem;
+  padding-top: 0.44rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 0.065rem solid var(--color-border-highlight);
   color: var(--color-accent);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 800;
-  letter-spacing: 1.6px;
+  letter-spacing: 0.1rem;
   text-transform: uppercase;
 }
 
 .about-story-content {
   display: grid;
-  grid-template-columns: minmax(220px, 0.9fr) minmax(0, 1fr);
-  gap: clamp(28px, 6vw, 90px);
-  max-width: 980px;
+  grid-template-columns: minmax(13.75rem, 0.9fr) minmax(0, 1fr);
+  gap: clamp(1.75rem, 6vw, 5.625rem);
+  max-width: 61.25rem;
   margin: 0 auto;
 }
 
@@ -147,14 +147,14 @@
 .about-cta h2 {
   margin: 0;
   color: var(--color-heading-deep);
-  font-size: clamp(28px, 3.2vw, 42px);
+  font-size: clamp(1.75rem, 3.2vw, 2.625rem);
   line-height: 1.12;
 }
 
 .about-story-copy p {
-  margin: 0 0 16px;
+  margin: 0 0 1rem;
   color: var(--color-text-muted);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.7;
 }
 
@@ -163,67 +163,67 @@
 }
 
 .about-features {
-  padding: 45px 0 52px;
+  padding: 2.815rem 0 3.25rem;
 }
 
 .about-features-content {
-  max-width: 980px;
+  max-width: 61.25rem;
   margin: 0 auto;
 }
 
 .about-features-content .about-section-label {
   padding-top: 0;
-  margin: 0 auto 13px;
+  margin: 0 auto 0.815rem;
 }
 
 .about-feature-links {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  border-top: 1px solid var(--color-border-highlight);
-  border-bottom: 1px solid var(--color-border-highlight);
+  gap: 0.065rem;
+  border-top: 0.065rem solid var(--color-border-highlight);
+  border-bottom: 0.065rem solid var(--color-border-highlight);
 }
 
 .about-feature-link {
   display: grid;
-  grid-template-columns: 25px minmax(0, 1fr) 18px;
+  grid-template-columns: 1.565rem minmax(0, 1fr) 1.125rem;
   align-items: center;
-  gap: 10px;
-  min-height: 104px;
-  padding: 16px 14px 16px 0;
+  gap: 0.625rem;
+  min-height: 6.5rem;
+  padding: 1rem 0.875rem 1rem 0;
   color: var(--color-brand);
   text-decoration: none;
 }
 
 .about-feature-link + .about-feature-link {
-  padding-left: 14px;
-  border-left: 1px solid var(--color-border-highlight);
+  padding-left: 0.875rem;
+  border-left: 0.065rem solid var(--color-border-highlight);
 }
 
 .about-feature-link > svg {
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .about-feature-link > svg:last-child {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
 }
 
 .about-feature-link span {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .about-feature-link strong {
   color: var(--color-heading-soft);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .about-feature-link small {
   color: var(--color-text-faint);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.35;
 }
 
@@ -237,7 +237,7 @@
 .about-architecture,
 .about-technology,
 .about-experience {
-  padding: 45px 0 52px;
+  padding: 2.815rem 0 3.25rem;
 }
 
 .about-information-intro,
@@ -245,7 +245,7 @@
 .about-architecture-content,
 .about-technology-content,
 .about-experience-content {
-  max-width: 980px;
+  max-width: 61.25rem;
   margin: 0 auto;
 }
 
@@ -254,42 +254,42 @@
 .about-architecture-content h2,
 .about-technology-content h2,
 .about-experience-content h2 {
-  max-width: 620px;
-  margin: 0 0 16px;
+  max-width: 38.75rem;
+  margin: 0 0 1rem;
   color: var(--color-heading-deep);
-  font-size: clamp(28px, 3.2vw, 42px);
+  font-size: clamp(1.75rem, 3.2vw, 2.625rem);
   line-height: 1.12;
 }
 
 .about-information-intro > p,
 .about-experience-content > p {
-  max-width: 700px;
+  max-width: 43.75rem;
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.7;
 }
 
 .about-github-link {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  margin-top: 22px;
-  padding-bottom: 7px;
-  border-bottom: 2px solid var(--color-brand);
+  gap: 0.565rem;
+  margin-top: 1.375rem;
+  padding-bottom: 0.44rem;
+  border-bottom: 0.125rem solid var(--color-brand);
   color: var(--color-brand);
   font-weight: 800;
   text-decoration: none;
 }
 
 .about-github-link svg:first-child {
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .about-github-link svg:last-child {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
 }
 
 .about-github-link:hover {
@@ -299,24 +299,24 @@
 .about-developer-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  border-top: 1px solid var(--color-border-highlight);
-  border-bottom: 1px solid var(--color-border-highlight);
+  gap: 0.065rem;
+  border-top: 0.065rem solid var(--color-border-highlight);
+  border-bottom: 0.065rem solid var(--color-border-highlight);
 }
 
 .about-developer {
   display: flex;
   align-items: center;
-  gap: 9px;
-  min-height: 58px;
-  padding: 12px 16px 12px 0;
+  gap: 0.565rem;
+  min-height: 3.625rem;
+  padding: 0.75rem 1rem 0.75rem 0;
   color: var(--color-text-muted);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .about-developer svg {
-  width: 18px;
-  height: 18px;
+  width: 1.125rem;
+  height: 1.125rem;
   color: var(--color-brand);
   flex-shrink: 0;
 }
@@ -329,55 +329,55 @@
 .about-technology-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1px;
-  margin-top: 27px;
-  border-top: 1px solid var(--color-border-highlight);
-  border-bottom: 1px solid var(--color-border-highlight);
+  gap: 0.065rem;
+  margin-top: 1.69rem;
+  border-top: 0.065rem solid var(--color-border-highlight);
+  border-bottom: 0.065rem solid var(--color-border-highlight);
 }
 
 .about-architecture-layer,
 .about-technology-grid article {
   position: relative;
-  min-height: 188px;
-  padding: 24px 24px 25px 0;
+  min-height: 11.75rem;
+  padding: 1.5rem 1.5rem 1.565rem 0;
 }
 
 .about-architecture-layer + .about-architecture-layer,
 .about-technology-grid article + article {
-  padding-left: 24px;
-  border-left: 1px solid var(--color-border-highlight);
+  padding-left: 1.5rem;
+  border-left: 0.065rem solid var(--color-border-highlight);
 }
 
 .about-architecture-layer > svg,
 .about-technology-grid article > svg {
-  width: 22px;
-  height: 22px;
-  margin-bottom: 25px;
+  width: 1.375rem;
+  height: 1.375rem;
+  margin-bottom: 1.565rem;
   color: var(--color-brand);
 }
 
 .about-layer-number {
   position: absolute;
-  top: 25px;
-  right: 24px;
+  top: 1.565rem;
+  right: 1.5rem;
   color: var(--color-accent);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 800;
 }
 
 .about-architecture-layer h3,
 .about-technology-grid h3 {
-  margin: 0 0 8px;
+  margin: 0 0 0.5rem;
   color: var(--color-heading-soft);
-  font-size: 19px;
+  font-size: 1.19rem;
 }
 
 .about-architecture-layer p,
 .about-technology-grid p {
-  max-width: 270px;
+  max-width: 16.875rem;
   margin: 0;
   color: var(--color-text-faint);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.6;
 }
 
@@ -385,22 +385,22 @@
   display: flex;
   align-items: end;
   justify-content: space-between;
-  gap: 30px;
-  padding: 70px 0 20px;
+  gap: 1.875rem;
+  padding: 4.375rem 0 1.25rem;
 }
 
 .about-cta-kicker {
-  margin-bottom: 13px;
+  margin-bottom: 0.815rem;
 }
 
 .about-cta h2 {
-  max-width: 540px;
+  max-width: 33.75rem;
 }
 
 .about-cta-link {
   flex: 0 0 auto;
-  padding-bottom: 7px;
-  border-bottom: 2px solid var(--color-brand);
+  padding-bottom: 0.44rem;
+  border-bottom: 0.125rem solid var(--color-brand);
 }
 
 .about-cta-link:hover {
@@ -408,47 +408,47 @@
 }
 
 @keyframes about-reveal {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(0.875rem); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes about-float {
   0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-8px) rotate(2deg); }
+  50% { transform: translateY(-0.5rem) rotate(2deg); }
 }
 
 @media (max-width: 760px) {
   .about-page {
-    padding: 0 24px 120px;
+    padding: 0 1.5rem 7.5rem;
   }
 
   .about-hero {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 46px;
+    gap: 2.875rem;
     min-height: auto;
-    padding: 60px 0 70px;
+    padding: 3.75rem 0 4.375rem;
   }
 
   .about-hero-mark {
     align-self: center;
-    width: min(76vw, 310px);
+    width: min(76vw, 19.375rem);
     order: -1;
   }
 
   .about-story,
   .about-story-content {
     grid-template-columns: 1fr;
-    gap: 22px;
+    gap: 1.375rem;
   }
 
   .about-story {
-    padding: 42px 0 48px;
+    padding: 2.625rem 0 3rem;
   }
 
   .about-features {
-    padding: 42px 0 48px;
+    padding: 2.625rem 0 3rem;
   }
 
   .about-information,
@@ -456,7 +456,7 @@
   .about-architecture,
   .about-technology,
   .about-experience {
-    padding: 42px 0 48px;
+    padding: 2.625rem 0 3rem;
   }
 
   .about-developer-grid,
@@ -466,7 +466,7 @@
   }
 
   .about-developer {
-    min-height: 50px;
+    min-height: 3.125rem;
   }
 
   .about-architecture-layer,
@@ -474,22 +474,22 @@
   .about-architecture-layer + .about-architecture-layer,
   .about-technology-grid article + article {
     min-height: auto;
-    padding: 21px 0;
+    padding: 1.315rem 0;
     border-left: 0;
   }
 
   .about-architecture-layer + .about-architecture-layer,
   .about-technology-grid article + article {
-    border-top: 1px solid var(--color-border-highlight);
+    border-top: 0.065rem solid var(--color-border-highlight);
   }
 
   .about-architecture-layer > svg,
   .about-technology-grid article > svg {
-    margin-bottom: 17px;
+    margin-bottom: 1.065rem;
   }
 
   .about-layer-number {
-    top: 22px;
+    top: 1.375rem;
     right: 0;
   }
 
@@ -499,20 +499,20 @@
 
   .about-feature-link,
   .about-feature-link + .about-feature-link {
-    padding: 17px 0;
+    padding: 1.065rem 0;
     border-left: 0;
   }
 
   .about-feature-link + .about-feature-link {
-    border-top: 1px solid var(--color-border-highlight);
+    border-top: 0.065rem solid var(--color-border-highlight);
   }
 
   .about-cta {
     display: block;
-    padding-top: 52px;
+    padding-top: 3.25rem;
   }
 
   .about-cta-link {
-    margin-top: 26px;
+    margin-top: 1.625rem;
   }
 }

@@ -2,8 +2,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(32px, 8vw, 110px);
-  padding: 72px 24px calc(var(--bottom-navigation-height) + 24px);
+  gap: clamp(2rem, 8vw, 6.875rem);
+  padding: 4.5rem 1.5rem calc(var(--bottom-navigation-height) + 1.5rem);
   background: var(--gradient-not-found);
   color: var(--color-ink);
   overflow: hidden;
@@ -14,10 +14,10 @@
   display: flex;
   align-items: center;
   color: var(--color-brand);
-  font-size: clamp(92px, 16vw, 176px);
+  font-size: clamp(5.75rem, 16vw, 11rem);
   font-weight: 800;
   line-height: 0.8;
-  letter-spacing: -8px;
+  letter-spacing: -0.5rem;
 }
 
 .not-found-art::before,
@@ -25,20 +25,20 @@
   content: '';
   position: absolute;
   z-index: 0;
-  width: 170px;
-  height: 170px;
-  border: 1px solid color-mix(in srgb, var(--color-brand) 18%, transparent);
+  width: 10.625rem;
+  height: 10.625rem;
+  border: 0.065rem solid color-mix(in srgb, var(--color-brand) 18%, transparent);
   border-radius: 50%;
 }
 
 .not-found-art::before {
-  top: -38px;
-  left: -38px;
+  top: -2.375rem;
+  left: -2.375rem;
 }
 
 .not-found-art::after {
-  right: -38px;
-  bottom: -38px;
+  right: -2.375rem;
+  bottom: -2.375rem;
 }
 
 .not-found-number,
@@ -48,46 +48,46 @@
 }
 
 .not-found-pin {
-  width: clamp(66px, 10vw, 108px);
-  height: clamp(66px, 10vw, 108px);
-  margin: 0 10px;
+  width: clamp(4.125rem, 10vw, 6.75rem);
+  height: clamp(4.125rem, 10vw, 6.75rem);
+  margin: 0 0.625rem;
   color: var(--color-accent);
   stroke-width: 1.5;
 }
 
 .not-found-content {
-  max-width: 440px;
+  max-width: 27.5rem;
 }
 
 .not-found-eyebrow {
-  margin: 0 0 12px;
+  margin: 0 0 0.75rem;
   color: var(--color-accent);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 0.125rem;
   text-transform: uppercase;
 }
 
 .not-found-content h1 {
   margin: 0;
   color: var(--color-heading);
-  font-size: clamp(32px, 5vw, 52px);
+  font-size: clamp(2rem, 5vw, 3.25rem);
   line-height: 1.08;
 }
 
 .not-found-content p:not(.not-found-eyebrow) {
-  margin: 20px 0 28px;
+  margin: 1.25rem 0 1.75rem;
   color: var(--color-text-muted);
-  font-size: 17px;
+  font-size: 1.065rem;
   line-height: 1.65;
 }
 
 .not-found-home-link {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  padding: 13px 18px;
-  border-radius: 8px;
+  gap: 0.565rem;
+  padding: 0.815rem 1.125rem;
+  border-radius: 0.5rem;
   background: var(--color-brand);
   color: var(--color-surface);
   font-weight: 700;
@@ -97,30 +97,30 @@
 
 .not-found-home-link:hover {
   background: var(--color-brand-dark);
-  transform: translateY(-2px);
+  transform: translateY(-0.125rem);
 }
 
 .not-found-home-link:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--color-accent) 50%, transparent);
-  outline-offset: 3px;
+  outline: 0.19rem solid color-mix(in srgb, var(--color-accent) 50%, transparent);
+  outline-offset: 0.19rem;
 }
 
 @media (max-width: 680px) {
   .not-found-page {
     flex-direction: column;
-    gap: 30px;
+    gap: 1.875rem;
     justify-content: flex-start;
-    padding-top: 76px;
+    padding-top: 4.75rem;
     text-align: center;
   }
 
   .not-found-art {
-    font-size: 104px;
+    font-size: 6.5rem;
   }
 
   .not-found-pin {
-    width: 72px;
-    height: 72px;
+    width: 4.5rem;
+    height: 4.5rem;
   }
 
   .not-found-home-link {
