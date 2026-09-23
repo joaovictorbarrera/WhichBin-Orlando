@@ -19,9 +19,6 @@ public record UpdateUserRequest(
         String email,
 
         @Size(min = 8, max = 128, message = "Password must be between 8 and 128 characters")
-        String password,
-
-        @Size(max = 30, message = "Phone number must be 30 characters or fewer")
-        String phoneNumber
+        String password
 ) {
 }

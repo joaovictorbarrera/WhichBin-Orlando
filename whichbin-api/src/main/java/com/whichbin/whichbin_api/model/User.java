@@ -37,9 +37,6 @@ public class User {
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 
-    @Column(name = "phone_number", length = 30)
-    private String phoneNumber;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
@@ -49,12 +46,11 @@ public class User {
     protected User() {
     }
 
-    public User(String firstName, String lastName, String email, String passwordHash, String phoneNumber) {
+    public User(String firstName, String lastName, String email, String passwordHash) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.passwordHash = passwordHash;
-        this.phoneNumber = phoneNumber;
     }
 
     @PrePersist
@@ -103,14 +99,6 @@ public class User {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
     }
 
     public OffsetDateTime getCreatedAt() {

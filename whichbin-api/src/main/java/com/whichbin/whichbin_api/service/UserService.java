@@ -60,8 +60,7 @@ public class UserService {
                 normalizeText(request.firstName()),
                 normalizeText(request.lastName()),
                 normalizedEmail,
-                passwordEncoder.encode(request.password()),
-                normalizeNullableText(request.phoneNumber())
+                passwordEncoder.encode(request.password())
         );
 
         User savedUser = userRepository.save(user);
@@ -80,7 +79,6 @@ public class UserService {
         user.setFirstName(normalizeText(request.firstName()));
         user.setLastName(normalizeText(request.lastName()));
         user.setEmail(normalizedEmail);
-        user.setPhoneNumber(normalizeNullableText(request.phoneNumber()));
 
         if (request.password() != null && !request.password().isBlank()) {
             user.setPasswordHash(passwordEncoder.encode(request.password()));
@@ -106,7 +104,6 @@ public class UserService {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
-                user.getPhoneNumber(),
                 user.getCreatedAt(),
                 user.getUpdatedAt()
         );
@@ -117,14 +114,6 @@ public class UserService {
     }
 
     private String normalizeText(String value) {
-        return value.trim();
-    }
-
-    private String normalizeNullableText(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-
         return value.trim();
     }
 }
