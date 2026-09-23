@@ -90,11 +90,6 @@ function Navigation() {
                 <span>Help / How to Use</span>
               </NavLink>
 
-              <NavLink to="/settings" onClick={closeMenu}>
-                <FiSettings />
-                <span>Settings</span>
-              </NavLink>
-
               <NavLink to="/admin/login" onClick={closeMenu}>
                 <FiLock />
                 <span>Admin Login</span>
