@@ -10,6 +10,7 @@ import {
   FiHelpCircle,
   FiSettings,
   FiLock,
+  FiActivity,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
 import './Navigation.css'
@@ -76,6 +77,11 @@ function Navigation() {
                 <FiLock />
                 <span>Admin Login</span>
               </Link>
+
+              <Link to="/apistatus" onClick={closeMenu}>
+                <FiActivity />
+                <span>API Status</span>
+              </Link>
             </div>
           )}
         </div>
@@ -101,6 +107,7 @@ function Navigation() {
           <FiBell />
           <span>Announcements</span>
         </Link>
+
       </nav>
     </>
   )
