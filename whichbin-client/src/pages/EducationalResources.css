@@ -1,16 +1,16 @@
 .resources-page {
-  background-color: #f7faf8;
+  background-color: var(--color-page);
 }
 
 .resources-page h1 {
   margin: 0 0 8px;
-  color: #123d32;
+  color: var(--color-heading-deep);
   font-size: 32px;
 }
 
 .resources-intro {
   margin: 0 0 30px;
-  color: #4f625d;
+  color: var(--color-text-muted);
   line-height: 1.6;
   font-size: 16px;
 }
@@ -25,10 +25,10 @@
   display: flex;
   align-items: center;
   padding: 20px;
-  background-color: white;
+  background-color: var(--color-surface);
   border-radius: 16px;
-  border: 1px solid #dce7e1;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-card);
   text-decoration: none;
   color: inherit;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -36,7 +36,7 @@
 
 .resource-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.10);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .resource-icon {
@@ -47,8 +47,8 @@
   justify-content: center;
   margin-right: 18px;
   border-radius: 14px;
-  background-color: #e4f3e9;
-  color: #2e7d32;
+  background-color: var(--color-surface-green);
+  color: var(--color-brand);
   font-size: 28px;
   flex-shrink: 0;
 }
@@ -59,20 +59,20 @@
 
 .resource-content h2 {
   margin: 0 0 6px;
-  color: #173d35;
+  color: var(--color-heading-soft);
   font-size: 18px;
 }
 
 .resource-content p {
   margin: 0;
-  color: #61716c;
+  color: var(--color-text-soft);
   font-size: 14px;
   line-height: 1.5;
 }
 
 .resource-arrow {
   margin-left: 15px;
-  color: #2e7d32;
+  color: var(--color-brand);
   font-size: 30px;
   font-weight: 300;
 }

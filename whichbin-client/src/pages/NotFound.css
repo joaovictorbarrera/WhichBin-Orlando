@@ -4,8 +4,8 @@
   justify-content: center;
   gap: clamp(32px, 8vw, 110px);
   padding: 72px 24px calc(var(--bottom-navigation-height) + 24px);
-  background: linear-gradient(135deg, #f5f8f5 0%, #eaf3ed 100%);
-  color: #294238;
+  background: var(--gradient-not-found);
+  color: var(--color-ink);
   overflow: hidden;
 }
 
@@ -13,7 +13,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  color: #2e7d32;
+  color: var(--color-brand);
   font-size: clamp(92px, 16vw, 176px);
   font-weight: 800;
   line-height: 0.8;
@@ -27,7 +27,7 @@
   z-index: 0;
   width: 170px;
   height: 170px;
-  border: 1px solid rgba(46, 125, 50, 0.18);
+  border: 1px solid color-mix(in srgb, var(--color-brand) 18%, transparent);
   border-radius: 50%;
 }
 
@@ -51,7 +51,7 @@
   width: clamp(66px, 10vw, 108px);
   height: clamp(66px, 10vw, 108px);
   margin: 0 10px;
-  color: #d28a32;
+  color: var(--color-accent);
   stroke-width: 1.5;
 }
 
@@ -61,7 +61,7 @@
 
 .not-found-eyebrow {
   margin: 0 0 12px;
-  color: #d28a32;
+  color: var(--color-accent);
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 2px;
@@ -70,14 +70,14 @@
 
 .not-found-content h1 {
   margin: 0;
-  color: #1f362c;
+  color: var(--color-heading);
   font-size: clamp(32px, 5vw, 52px);
   line-height: 1.08;
 }
 
 .not-found-content p:not(.not-found-eyebrow) {
   margin: 20px 0 28px;
-  color: #607169;
+  color: var(--color-text-muted);
   font-size: 17px;
   line-height: 1.65;
 }
@@ -88,20 +88,20 @@
   gap: 9px;
   padding: 13px 18px;
   border-radius: 8px;
-  background: #2e7d32;
-  color: white;
+  background: var(--color-brand);
+  color: var(--color-surface);
   font-weight: 700;
   text-decoration: none;
   transition: background-color 160ms ease, transform 160ms ease;
 }
 
 .not-found-home-link:hover {
-  background: #256628;
+  background: var(--color-brand-dark);
   transform: translateY(-2px);
 }
 
 .not-found-home-link:focus-visible {
-  outline: 3px solid rgba(210, 138, 50, 0.5);
+  outline: 3px solid color-mix(in srgb, var(--color-accent) 50%, transparent);
   outline-offset: 3px;
 }
 
