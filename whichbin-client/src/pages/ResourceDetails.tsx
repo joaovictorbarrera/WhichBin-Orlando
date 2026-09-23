@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { FiArrowLeft } from 'react-icons/fi'
 import {
   getResourceById,
   type Resource,
@@ -43,6 +44,7 @@ function ResourceDetails() {
     return (
       <PageLayout className="resource-details-page" width="wide">
         <Link to="/resources" className="resource-back-link">
+          <FiArrowLeft aria-hidden="true" />
           Back to Educational Resources
         </Link>
 
@@ -57,6 +59,7 @@ function ResourceDetails() {
     return (
       <PageLayout className="resource-details-page" width="wide">
         <Link to="/resources" className="resource-back-link">
+          <FiArrowLeft aria-hidden="true" />
           Back to Educational Resources
         </Link>
 
@@ -71,6 +74,7 @@ function ResourceDetails() {
   return (
     <PageLayout className="resource-details-page" width="wide">
       <Link to="/resources" className="resource-back-link">
+        <FiArrowLeft aria-hidden="true" />
         Back to Educational Resources
       </Link>
 
