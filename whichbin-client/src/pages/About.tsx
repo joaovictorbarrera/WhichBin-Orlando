@@ -1,4 +1,17 @@
-import { FiArrowRight, FiBell, FiCheck, FiHeart, FiMapPin, FiSearch, FiTarget } from 'react-icons/fi'
+import {
+  FiArrowRight,
+  FiAward,
+  FiBell,
+  FiCode,
+  FiDatabase,
+  FiGitBranch,
+  FiGithub,
+  FiMapPin,
+  FiMonitor,
+  FiSearch,
+  FiServer,
+  FiUsers,
+} from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import PageLayout from '../components/PageLayout'
@@ -48,10 +61,9 @@ function About() {
         </div>
       </section>
 
-      <section className="about-features" aria-labelledby="about-features-heading">
-        <div className="about-section-label">A simple public toolkit</div>
+      <section className="about-features" aria-label="Public recycling toolkit">
         <div className="about-features-content">
-          <h2 id="about-features-heading">Everything you need for the next decision.</h2>
+          <div className="about-section-label">A simple public toolkit</div>
           <div className="about-feature-links">
             <Link to="/item-search" className="about-feature-link">
               <FiSearch />
@@ -72,25 +84,117 @@ function About() {
         </div>
       </section>
 
-      <section className="about-pillars" aria-label="WhichBin principles">
-        <article className="about-pillar">
-          <span className="about-pillar-icon"><FiTarget /></span>
-          <span className="about-pillar-number">01</span>
-          <h2>Local first</h2>
-          <p>Guidance shaped around Orlando households and the choices they make every day.</p>
-        </article>
-        <article className="about-pillar">
-          <span className="about-pillar-icon"><FiCheck /></span>
-          <span className="about-pillar-number">02</span>
-          <h2>Clear by design</h2>
-          <p>Useful answers without the jargon, uncertainty, or extra digging.</p>
-        </article>
-        <article className="about-pillar">
-          <span className="about-pillar-icon"><FiHeart /></span>
-          <span className="about-pillar-number">03</span>
-          <h2>Better together</h2>
-          <p>Small decisions add up when a whole community has the same information.</p>
-        </article>
+      <section className="about-information" aria-labelledby="about-information-heading">
+        <div className="about-section-label">Project overview</div>
+        <div className="about-information-intro">
+          <h2 id="about-information-heading">A resident-focused project for clearer recycling decisions.</h2>
+          <p>
+            WhichBin Orlando explores how local recycling information can be easier
+            to find and understand. It complements existing collection services by
+            focusing on the question residents ask when an item is in their hands:
+            what should I do with this?
+          </p>
+          <a
+            className="about-github-link"
+            href="https://github.com/joaovictorbarrera/WhichBin-Orlando"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <FiGithub aria-hidden="true" />
+            View the project on GitHub
+            <FiArrowRight aria-hidden="true" />
+          </a>
+        </div>
+      </section>
+
+      <section className="about-team" aria-labelledby="about-team-heading">
+        <div className="about-section-label">The people behind WhichBin</div>
+        <div className="about-team-content">
+          <h2 id="about-team-heading">Built by a collaborative team.</h2>
+          <div className="about-developer-grid">
+            {[
+              'Joao Barrera',
+              'Christopher Ramirez',
+              'Alejandro Coro',
+              'Todd Uhl',
+              'Argenis Santiago',
+              'Alicia Cason',
+              'CJ VanZile',
+            ].map((developer) => (
+              <div
+                className={`about-developer ${developer === 'Joao Barrera' ? 'about-developer-lead' : ''}`.trim()}
+                key={developer}
+              >
+                {developer === 'Joao Barrera' ? <FiAward aria-hidden="true" /> : <FiUsers aria-hidden="true" />}
+                <span>{developer}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="about-architecture" aria-labelledby="about-architecture-heading">
+        <div className="about-section-label">Software architecture</div>
+        <div className="about-architecture-content">
+          <h2 id="about-architecture-heading">A clear path from question to answer.</h2>
+          <div className="about-architecture-grid">
+            <article className="about-architecture-layer">
+              <FiMonitor aria-hidden="true" />
+              <span className="about-layer-number">01</span>
+              <h3>React frontend</h3>
+              <p>The presentation layer gives residents a simple, responsive way to search and learn.</p>
+            </article>
+            <article className="about-architecture-layer">
+              <FiServer aria-hidden="true" />
+              <span className="about-layer-number">02</span>
+              <h3>Spring Boot API</h3>
+              <p>The application layer processes requests and returns recycling information as JSON.</p>
+            </article>
+            <article className="about-architecture-layer">
+              <FiDatabase aria-hidden="true" />
+              <span className="about-layer-number">03</span>
+              <h3>MySQL database</h3>
+              <p>The data layer stores searchable items, instructions, resources, and announcements.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="about-technology" aria-labelledby="about-technology-heading">
+        <div className="about-section-label">Technology and hosting</div>
+        <div className="about-technology-content">
+          <h2 id="about-technology-heading">Purposeful tools behind the experience.</h2>
+          <div className="about-technology-grid">
+            <article>
+              <FiCode aria-hidden="true" />
+              <h3>Frontend</h3>
+              <p>React, developed in Visual Studio Code and hosted with Vercel.</p>
+            </article>
+            <article>
+              <FiGitBranch aria-hidden="true" />
+              <h3>Backend</h3>
+              <p>Java Spring Boot and Maven, with the API hosted on Railway.</p>
+            </article>
+            <article>
+              <FiDatabase aria-hidden="true" />
+              <h3>Collaboration</h3>
+              <p>MySQL, Git, and GitHub support persistent data and team delivery.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="about-experience" aria-labelledby="about-experience-heading">
+        <div className="about-section-label">User experience</div>
+        <div className="about-experience-content">
+          <h2 id="about-experience-heading">Simple enough to use in the moment.</h2>
+          <p>
+            WhichBin is designed for phones, tablets, and desktop screens with
+            readable typography, clear actions, consistent layouts, and accessible
+            navigation. The goal is to help someone find an answer and move on,
+            without asking residents to create an account or sort through unnecessary detail.
+          </p>
+        </div>
       </section>
 
       <section className="about-cta">

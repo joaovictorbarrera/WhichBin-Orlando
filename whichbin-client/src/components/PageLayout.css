@@ -1,20 +1,15 @@
 :root {
-  --top-navigation-height: 59px;
-  --bottom-navigation-height: 61px;
+  --top-navigation-height: 3.69rem;
+  --bottom-navigation-height: 3.815rem;
 }
 
 .page-layout {
   min-height: calc(100dvh - var(--top-navigation-height));
-  padding: 40px 20px calc(var(--bottom-navigation-height) + 24px);
-}
-
-.page-layout-narrow {
-  max-width: 700px;
-  margin: 0 auto;
+  padding: 2.5rem 1.25rem calc(var(--bottom-navigation-height) + 1.5rem);
 }
 
 .page-layout-wide {
-  max-width: 900px;
+  max-width: 56.25rem;
   margin: 0 auto;
 }
 
@@ -24,12 +19,12 @@
 
 @media (max-width: 600px) {
   .page-layout {
-    padding: 30px 16px calc(var(--bottom-navigation-height) + 24px);
+    padding: 1.875rem 1rem calc(var(--bottom-navigation-height) + 1.5rem);
   }
 }
 
 @media (min-width: 1024px) {
   :root {
-    --bottom-navigation-height: 0px;
+    --bottom-navigation-height: 0;
   }
 }

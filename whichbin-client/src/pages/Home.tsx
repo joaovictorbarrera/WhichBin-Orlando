@@ -36,25 +36,25 @@ function Home() {
         </div>
       </section>
 
-      <section className="home-highlights" aria-label="WhichBin highlights">
-        <article>
-          <span className="highlight-number">01</span>
-          <FiSearch className="highlight-icon" aria-hidden="true" />
-          <h2>Search with confidence</h2>
-          <p>Find the right disposal category and instructions for an item.</p>
-        </article>
-        <article>
-          <span className="highlight-number">02</span>
-          <FaRecycle className="highlight-icon" aria-hidden="true" />
-          <h2>Learn what helps</h2>
-          <p>Build better habits with clear recycling education.</p>
-        </article>
-        <article>
-          <span className="highlight-number">03</span>
-          <FiBell className="highlight-icon" aria-hidden="true" />
-          <h2>Stay up to date</h2>
-          <p>See announcements about local changes and disposal guidance.</p>
-        </article>
+      <section className="home-toolkit" aria-label="Public recycling toolkit">
+        <div className="home-toolkit-label">A simple public toolkit</div>
+        <div className="home-toolkit-links">
+          <Link to="/item-search" className="home-toolkit-link">
+            <FiSearch aria-hidden="true" />
+            <span><strong>Search with confidence</strong><small>Find the right disposal answer</small></span>
+            <FiArrowRight aria-hidden="true" />
+          </Link>
+          <Link to="/resources" className="home-toolkit-link">
+            <FaRecycle aria-hidden="true" />
+            <span><strong>Learn what helps</strong><small>Browse recycling resources</small></span>
+            <FiArrowRight aria-hidden="true" />
+          </Link>
+          <Link to="/announcements" className="home-toolkit-link">
+            <FiBell aria-hidden="true" />
+            <span><strong>Stay up to date</strong><small>See local recycling updates</small></span>
+            <FiArrowRight aria-hidden="true" />
+          </Link>
+        </div>
       </section>
     </PageLayout>
   );
