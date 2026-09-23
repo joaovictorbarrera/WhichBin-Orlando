@@ -27,3 +27,9 @@
     padding: 30px 16px calc(var(--bottom-navigation-height) + 24px);
   }
 }
+
+@media (min-width: 1024px) {
+  :root {
+    --bottom-navigation-height: 0px;
+  }
+}

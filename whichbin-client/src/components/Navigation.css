@@ -13,8 +13,12 @@
 .app-title {
   color: #2e7d32;
   text-decoration: none;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
+}
+
+.desktop-navigation {
+  display: none;
 }
 
 .menu-container {
@@ -79,6 +83,12 @@
   color: #2e7d32;
 }
 
+.dropdown-menu a.active,
+.desktop-nav-item.active,
+.nav-item.active {
+  color: #2e7d32;
+}
+
 .dropdown-menu svg {
   width: 20px;
   height: 20px;
@@ -120,12 +130,38 @@
   color: #2e7d32;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
+  .desktop-navigation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    margin-right: 24px;
+  }
+
+  .desktop-nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    color: #40534d;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .desktop-nav-item svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .desktop-nav-item:hover {
+    background: #f1f7f3;
+    color: #2e7d32;
+  }
+
   .bottom-navigation {
-    max-width: 700px;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    border-radius: 14px 14px 0 0;
+    display: none;
   }
 }
