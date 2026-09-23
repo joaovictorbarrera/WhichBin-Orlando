@@ -4,6 +4,7 @@ public record LoginResponse(
         Long id,
         String firstName,
         String lastName,
-        String email
+        String email,
+        String authorization
 ) {
 }
