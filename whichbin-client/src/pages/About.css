@@ -6,9 +6,14 @@
 
 .about-hero,
 .about-story,
-.about-pillars,
+.about-features,
+.about-information,
+.about-team,
+.about-architecture,
+.about-technology,
+.about-experience,
 .about-cta {
-  max-width: 1180px;
+  max-width: 980px;
   margin: 0 auto;
 }
 
@@ -43,7 +48,7 @@
   max-width: 640px;
   margin: 0;
   color: var(--color-heading);
-  font-size: clamp(44px, 5.8vw, 74px);
+  font-size: clamp(40px, 4.8vw, 60px);
   line-height: 1.02;
 }
 
@@ -131,15 +136,19 @@
 }
 
 .about-story {
-  display: grid;
-  grid-template-columns: minmax(160px, 0.45fr) minmax(0, 1.55fr);
-  gap: 45px;
   padding: 52px 0 58px;
-  border-top: 1px solid var(--color-border-highlight);
+}
+
+.about-story .about-section-label {
+  margin: 0 auto 16px;
 }
 
 .about-section-label {
+  max-width: 980px;
+  margin: 0 auto 16px;
   padding-top: 7px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border-highlight);
   color: var(--color-accent);
   font-size: 12px;
   font-weight: 800;
@@ -151,6 +160,8 @@
   display: grid;
   grid-template-columns: minmax(220px, 0.9fr) minmax(0, 1fr);
   gap: clamp(28px, 6vw, 90px);
+  max-width: 980px;
+  margin: 0 auto;
 }
 
 .about-story h2,
@@ -173,19 +184,17 @@
 }
 
 .about-features {
-  display: grid;
-  grid-template-columns: minmax(160px, 0.45fr) minmax(0, 1.55fr);
-  gap: 45px;
   padding: 45px 0 52px;
-  border-top: 1px solid var(--color-border-highlight);
 }
 
-.about-features-content h2 {
-  max-width: 430px;
-  margin: 0 0 23px;
-  color: var(--color-heading-deep);
-  font-size: clamp(28px, 3.2vw, 42px);
-  line-height: 1.12;
+.about-features-content {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.about-features-content .about-section-label {
+  padding-top: 0;
+  margin: 0 auto 13px;
 }
 
 .about-feature-links {
@@ -244,58 +253,175 @@
   color: var(--color-brand-deep);
 }
 
-.about-pillars {
+.about-information,
+.about-team,
+.about-architecture,
+.about-technology,
+.about-experience {
+  padding: 45px 0 52px;
+}
+
+.about-information-intro,
+.about-team-content,
+.about-architecture-content,
+.about-technology-content,
+.about-experience-content {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.about-information-intro h2,
+.about-team-content h2,
+.about-architecture-content h2,
+.about-technology-content h2,
+.about-experience-content h2 {
+  max-width: 620px;
+  margin: 0 0 16px;
+  color: var(--color-heading-deep);
+  font-size: clamp(28px, 3.2vw, 42px);
+  line-height: 1.12;
+}
+
+.about-information-intro > p,
+.about-experience-content > p {
+  max-width: 700px;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.about-github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 22px;
+  padding-bottom: 7px;
+  border-bottom: 2px solid var(--color-brand);
+  color: var(--color-brand);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.about-github-link svg:first-child {
+  width: 20px;
+  height: 20px;
+}
+
+.about-github-link svg:last-child {
+  width: 16px;
+  height: 16px;
+}
+
+.about-github-link:hover {
+  color: var(--color-brand-deep);
+}
+
+.about-developer-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px;
   border-top: 1px solid var(--color-border-highlight);
   border-bottom: 1px solid var(--color-border-highlight);
 }
 
-.about-pillar {
-  position: relative;
-  min-height: 245px;
-  padding: 28px 28px 30px 0;
+.about-developer {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 58px;
+  padding: 12px 16px 12px 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
 }
 
-.about-pillar + .about-pillar {
-  padding-left: 28px;
+.about-developer svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-brand);
+  flex-shrink: 0;
+}
+
+.about-developer-lead svg {
+  color: var(--color-accent);
+}
+
+.about-architecture-grid,
+.about-technology-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 27px;
+  border-top: 1px solid var(--color-border-highlight);
+  border-bottom: 1px solid var(--color-border-highlight);
+}
+
+.about-architecture-layer,
+.about-technology-grid article {
+  position: relative;
+  min-height: 188px;
+  padding: 24px 24px 25px 0;
+}
+
+.about-architecture-layer + .about-architecture-layer,
+.about-technology-grid article + article {
+  padding-left: 24px;
   border-left: 1px solid var(--color-border-highlight);
 }
 
-.about-pillar-icon {
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  margin-bottom: 30px;
-  border-radius: 50%;
-  background: var(--color-surface-green);
+.about-architecture-layer > svg,
+.about-technology-grid article > svg {
+  width: 22px;
+  height: 22px;
+  margin-bottom: 25px;
   color: var(--color-brand);
-  font-size: 20px;
 }
 
-.about-pillar-number {
+.about-layer-number {
   position: absolute;
-  top: 30px;
-  right: 28px;
+  top: 25px;
+  right: 24px;
   color: var(--color-accent);
   font-size: 12px;
   font-weight: 800;
 }
 
-.about-pillar h2 {
-  margin: 0 0 9px;
+.about-architecture-layer h3,
+.about-technology-grid h3 {
+  margin: 0 0 8px;
   color: var(--color-heading-soft);
-  font-size: 21px;
+  font-size: 19px;
 }
 
-.about-pillar p {
-  max-width: 260px;
+.about-architecture-layer p,
+.about-technology-grid p {
+  max-width: 270px;
   margin: 0;
   color: var(--color-text-faint);
   font-size: 14px;
   line-height: 1.6;
+}
+
+.about-architecture-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding-top: 24px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 700;
+  flex-wrap: wrap;
+}
+
+.about-architecture-flow > svg:first-child {
+  color: var(--color-brand);
+}
+
+.about-architecture-flow > svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
 }
 
 .about-cta {
@@ -355,8 +481,7 @@
   }
 
   .about-story,
-  .about-story-content,
-  .about-features {
+  .about-story-content {
     grid-template-columns: 1fr;
     gap: 22px;
   }
@@ -369,23 +494,52 @@
     padding: 42px 0 48px;
   }
 
-  .about-pillars {
+  .about-information,
+  .about-team,
+  .about-architecture,
+  .about-technology,
+  .about-experience {
+    padding: 42px 0 48px;
+  }
+
+  .about-developer-grid,
+  .about-architecture-grid,
+  .about-technology-grid {
     grid-template-columns: 1fr;
   }
 
-  .about-pillar,
-  .about-pillar + .about-pillar {
+  .about-developer {
+    min-height: 50px;
+  }
+
+  .about-architecture-layer,
+  .about-technology-grid article,
+  .about-architecture-layer + .about-architecture-layer,
+  .about-technology-grid article + article {
     min-height: auto;
-    padding: 26px 0;
+    padding: 21px 0;
     border-left: 0;
   }
 
-  .about-pillar + .about-pillar {
+  .about-architecture-layer + .about-architecture-layer,
+  .about-technology-grid article + article {
     border-top: 1px solid var(--color-border-highlight);
   }
 
-  .about-pillar-icon {
-    margin-bottom: 20px;
+  .about-architecture-layer > svg,
+  .about-technology-grid article > svg {
+    margin-bottom: 17px;
+  }
+
+  .about-layer-number {
+    top: 22px;
+    right: 0;
+  }
+
+  .about-architecture-flow {
+    justify-content: flex-start;
+    gap: 10px;
+    line-height: 1.4;
   }
 
   .about-feature-links {
@@ -400,11 +554,6 @@
 
   .about-feature-link + .about-feature-link {
     border-top: 1px solid var(--color-border-highlight);
-  }
-
-  .about-pillar-number {
-    top: 28px;
-    right: 0;
   }
 
   .about-cta {

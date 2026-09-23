@@ -42,15 +42,12 @@
 }
 
 .help-section-heading {
-  display: grid;
-  grid-template-columns: 0.75fr 1.25fr;
-  gap: 28px;
-  padding: 39px 0 25px;
+  padding: 39px 0 27px;
 }
 
 .help-section-label {
   display: block;
-  padding-top: 6px;
+  margin-bottom: 13px;
   color: var(--color-accent);
   font-size: 12px;
   font-weight: 800;
@@ -241,7 +238,6 @@
     font-size: 16px;
   }
 
-  .help-section-heading,
   .help-tips {
     grid-template-columns: 1fr;
     gap: 17px;

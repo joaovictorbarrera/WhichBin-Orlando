@@ -134,43 +134,75 @@
 .label-right { top: 48%; right: -3%; }
 .label-bottom { bottom: 5%; left: 37%; }
 
-.home-highlights {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1px;
-  max-width: 1180px;
-  margin: 0 auto;
+.home-toolkit {
+  max-width: 980px;
+  margin: 54px auto 0;
+  padding-top: 38px;
   border-top: 1px solid var(--color-border-highlight);
 }
 
-.home-highlights article {
-  padding: 27px 20px 0 0;
+.home-toolkit-label {
+  margin-bottom: 13px;
+  color: var(--color-accent);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
 }
 
-.highlight-icon {
-  display: block;
+.home-toolkit-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--color-border-highlight);
+  border-bottom: 1px solid var(--color-border-highlight);
+}
+
+.home-toolkit-link {
+  display: grid;
+  grid-template-columns: 25px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 10px;
+  min-height: 104px;
+  padding: 16px 14px 16px 0;
+  color: var(--color-brand);
+  text-decoration: none;
+}
+
+.home-toolkit-link + .home-toolkit-link {
+  padding-left: 14px;
+  border-left: 1px solid var(--color-border-highlight);
+}
+
+.home-toolkit-link > svg {
   width: 20px;
   height: 20px;
-  margin: 14px 0 15px;
-  color: var(--color-brand);
 }
 
-.highlight-number {
-  color: var(--color-accent);
-  font-size: 13px;
-  font-weight: 700;
+.home-toolkit-link > svg:last-child {
+  width: 16px;
+  height: 16px;
 }
 
-.home-highlights h2 {
-  margin: 0 0 8px;
-  color: var(--color-ink);
-  font-size: 22px;
+.home-toolkit-link span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.home-highlights p {
-  margin: 0;
+.home-toolkit-link strong {
+  color: var(--color-heading-soft);
+  font-size: 14px;
+}
+
+.home-toolkit-link small {
   color: var(--color-text-faint);
-  line-height: 1.5;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.home-toolkit-link:hover strong,
+.home-toolkit-link:hover > svg:last-child {
+  color: var(--color-brand-deep);
 }
 
 @keyframes home-reveal {
@@ -209,14 +241,24 @@
   .home-intro {
     font-size: 17px;
   }
-}
 
-@media (max-width: 460px) {
-  .home-highlights {
+  .home-toolkit {
+    margin-top: 45px;
+    padding-top: 31px;
+  }
+
+  .home-toolkit-links {
     grid-template-columns: 1fr;
   }
 
-  .home-highlights article {
-    padding-bottom: 4px;
+  .home-toolkit-link,
+  .home-toolkit-link + .home-toolkit-link {
+    padding: 17px 0;
+    border-left: 0;
+  }
+
+  .home-toolkit-link + .home-toolkit-link {
+    border-top: 1px solid var(--color-border-highlight);
   }
 }
+
