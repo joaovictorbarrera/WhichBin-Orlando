@@ -8,11 +8,6 @@
   padding: 40px 20px calc(var(--bottom-navigation-height) + 24px);
 }
 
-.page-layout-narrow {
-  max-width: 700px;
-  margin: 0 auto;
-}
-
 .page-layout-wide {
   max-width: 900px;
   margin: 0 auto;

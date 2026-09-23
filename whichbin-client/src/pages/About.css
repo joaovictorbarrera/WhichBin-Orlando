@@ -114,27 +114,6 @@
   box-shadow: var(--shadow-brand);
 }
 
-.about-mark-caption {
-  position: absolute;
-  top: 9%;
-  left: 7%;
-  color: var(--color-text-subtle);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  transform: rotate(-12deg);
-}
-
-.about-mark-caption-bottom {
-  top: auto;
-  right: 3%;
-  bottom: 13%;
-  left: auto;
-  color: var(--color-accent);
-  transform: rotate(10deg);
-}
-
 .about-story {
   padding: 52px 0 58px;
 }
