@@ -1,15 +1,11 @@
 .resource-details-page {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 40px 20px 110px;
-  background-color: #f7faf8;
-  min-height: 100vh;
+  background-color: var(--color-page);
 }
 
 .resource-back-link {
   display: inline-block;
   margin-bottom: 24px;
-  color: #2e7d32;
+  color: var(--color-brand);
   text-decoration: none;
   font-weight: 600;
 }
@@ -19,22 +15,22 @@
 }
 
 .resource-details-card {
-  background: white;
+  background: var(--color-surface);
   border-radius: 16px;
   padding: 40px;
-  border: 1px solid #dce7e1;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-details);
 }
 
 .resource-details-card h1 {
   margin: 0 0 12px;
-  color: #123d32;
+  color: var(--color-heading-deep);
   font-size: 32px;
 }
 
 .resource-details-card > p {
   margin: 0 0 32px;
-  color: #4f625d;
+  color: var(--color-text-muted);
   line-height: 1.7;
   font-size: 18px;
 }
@@ -47,28 +43,28 @@
 }
 
 .resource-section-green {
-  background: #f1f7f3;
-  border-left-color: #4caf50;
+  background: var(--color-surface-hover);
+  border-left-color: var(--color-success);
 }
 
 .resource-section-blue {
-  background: #f1f7f9;
-  border-left-color: #2196a3;
+  background: var(--color-surface-blue);
+  border-left-color: var(--color-info);
 }
 
 .resource-section-orange {
-  background: #fff7ed;
-  border-left-color: #f59e0b;
+  background: var(--color-surface-orange);
+  border-left-color: var(--color-warning);
 }
 
 .resource-section-red {
-  background: #fff2f2;
-  border-left-color: #e05a5a;
+  background: var(--color-surface-red);
+  border-left-color: var(--color-danger);
 }
 
 .resource-details-card section h2 {
   margin: 0 0 16px;
-  color: #173d35;
+  color: var(--color-heading-soft);
   font-size: 22px;
 }
 
@@ -79,7 +75,7 @@
 
 .resource-details-card li {
   margin-bottom: 10px;
-  color: #40534d;
+  color: var(--color-text);
   line-height: 1.6;
 }
 
@@ -88,10 +84,6 @@
 }
 
 @media (max-width: 600px) {
-  .resource-details-page {
-    padding: 30px 16px 110px;
-  }
-
   .resource-details-card {
     padding: 24px 20px;
     border-radius: 14px;

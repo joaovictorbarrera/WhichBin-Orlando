@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import {
   FiHome,
   FiSearch,
@@ -10,6 +10,7 @@ import {
   FiHelpCircle,
   FiSettings,
   FiLock,
+  FiActivity,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
 import './Navigation.css'
@@ -42,9 +43,31 @@ function Navigation() {
   return (
     <>
       <header className="top-navigation">
-        <Link to="/" className="app-title" onClick={closeMenu}>
+        <NavLink to="/" end className="app-title" onClick={closeMenu}>
           WhichBin Orlando
-        </Link>
+        </NavLink>
+
+        <nav className="desktop-navigation" aria-label="Primary navigation">
+          <NavLink to="/" end className="desktop-nav-item" onClick={closeMenu}>
+            <FiHome />
+            <span>Home</span>
+          </NavLink>
+
+          <NavLink to="/item-search" className="desktop-nav-item" onClick={closeMenu}>
+            <FiSearch />
+            <span>Search</span>
+          </NavLink>
+
+          <NavLink to="/resources" className="desktop-nav-item" onClick={closeMenu}>
+            <FaRecycle />
+            <span>Resources</span>
+          </NavLink>
+
+          <NavLink to="/announcements" className="desktop-nav-item" onClick={closeMenu}>
+            <FiBell />
+            <span>Announcements</span>
+          </NavLink>
+        </nav>
 
         <div className="menu-container" ref={menuRef}>
           <button
@@ -57,50 +80,56 @@ function Navigation() {
 
           {menuOpen && (
             <div className="dropdown-menu">
-              <Link to="/about" onClick={closeMenu}>
+              <NavLink to="/about" onClick={closeMenu}>
                 <FiInfo />
                 <span>About</span>
-              </Link>
+              </NavLink>
 
-              <Link to="/help" onClick={closeMenu}>
+              <NavLink to="/help" onClick={closeMenu}>
                 <FiHelpCircle />
                 <span>Help / How to Use</span>
-              </Link>
+              </NavLink>
 
-              <Link to="/settings" onClick={closeMenu}>
+              <NavLink to="/settings" onClick={closeMenu}>
                 <FiSettings />
                 <span>Settings</span>
-              </Link>
+              </NavLink>
 
-              <Link to="/admin/login" onClick={closeMenu}>
+              <NavLink to="/admin/login" onClick={closeMenu}>
                 <FiLock />
                 <span>Admin Login</span>
-              </Link>
+              </NavLink>
+
+              <NavLink to="/apistatus" onClick={closeMenu}>
+                <FiActivity />
+                <span>API Status</span>
+              </NavLink>
             </div>
           )}
         </div>
       </header>
 
       <nav className="bottom-navigation">
-        <Link to="/" className="nav-item">
+        <NavLink to="/" end className="nav-item">
           <FiHome />
           <span>Home</span>
-        </Link>
+        </NavLink>
 
-        <Link to="/item-search" className="nav-item">
+        <NavLink to="/item-search" className="nav-item">
           <FiSearch />
           <span>Search</span>
-        </Link>
+        </NavLink>
 
-        <Link to="/resources" className="nav-item">
+        <NavLink to="/resources" className="nav-item">
           <FaRecycle />
           <span>Resources</span>
-        </Link>
+        </NavLink>
 
-        <Link to="/announcements" className="nav-item">
+        <NavLink to="/announcements" className="nav-item">
           <FiBell />
           <span>Announcements</span>
-        </Link>
+        </NavLink>
+
       </nav>
     </>
   )
