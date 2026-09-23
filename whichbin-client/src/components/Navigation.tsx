@@ -8,7 +8,6 @@ import {
   FiX,
   FiInfo,
   FiHelpCircle,
-  FiSettings,
   FiLock,
   FiActivity,
 } from 'react-icons/fi'
@@ -44,6 +43,7 @@ function Navigation() {
     <>
       <header className="top-navigation">
         <NavLink to="/" end className="app-title" onClick={closeMenu}>
+          <FaRecycle aria-hidden="true" />
           WhichBin Orlando
         </NavLink>
 
@@ -88,11 +88,6 @@ function Navigation() {
               <NavLink to="/help" onClick={closeMenu}>
                 <FiHelpCircle />
                 <span>Help / How to Use</span>
-              </NavLink>
-
-              <NavLink to="/settings" onClick={closeMenu}>
-                <FiSettings />
-                <span>Settings</span>
               </NavLink>
 
               <NavLink to="/admin/login" onClick={closeMenu}>

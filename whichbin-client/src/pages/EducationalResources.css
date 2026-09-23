@@ -1,32 +1,38 @@
 .resources-page {
-  background-color: var(--color-page);
+  min-height: calc(100dvh - var(--top-navigation-height));
+  background: var(--color-page);
 }
 
 .resources-page h1 {
-  margin: 0 0 8px;
+  margin: 0;
   color: var(--color-heading-deep);
-  font-size: 32px;
+  font-size: clamp(30px, 5vw, 42px);
+  line-height: 1.1;
 }
 
 .resources-intro {
-  margin: 0 0 30px;
+  max-width: 550px;
+  margin: 12px 0 34px;
   color: var(--color-text-muted);
   line-height: 1.6;
   font-size: 16px;
 }
 
 .resources-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
 }
 
 .resource-card {
-  display: flex;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 24px;
+  gap: 20px;
   align-items: center;
-  padding: 20px;
+  min-height: 124px;
+  padding: 23px 24px;
   background-color: var(--color-surface);
-  border-radius: 16px;
+  border-radius: 12px;
   border: 1px solid var(--color-border-soft);
   box-shadow: var(--shadow-card);
   text-decoration: none;
@@ -39,61 +45,110 @@
   box-shadow: var(--shadow-card-hover);
 }
 
+.resource-card:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  outline-offset: 3px;
+}
+
 .resource-icon {
-  width: 54px;
-  height: 54px;
+  width: 58px;
+  height: 58px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 18px;
+  margin: 0;
   border-radius: 14px;
   background-color: var(--color-surface-green);
   color: var(--color-brand);
-  font-size: 28px;
+  font-size: 29px;
   flex-shrink: 0;
 }
 
+.resource-icon.resource-style-green {
+  background-color: var(--color-surface-green);
+  color: var(--color-brand);
+}
+
+.resource-icon.resource-style-blue {
+  background-color: var(--color-surface-blue);
+  color: var(--color-info);
+}
+
+.resource-icon.resource-style-orange {
+  background-color: var(--color-surface-orange);
+  color: var(--color-accent);
+}
+
+.resource-icon.resource-style-purple {
+  background-color: #f3eff8;
+  color: #76529a;
+}
+
 .resource-content {
-  flex: 1;
+  min-width: 0;
 }
 
 .resource-content h2 {
   margin: 0 0 6px;
   color: var(--color-heading-soft);
-  font-size: 18px;
+  font-size: 19px;
+  line-height: 1.25;
 }
 
 .resource-content p {
   margin: 0;
   color: var(--color-text-soft);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.5;
 }
 
 .resource-arrow {
-  margin-left: 15px;
+  display: grid;
+  place-items: center;
   color: var(--color-brand);
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 300;
 }
 
+@media (max-width: 760px) {
+  .resources-list {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
 @media (max-width: 600px) {
+  .resources-list {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
   .resources-page h1 {
-    font-size: 28px;
+    font-size: 30px;
   }
 
   .resource-card {
-    padding: 16px;
+    grid-template-columns: 48px minmax(0, 1fr) 20px;
+    gap: 13px;
+    min-height: 96px;
+    padding: 15px;
   }
 
   .resource-icon {
     width: 48px;
     height: 48px;
-    margin-right: 14px;
     font-size: 24px;
   }
 
   .resource-content h2 {
     font-size: 17px;
+  }
+
+  .resource-content p {
+    font-size: 13px;
+  }
+
+  .resource-arrow {
+    font-size: 23px;
   }
 }

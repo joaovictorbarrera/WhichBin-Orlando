@@ -1,8 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
 * {
 	box-sizing: border-box;
 }
 
 :root {
+	--font-body: 'DM Sans', 'Segoe UI', sans-serif;
 	--color-brand: #2e7d32;
 	--color-brand-dark: #256628;
 	--color-brand-deep: #1f5623;
@@ -61,6 +64,16 @@ body,
 }
 
 body {
+	font-family: var(--font-body);
+	font-weight: 500;
+	line-height: 1.5;
 	background-color: var(--color-page);
 	overflow-x: hidden;
+}
+
+button,
+input,
+textarea,
+select {
+	font: inherit;
 }
