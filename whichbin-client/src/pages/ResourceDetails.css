@@ -101,9 +101,17 @@
 }
 
 @media (max-width: 600px) {
+  .resource-details-page {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
   .resource-details-card {
-    padding: 23px 18px;
-    border-radius: 12px;
+    padding: 8px 0 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .resource-details-card h1 {
