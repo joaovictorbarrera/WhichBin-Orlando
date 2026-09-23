@@ -3,14 +3,14 @@ package com.whichbin.whichbin_api.service;
 import com.whichbin.whichbin_api.dto.user.CreateUserRequest;
 import com.whichbin.whichbin_api.dto.user.UpdateUserRequest;
 import com.whichbin.whichbin_api.dto.user.UserResponse;
-import com.whichbin.whichbin_api.exception.EmailAlreadyInUseException;
-import com.whichbin.whichbin_api.exception.ResourceNotFoundException;
 import com.whichbin.whichbin_api.model.User;
 import com.whichbin.whichbin_api.repository.UserRepository;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -53,7 +53,10 @@ public class UserService {
         String normalizedEmail = normalizeEmail(request.email());
 
         if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
-            throw new EmailAlreadyInUseException("Email is already in use");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Email already in use"
+            );
         }
 
         User user = new User(
@@ -73,7 +76,10 @@ public class UserService {
         String normalizedEmail = normalizeEmail(request.email());
 
         if (userRepository.existsByEmailIgnoreCaseAndIdNot(normalizedEmail, id)) {
-            throw new EmailAlreadyInUseException("Email is already in use");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Email already in use"
+            );
         }
 
         user.setFirstName(normalizeText(request.firstName()));
@@ -95,7 +101,7 @@ public class UserService {
 
     private User findUserOrThrow(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User was not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     private UserResponse toResponse(User user) {
