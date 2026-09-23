@@ -1,4 +1,4 @@
-import { FiArrowRight, FiMapPin } from 'react-icons/fi';
+import { FiArrowRight, FiBell, FiMapPin, FiSearch } from 'react-icons/fi';
 import { FaRecycle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import PageLayout from '../components/PageLayout';
@@ -12,16 +12,16 @@ function Home() {
           <p className="home-eyebrow"><FiMapPin /> Orlando, Florida</p>
           <h1>Put every item in its right place.</h1>
           <p className="home-intro">
-            A clearer way to find the right bin for what you are throwing away,
-            right here in Orlando.
+            Search an item, understand how to handle it, and keep up with local
+            recycling guidance in one place.
           </p>
           <div className="home-actions">
-            <Link to="/resources" className="home-primary-action">
-              Explore recycling resources
+            <Link to="/item-search" className="home-primary-action">
+              Search for an item
               <FiArrowRight aria-hidden="true" />
             </Link>
-            <Link to="/apistatus" className="home-secondary-action">
-              View API status
+            <Link to="/resources" className="home-secondary-action">
+              Explore resources
             </Link>
           </div>
         </div>
@@ -39,13 +39,21 @@ function Home() {
       <section className="home-highlights" aria-label="WhichBin highlights">
         <article>
           <span className="highlight-number">01</span>
-          <h2>Know before you throw</h2>
-          <p>Make confident choices with simple, local guidance.</p>
+          <FiSearch className="highlight-icon" aria-hidden="true" />
+          <h2>Search with confidence</h2>
+          <p>Find the right disposal category and instructions for an item.</p>
         </article>
         <article>
           <span className="highlight-number">02</span>
-          <h2>Keep Orlando cleaner</h2>
-          <p>Small sorting decisions add up to a healthier community.</p>
+          <FaRecycle className="highlight-icon" aria-hidden="true" />
+          <h2>Learn what helps</h2>
+          <p>Build better habits with clear recycling education.</p>
+        </article>
+        <article>
+          <span className="highlight-number">03</span>
+          <FiBell className="highlight-icon" aria-hidden="true" />
+          <h2>Stay up to date</h2>
+          <p>See announcements about local changes and disposal guidance.</p>
         </article>
       </section>
     </PageLayout>

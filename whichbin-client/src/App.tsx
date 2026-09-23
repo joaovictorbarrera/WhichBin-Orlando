@@ -5,6 +5,7 @@ import ApiStatus from './pages/ApiStatus';
 import EducationalResources from './pages/EducationalResources';
 import ResourceDetails from './pages/ResourceDetails';
 import About from './pages/About';
+import Help from './pages/Help';
 import NotFound from './pages/NotFound';
 import Navigation from './components/Navigation';
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/resources" element={<EducationalResources />} />
         <Route path="/resources/:resourceId" element={<ResourceDetails />} />
         <Route path="/about" element={<About />} />
+        <Route path="/help" element={<Help />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

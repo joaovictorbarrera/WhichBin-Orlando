@@ -1,4 +1,4 @@
-import { FiArrowRight, FiCheck, FiHeart, FiMapPin, FiTarget } from 'react-icons/fi'
+import { FiArrowRight, FiBell, FiCheck, FiHeart, FiMapPin, FiSearch, FiTarget } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import PageLayout from '../components/PageLayout'
@@ -12,11 +12,11 @@ function About() {
           <p className="about-eyebrow"><FiMapPin /> Made for Orlando</p>
           <h1>Better sorting starts with a little more certainty.</h1>
           <p className="about-lede">
-            WhichBin Orlando makes it easier to decide what belongs in each bin,
-            so good intentions can turn into everyday action.
+            WhichBin Orlando brings item searches, practical education, and local
+            updates together so good intentions can turn into everyday action.
           </p>
-          <Link to="/resources" className="about-primary-action">
-            Browse recycling resources
+          <Link to="/item-search" className="about-primary-action">
+            Search for an item
             <FiArrowRight aria-hidden="true" />
           </Link>
         </div>
@@ -36,13 +36,38 @@ function About() {
           <div className="about-story-copy">
             <p>
               Recycling rules can vary by place, and the wrong guess can send a
-              useful material to the landfill. WhichBin brings local guidance into
-              one simple, approachable place.
+              useful material to the landfill. Orlando already provides collection
+              schedules through Orlando Collects; WhichBin focuses on the decision
+              that comes before that: what to do with a specific item.
             </p>
             <p>
-              We are building a calmer way to learn, search, and make a better
-              choice at the moment it matters: when an item is in your hand.
+              Search for an item, learn from clear recycling resources, and check
+              announcements when local guidance changes. No account is required.
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="about-features" aria-labelledby="about-features-heading">
+        <div className="about-section-label">A simple public toolkit</div>
+        <div className="about-features-content">
+          <h2 id="about-features-heading">Everything you need for the next decision.</h2>
+          <div className="about-feature-links">
+            <Link to="/item-search" className="about-feature-link">
+              <FiSearch />
+              <span><strong>Search items</strong><small>Get a disposal answer</small></span>
+              <FiArrowRight aria-hidden="true" />
+            </Link>
+            <Link to="/resources" className="about-feature-link">
+              <FaRecycle />
+              <span><strong>Learn the basics</strong><small>Browse recycling resources</small></span>
+              <FiArrowRight aria-hidden="true" />
+            </Link>
+            <Link to="/announcements" className="about-feature-link">
+              <FiBell />
+              <span><strong>See what is changing</strong><small>Read local announcements</small></span>
+              <FiArrowRight aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>
@@ -71,10 +96,10 @@ function About() {
       <section className="about-cta">
         <div>
           <p className="about-cta-kicker">Ready when you are</p>
-          <h2>Find the right home for your next item.</h2>
+          <h2>Make the next disposal decision a little easier.</h2>
         </div>
-        <Link to="/resources" className="about-cta-link">
-          Explore resources
+        <Link to="/item-search" className="about-cta-link">
+          Search an item
           <FiArrowRight aria-hidden="true" />
         </Link>
       </section>

@@ -172,6 +172,78 @@
   margin-bottom: 0;
 }
 
+.about-features {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.45fr) minmax(0, 1.55fr);
+  gap: 45px;
+  padding: 45px 0 52px;
+  border-top: 1px solid var(--color-border-highlight);
+}
+
+.about-features-content h2 {
+  max-width: 430px;
+  margin: 0 0 23px;
+  color: var(--color-heading-deep);
+  font-size: clamp(28px, 3.2vw, 42px);
+  line-height: 1.12;
+}
+
+.about-feature-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  border-top: 1px solid var(--color-border-highlight);
+  border-bottom: 1px solid var(--color-border-highlight);
+}
+
+.about-feature-link {
+  display: grid;
+  grid-template-columns: 25px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 10px;
+  min-height: 104px;
+  padding: 16px 14px 16px 0;
+  color: var(--color-brand);
+  text-decoration: none;
+}
+
+.about-feature-link + .about-feature-link {
+  padding-left: 14px;
+  border-left: 1px solid var(--color-border-highlight);
+}
+
+.about-feature-link > svg {
+  width: 20px;
+  height: 20px;
+}
+
+.about-feature-link > svg:last-child {
+  width: 16px;
+  height: 16px;
+}
+
+.about-feature-link span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.about-feature-link strong {
+  color: var(--color-heading-soft);
+  font-size: 14px;
+}
+
+.about-feature-link small {
+  color: var(--color-text-faint);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.about-feature-link:hover strong,
+.about-feature-link:hover > svg:last-child {
+  color: var(--color-brand-deep);
+}
+
 .about-pillars {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -283,12 +355,17 @@
   }
 
   .about-story,
-  .about-story-content {
+  .about-story-content,
+  .about-features {
     grid-template-columns: 1fr;
     gap: 22px;
   }
 
   .about-story {
+    padding: 42px 0 48px;
+  }
+
+  .about-features {
     padding: 42px 0 48px;
   }
 
@@ -309,6 +386,20 @@
 
   .about-pillar-icon {
     margin-bottom: 20px;
+  }
+
+  .about-feature-links {
+    grid-template-columns: 1fr;
+  }
+
+  .about-feature-link,
+  .about-feature-link + .about-feature-link {
+    padding: 17px 0;
+    border-left: 0;
+  }
+
+  .about-feature-link + .about-feature-link {
+    border-top: 1px solid var(--color-border-highlight);
   }
 
   .about-pillar-number {
