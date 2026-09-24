@@ -2,6 +2,7 @@ package com.whichbin.whichbin_api.auth;
 
 import com.whichbin.whichbin_api.model.User;
 import com.whichbin.whichbin_api.repository.UserRepository;
+import com.whichbin.whichbin_api.service.AuthorizationTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
@@ -16,14 +17,11 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     public static final String AUTHENTICATED_USER_ATTRIBUTE = "authenticatedUser";
 
-    private final UserRepository userRepository;
     private final AuthorizationTokenService authorizationTokenService;
 
     public AuthenticationInterceptor(
-            UserRepository userRepository,
             AuthorizationTokenService authorizationTokenService
     ) {
-        this.userRepository = userRepository;
         this.authorizationTokenService = authorizationTokenService;
     }
 
@@ -45,42 +43,14 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        String authorizationToken = extractAuthorizationToken(request);
+        String token = authorizationTokenService.extractBearerToken(request.getHeader(HttpHeaders.AUTHORIZATION))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized"));
 
-        String authorizationHash = authorizationTokenService.hashAuthorizationToken(authorizationToken);
-
-        User user = userRepository.findByAuthorizationHash(authorizationHash)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED,
-                        "Invalid authorization token"
-                ));
+        User user = authorizationTokenService.findUserByAuthorizationToken(token)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized"));
 
         request.setAttribute(AUTHENTICATED_USER_ATTRIBUTE, user);
 
         return true;
-    }
-
-    private String extractAuthorizationToken(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-        if (authorizationHeader == null || authorizationHeader.isBlank()) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Missing Authorization header"
-            );
-        }
-
-        if (authorizationHeader.regionMatches(true, 0, "Bearer ", 0, 7)) {
-            String token = authorizationHeader.substring(7).trim();
-
-            if (!token.isBlank()) {
-                return token;
-            }
-        }
-
-        throw new ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "Invalid Authorization header"
-        );
     }
 }

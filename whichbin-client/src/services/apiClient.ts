@@ -7,7 +7,11 @@ export function setUnauthorizedHandler(handler: (() => void) | null) {
   unauthorizedHandler = handler
 }
 
-export async function apiFetch(path: string, options: RequestInit = {}) {
+export async function apiFetch(
+  path: string,
+  options: RequestInit = {},
+  handleUnauthorized = true
+) {
   const storedUser = localStorage.getItem(AUTH_STORAGE_KEY)
   const authorization = storedUser ? getAuthorizationToken(storedUser) : null
   const headers = new Headers(options.headers)
@@ -21,7 +25,7 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
     headers,
   })
 
-  if (response.status === 401) {
+  if (response.status === 401 && handleUnauthorized) {
     unauthorizedHandler?.()
   }
 

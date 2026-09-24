@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { getCurrentUser, login as loginRequest, type AuthUser } from '../services/authService'
+import { getCurrentUser, login as loginRequest, logout as logoutRequest, type AuthUser } from '../services/authService'
 import { setUnauthorizedHandler } from '../services/apiClient'
 import { AuthContext } from './AuthState'
 import './AuthLoading.css'
@@ -53,9 +53,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(authenticatedUser)
   }
 
-  function logout() {
-    localStorage.removeItem(AUTH_STORAGE_KEY)
-    setUser(null)
+  async function logout() {
+    try {
+      await logoutRequest()
+    } finally {
+      localStorage.removeItem(AUTH_STORAGE_KEY)
+      setUser(null)
+    }
   }
 
   if (isCheckingSession) {
