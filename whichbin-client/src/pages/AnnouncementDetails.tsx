@@ -30,11 +30,10 @@ function AnnouncementDetails() {
   const { announcementId } = useParams()
 
   const [announcement, setAnnouncement] = useState<Announcement | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(Boolean(announcementId))
 
   useEffect(() => {
     if (!announcementId) {
-      setLoading(false)
       return
     }
 
@@ -44,12 +43,15 @@ function AnnouncementDetails() {
       .then((data) => {
         if (isMounted) {
           setAnnouncement(data)
-          setLoading(false)
         }
       })
       .catch(() => {
         if (isMounted) {
           setAnnouncement(null)
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
           setLoading(false)
         }
       })
@@ -74,7 +76,7 @@ function AnnouncementDetails() {
     )
   }
 
-  if (!announcement) {
+  if (!announcementId || !announcement) {
     return (
       <PageLayout className="announcement-details-page" width="wide">
         <Link className="announcement-back-link" to="/announcements">
