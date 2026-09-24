@@ -122,6 +122,11 @@ function Navigation() {
                 <span>Help / How to Use</span>
               </NavLink>
 
+              <NavLink to="/apistatus" onClick={closeMenu}>
+                <FiActivity />
+                <span>API Status</span>
+              </NavLink>
+
               {!isAuthenticated && (
                 <NavLink to="/admin/login" onClick={closeMenu}>
                   <FiLock />
@@ -135,11 +140,6 @@ function Navigation() {
                   <span>Sign out</span>
                 </button>
               )}
-
-              <NavLink to="/apistatus" onClick={closeMenu}>
-                <FiActivity />
-                <span>API Status</span>
-              </NavLink>
             </div>
           )}
         </div>
