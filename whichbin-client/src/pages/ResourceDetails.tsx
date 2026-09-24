@@ -16,8 +16,7 @@ function ResourceDetails() {
   const { resourceId } = useParams()
 
   const [resource, setResource] = useState<Resource | null>(null)
-  const [triviaQuestions, setTriviaQuestions] = useState<TriviaQuestion[]>([])
-  const [triviaLoading, setTriviaLoading] = useState(false)
+  const [triviaQuestions, setTriviaQuestions] = useState<TriviaQuestion[] | null>(null)
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [score, setScore] = useState(0)
@@ -57,19 +56,15 @@ function ResourceDetails() {
 
     let isMounted = true
 
-    setTriviaLoading(true)
-
     getTriviaQuestions()
       .then((questions) => {
         if (isMounted) {
           setTriviaQuestions(questions ?? [])
-          setTriviaLoading(false)
         }
       })
       .catch(() => {
         if (isMounted) {
           setTriviaQuestions([])
-          setTriviaLoading(false)
         }
       })
 
@@ -78,6 +73,8 @@ function ResourceDetails() {
     }
   }, [resource])
 
+  const triviaLoading = resource?.title === 'Take the Challenge' && triviaQuestions === null
+
   function handleAnswer(answer: string) {
     if (selectedAnswer !== null || quizComplete) {
       return
@@ -85,13 +82,13 @@ function ResourceDetails() {
 
     setSelectedAnswer(answer)
 
-    if (answer === triviaQuestions[currentQuestion].correctAnswer) {
+    if (answer === triviaQuestions?.[currentQuestion]?.correctAnswer) {
       setScore((currentScore) => currentScore + 1)
     }
   }
 
   function handleNextQuestion() {
-    if (currentQuestion === triviaQuestions.length - 1) {
+    if (currentQuestion === (triviaQuestions?.length ?? 0) - 1) {
       setQuizComplete(true)
       return
     }
@@ -112,7 +109,7 @@ function ResourceDetails() {
       return 'trivia-answer'
     }
 
-    if (answer === triviaQuestions[currentQuestion].correctAnswer) {
+    if (answer === triviaQuestions?.[currentQuestion]?.correctAnswer) {
       return 'trivia-answer trivia-answer-correct'
     }
 
@@ -172,7 +169,7 @@ function ResourceDetails() {
       )
     }
 
-    if (!triviaQuestions.length) {
+    if (!triviaQuestions?.length) {
       return (
         <PageLayout className="resource-details-page" width="wide">
           <Link to="/resources" className="resource-back-link">
@@ -201,7 +198,7 @@ function ResourceDetails() {
             <h1>Challenge Complete!</h1>
 
             <p>
-              You scored {score} out of {triviaQuestions.length}.
+              You scored {score} out of {triviaQuestions?.length ?? 0}.
             </p>
 
             <button
@@ -216,7 +213,7 @@ function ResourceDetails() {
       )
     }
 
-    const question = triviaQuestions[currentQuestion]
+    const question = triviaQuestions![currentQuestion]
 
     const answers = [
       question.answerA,
@@ -238,7 +235,7 @@ function ResourceDetails() {
           <p>{resource.description}</p>
 
           <p>
-            Question {currentQuestion + 1} of {triviaQuestions.length}
+            Question {currentQuestion + 1} of {triviaQuestions?.length ?? 0}
           </p>
 
 <section className="trivia-question">
