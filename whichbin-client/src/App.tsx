@@ -15,6 +15,8 @@ import AdminAnnouncements from './pages/admin/AdminAnnouncements';
 import NotFound from './pages/NotFound';
 import Navigation from './components/Navigation';
 import ProtectedRoute from './components/ProtectedRoute';
+import Announcements from './pages/Announcements';
+import AnnouncementDetails from './pages/AnnouncementDetails';
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
         <Route path="/resources/:resourceId" element={<ResourceDetails />} />
         <Route path="/about" element={<About />} />
         <Route path="/help" element={<Help />} />
+        <Route path="/announcements" element={<Announcements />} />
+        <Route path="/announcements/:announcementId" element={<AnnouncementDetails />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
