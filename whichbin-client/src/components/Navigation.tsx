@@ -42,9 +42,12 @@ function Navigation() {
     setMenuOpen(false)
   }
 
-  function handleLogout() {
-    logout()
-    closeMenu()
+  async function handleLogout() {
+    try {
+      await logout()
+    } finally {
+      closeMenu()
+    }
   }
 
   return (

@@ -37,9 +37,6 @@ public class User {
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 
-    @Column(name = "authorization_hash", length = 64, unique = true)
-    private String authorizationHash;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
@@ -110,13 +107,5 @@ public class User {
 
     public OffsetDateTime getUpdatedAt() {
         return updatedAt;
-    }
-
-    public String getAuthorizationHash() {
-        return authorizationHash;
-    }
-
-    public void setAuthorizationHash(String authorizationHash) {
-        this.authorizationHash = authorizationHash;
     }
 }
