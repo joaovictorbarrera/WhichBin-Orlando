@@ -1,4 +1,4 @@
-import { API_URL } from '../api/config'
+import { apiFetch } from './apiClient'
 
 export type Announcement = {
   id: number
@@ -12,7 +12,7 @@ export type Announcement = {
 
 export async function getAnnouncements(): Promise<Announcement[] | null> {
   try {
-    const response = await fetch(`${API_URL}announcements`)
+    const response = await apiFetch('announcements')
 
     if (!response.ok) {
       return null
@@ -28,7 +28,7 @@ export async function getAnnouncementById(
   announcementId: string
 ): Promise<Announcement | null> {
   try {
-    const response = await fetch(`${API_URL}announcements/${announcementId}`)
+    const response = await apiFetch(`announcements/${announcementId}`)
 
     if (!response.ok) {
       return null
