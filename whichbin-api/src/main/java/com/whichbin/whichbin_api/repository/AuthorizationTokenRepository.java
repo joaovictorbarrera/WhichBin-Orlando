@@ -17,5 +17,5 @@ public interface AuthorizationTokenRepository extends JpaRepository<Authorizatio
     void deleteByAuthorizationHash(String authorizationHash);
 
     @Modifying
-    int deleteByExpiresAtBefore(Instant now);
+    void deleteByExpiresAtBefore(Instant now);
 }
