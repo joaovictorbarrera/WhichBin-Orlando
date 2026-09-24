@@ -1,0 +1,59 @@
+name: Discord deployment notifications
+
+on:
+  deployment_status:
+
+permissions: {}
+
+jobs:
+  notify:
+    # Only Vercel production deployments with a final result.
+    if: >-
+      github.event.deployment.creator.login == 'vercel[bot]' &&
+      github.event.deployment.environment == 'Production' &&
+      (github.event.deployment_status.state == 'success' ||
+       github.event.deployment_status.state == 'failure' ||
+       github.event.deployment_status.state == 'error')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Post result to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_DEPLOYMENT_WEBHOOK }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          with open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8") as f:
+              event = json.load(f)
+
+          status = event["deployment_status"]
+          deployment = event["deployment"]
+          state = status["state"]
+          result = "✅ Succeeded" if state == "success" else "❌ Failed"
+          url = status.get("environment_url") or status.get("target_url")
+          commit = deployment["sha"][:7]
+
+          message = (
+              f"**WhichBin Orlando production deployment {result}**\n"
+              f"Commit: `{commit}`"
+          )
+          if url:
+              message += f"\nDeployment: {url}"
+
+          payload = json.dumps({
+              "content": message,
+              "allowed_mentions": {"parse": []}
+          }).encode("utf-8")
+
+          request = urllib.request.Request(
+              os.environ["DISCORD_WEBHOOK"],
+              data=payload,
+              headers={"Content-Type": "application/json"},
+              method="POST",
+          )
+          with urllib.request.urlopen(request, timeout=15) as response:
+              print(f"Discord response: {response.status}")
+          PY
