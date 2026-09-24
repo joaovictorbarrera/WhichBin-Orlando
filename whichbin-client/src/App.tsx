@@ -6,6 +6,7 @@ import EducationalResources from './pages/EducationalResources';
 import ResourceDetails from './pages/ResourceDetails';
 import About from './pages/About';
 import Help from './pages/Help';
+import AdminLogin from './pages/AdminLogin';
 import NotFound from './pages/NotFound';
 import Navigation from './components/Navigation';
 import Announcements from './pages/Announcements';
@@ -24,10 +25,8 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/help" element={<Help />} />
         <Route path="/announcements" element={<Announcements />} />
-        <Route
-         path="/announcements/:announcementId"
-         element={<AnnouncementDetails />}
-        />
+        <Route path="/announcements/:announcementId" element={<AnnouncementDetails />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

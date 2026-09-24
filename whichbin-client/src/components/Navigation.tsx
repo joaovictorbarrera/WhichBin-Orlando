@@ -9,12 +9,15 @@ import {
   FiInfo,
   FiHelpCircle,
   FiLock,
+  FiLogOut,
   FiActivity,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
+import { useAuth } from '../context/useAuth'
 import './Navigation.css'
 
 function Navigation() {
+  const { user, isAuthenticated, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -37,6 +40,11 @@ function Navigation() {
 
   function closeMenu() {
     setMenuOpen(false)
+  }
+
+  function handleLogout() {
+    logout()
+    closeMenu()
   }
 
   return (
@@ -80,6 +88,14 @@ function Navigation() {
 
           {menuOpen && (
             <div className="dropdown-menu">
+              {isAuthenticated && user && (
+                <div className="authenticated-user">
+                  <span className="authenticated-user-label">Signed in as</span>
+                  <strong>{user.firstName} {user.lastName}</strong>
+                  <span>{user.email}</span>
+                </div>
+              )}
+
               <NavLink to="/about" onClick={closeMenu}>
                 <FiInfo />
                 <span>About</span>
@@ -90,10 +106,19 @@ function Navigation() {
                 <span>Help / How to Use</span>
               </NavLink>
 
-              <NavLink to="/admin/login" onClick={closeMenu}>
-                <FiLock />
-                <span>Admin Login</span>
-              </NavLink>
+              {!isAuthenticated && (
+                <NavLink to="/admin/login" onClick={closeMenu}>
+                  <FiLock />
+                  <span>Admin Login</span>
+                </NavLink>
+              )}
+
+              {isAuthenticated && (
+                <button className="sign-out-button" type="button" onClick={handleLogout}>
+                  <FiLogOut />
+                  <span>Sign out</span>
+                </button>
+              )}
 
               <NavLink to="/apistatus" onClick={closeMenu}>
                 <FiActivity />

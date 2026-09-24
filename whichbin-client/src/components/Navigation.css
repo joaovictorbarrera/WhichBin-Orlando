@@ -92,6 +92,30 @@
   color: var(--color-brand);
 }
 
+.authenticated-user {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0.25rem 0.25rem 0.5rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--color-surface-green-soft);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.authenticated-user strong {
+  color: var(--color-heading-soft);
+  font-size: 0.875rem;
+}
+
+.authenticated-user-label {
+  color: var(--color-accent);
+  font-size: 0.69rem;
+  font-weight: 800;
+  letter-spacing: 0.06rem;
+  text-transform: uppercase;
+}
+
 .dropdown-menu a.active,
 .desktop-nav-item.active,
 .nav-item.active {
@@ -102,6 +126,27 @@
   width: 1.25rem;
   height: 1.25rem;
   flex-shrink: 0;
+}
+
+.sign-out-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0.875rem;
+  padding: 0.815rem 0.75rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.94rem;
+  text-align: left;
+}
+
+.sign-out-button:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-danger);
 }
 
 .bottom-navigation {
