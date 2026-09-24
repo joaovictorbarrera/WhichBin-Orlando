@@ -1,18 +1,15 @@
 import { FiArrowLeft, FiUsers } from 'react-icons/fi'
 import type { ReactNode } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
 import { useAuth } from '../../context/useAuth'
 import './AdminSection.css'
 
 function AdminUsers() {
-  const { user, isAuthenticated } = useAuth()
+  const { user } = useAuth()
+  const authenticatedUser = user!
 
-  if (!isAuthenticated || !user) {
-    return <Navigate to="/admin/login" replace />
-  }
-
-  return <AdminUsersView name={user.firstName} />
+  return <AdminUsersView name={authenticatedUser.firstName} />
 }
 
 function AdminUsersView({ name }: { name: string }) {

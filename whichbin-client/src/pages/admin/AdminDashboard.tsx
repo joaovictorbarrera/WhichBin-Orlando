@@ -1,5 +1,5 @@
 import { FiBell, FiBox, FiFileText, FiUsers } from 'react-icons/fi'
-import { Link, Navigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
 import { useAuth } from '../../context/useAuth'
 import './AdminDashboard.css'
@@ -36,24 +36,21 @@ const adminLinks = [
 ]
 
 function AdminDashboard() {
-  const { user, isAuthenticated } = useAuth()
-
-  if (!isAuthenticated || !user) {
-    return <Navigate to="/admin/login" replace />
-  }
+  const { user } = useAuth()
+  const authenticatedUser = user!
 
   return (
     <PageLayout className="admin-dashboard-page" width="wide">
       <header className="admin-dashboard-header">
         <div>
           <p className="admin-dashboard-eyebrow">Admin dashboard</p>
-          <h1>Good to see you, {user.firstName}.</h1>
+          <h1>Good to see you, {authenticatedUser.firstName}.</h1>
           <p>Choose an area to manage WhichBin Orlando content.</p>
         </div>
         <div className="admin-dashboard-user">
           <span>Signed in as</span>
-          <strong>{user.firstName} {user.lastName}</strong>
-          <small>{user.email}</small>
+          <strong>{authenticatedUser.firstName} {authenticatedUser.lastName}</strong>
+          <small>{authenticatedUser.email}</small>
         </div>
       </header>
       <div className="admin-dashboard-grid">

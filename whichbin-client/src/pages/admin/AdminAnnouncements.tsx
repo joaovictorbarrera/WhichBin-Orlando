@@ -1,15 +1,12 @@
 import { FiArrowLeft, FiBell } from 'react-icons/fi'
-import { Link, Navigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
 import { useAuth } from '../../context/useAuth'
 import './AdminSection.css'
 
 function AdminAnnouncements() {
-  const { user, isAuthenticated } = useAuth()
-
-  if (!isAuthenticated || !user) {
-    return <Navigate to="/admin/login" replace />
-  }
+  const { user } = useAuth()
+  const authenticatedUser = user!
 
   return (
     <PageLayout className="admin-section-page admin-section-announcements" width="wide">
@@ -22,7 +19,7 @@ function AdminAnnouncements() {
         <p className="admin-section-eyebrow">Admin workspace</p>
         <h1>Manage Announcements</h1>
         <p>Publish and update resident-facing recycling announcements.</p>
-        <small>Signed in as {user.firstName}. Announcement tools are coming next.</small>
+        <small>Signed in as {authenticatedUser.firstName}. Announcement tools are coming next.</small>
       </section>
     </PageLayout>
   )

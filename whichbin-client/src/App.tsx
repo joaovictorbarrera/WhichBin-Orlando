@@ -14,6 +14,7 @@ import AdminResources from './pages/admin/AdminResources';
 import AdminAnnouncements from './pages/admin/AdminAnnouncements';
 import NotFound from './pages/NotFound';
 import Navigation from './components/Navigation';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -28,11 +29,11 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/help" element={<Help />} />
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
-        <Route path="/admin/items" element={<AdminItems />} />
-        <Route path="/admin/resources" element={<AdminResources />} />
-        <Route path="/admin/announcements" element={<AdminAnnouncements />} />
+        <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
+        <Route path="/admin/items" element={<ProtectedRoute><AdminItems /></ProtectedRoute>} />
+        <Route path="/admin/resources" element={<ProtectedRoute><AdminResources /></ProtectedRoute>} />
+        <Route path="/admin/announcements" element={<ProtectedRoute><AdminAnnouncements /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
