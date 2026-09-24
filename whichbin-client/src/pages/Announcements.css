@@ -1,6 +1,7 @@
 .announcements-page {
   min-height: calc(100dvh - var(--top-navigation-height));
   padding-top: 3.5rem;
+  padding-bottom: calc(var(--bottom-navigation-height) + 3rem);
   background: var(--color-page);
 }
 
@@ -42,6 +43,12 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .announcements-list {
+    margin-bottom: 3rem;
+  }
 }
 
 .announcement-card {
