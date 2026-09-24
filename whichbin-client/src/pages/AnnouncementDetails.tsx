@@ -16,6 +16,16 @@ function formatType(type: string) {
   return type.replaceAll('_', ' ')
 }
 
+function formatDateTime(dateTime: string) {
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(new Date(dateTime))
+}
+
 function AnnouncementDetails() {
   const { announcementId } = useParams()
 
@@ -118,8 +128,8 @@ function AnnouncementDetails() {
             <FiCalendar aria-hidden="true" />
 
             <div>
-              <span>Start Date</span>
-              <strong>{announcement.startDate}</strong>
+              <span>Start Date & Time</span>
+              <strong>{formatDateTime(announcement.startDate)}</strong>
             </div>
           </div>
 
@@ -128,8 +138,8 @@ function AnnouncementDetails() {
               <FiCalendar aria-hidden="true" />
 
               <div>
-                <span>End Date</span>
-                <strong>{announcement.endDate}</strong>
+                <span>End Date & Time</span>
+                <strong>{formatDateTime(announcement.endDate)}</strong>
               </div>
             </div>
           )}

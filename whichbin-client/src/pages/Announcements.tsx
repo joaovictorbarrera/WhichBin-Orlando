@@ -12,6 +12,16 @@ function formatType(type: string) {
   return type.replaceAll('_', ' ')
 }
 
+function formatDateTime(dateTime: string) {
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(new Date(dateTime))
+}
+
 function Announcements() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
   const [loading, setLoading] = useState(true)
@@ -38,10 +48,6 @@ function Announcements() {
     }
   }, [])
 
-  const activeAnnouncements = announcements.filter(
-    (announcement) => announcement.active
-  )
-
   return (
     <PageLayout className="announcements-page" width="wide">
       <div className="announcements-header">
@@ -64,7 +70,7 @@ function Announcements() {
         </div>
       )}
 
-      {!loading && activeAnnouncements.length === 0 && (
+      {!loading && announcements.length === 0 && (
         <div className="announcements-status">
           <FiBell aria-hidden="true" />
           <h2>No announcements right now</h2>
@@ -72,12 +78,14 @@ function Announcements() {
         </div>
       )}
 
-      {!loading && activeAnnouncements.length > 0 && (
+      {!loading && announcements.length > 0 && (
         <div className="announcements-list">
-          {activeAnnouncements.map((announcement) => (
+          {announcements.map((announcement) => (
             <Link
               to={`/announcements/${announcement.id}`}
-              className={`announcement-card announcement-${announcement.type.toLowerCase().replaceAll('_', '-')}`}
+              className={`announcement-card announcement-${announcement.type
+                .toLowerCase()
+                .replaceAll('_', '-')}`}
               key={announcement.id}
             >
               <div className="announcement-card-content">
@@ -87,17 +95,19 @@ function Announcements() {
                   </span>
 
                   <span className="announcement-date">
-                    {announcement.startDate}
+                    {formatDateTime(announcement.startDate)}
                   </span>
                 </div>
 
                 <h2>{announcement.title}</h2>
 
-                <p>{announcement.message}</p>
+                <p className="announcement-preview">
+                  {announcement.message}
+                </p>
 
                 {announcement.endDate && (
                   <small>
-                    Available through {announcement.endDate}
+                    Available through {formatDateTime(announcement.endDate)}
                   </small>
                 )}
               </div>

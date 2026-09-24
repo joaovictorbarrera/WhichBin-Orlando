@@ -73,4 +73,12 @@ public class AnnouncementController {
 
         return ResponseEntity.noContent().build();
     }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(
+        IllegalArgumentException exception) {
+
+    return ResponseEntity
+            .badRequest()
+            .body(exception.getMessage());
+    }
 }

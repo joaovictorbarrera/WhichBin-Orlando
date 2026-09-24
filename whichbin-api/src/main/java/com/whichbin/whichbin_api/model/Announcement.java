@@ -1,12 +1,14 @@
 package com.whichbin.whichbin_api.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "announcements")
@@ -18,16 +20,25 @@ public class Announcement {
 
     private String title;
     private String message;
-    private String type;
-    private LocalDate startDate;
-    private LocalDate endDate;
+
+    @Enumerated(EnumType.STRING)
+    private AnnouncementType type;
+
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+
     private boolean active;
 
     public Announcement() {
     }
 
-    public Announcement(String title, String message, String type,
-                        LocalDate startDate, LocalDate endDate, boolean active) {
+    public Announcement(
+            String title,
+            String message,
+            AnnouncementType type,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            boolean active) {
         this.title = title;
         this.message = message;
         this.type = type;
@@ -60,27 +71,27 @@ public class Announcement {
         this.message = message;
     }
 
-    public String getType() {
+    public AnnouncementType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(AnnouncementType type) {
         this.type = type;
     }
 
-    public LocalDate getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
     }
 

@@ -40,8 +40,8 @@
 
 .announcements-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: 1fr;
+  gap: 1rem;
 }
 
 .announcement-card {
@@ -50,7 +50,7 @@
   grid-template-columns: minmax(0, 1fr) 1.5rem;
   gap: 1rem;
   align-items: center;
-  min-height: 11rem;
+  min-height: 9rem;
   padding: 1.5rem;
   overflow: hidden;
   background: var(--color-surface);
@@ -118,6 +118,14 @@
   color: var(--color-text-soft);
   font-size: 0.94rem;
   line-height: 1.55;
+}
+
+.announcement-preview {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .announcement-card small {
