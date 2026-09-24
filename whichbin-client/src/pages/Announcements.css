@@ -1,0 +1,258 @@
+.announcements-page {
+  min-height: calc(100dvh - var(--top-navigation-height));
+  padding-top: 3.5rem;
+  background: var(--color-page);
+}
+
+.announcements-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2.125rem;
+}
+
+.announcements-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  flex-shrink: 0;
+  border-radius: 0.875rem;
+  background: var(--color-surface-green);
+  color: var(--color-brand);
+  font-size: 1.75rem;
+}
+
+.announcements-page h1 {
+  margin: 0;
+  color: var(--color-heading-deep);
+  font-size: clamp(1.875rem, 5vw, 2.625rem);
+  line-height: 1.1;
+}
+
+.announcements-intro {
+  max-width: 38rem;
+  margin: 0.625rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.announcements-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.announcement-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1.5rem;
+  gap: 1rem;
+  align-items: center;
+  min-height: 11rem;
+  padding: 1.5rem;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 0.065rem solid var(--color-border-soft);
+  border-left: 0.25rem solid var(--color-brand);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-card);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.announcement-card:hover {
+  transform: translateY(-0.125rem);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.announcement-card:focus-visible {
+  outline: 0.19rem solid
+    color-mix(in srgb, var(--color-accent) 55%, transparent);
+  outline-offset: 0.19rem;
+}
+
+.announcement-card-content {
+  min-width: 0;
+}
+
+.announcement-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.announcement-type {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.3rem 0.625rem;
+  border-radius: 999px;
+  background: var(--color-surface-green);
+  color: var(--color-brand);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.045rem;
+  text-transform: uppercase;
+}
+
+.announcement-date {
+  color: var(--color-text-faint);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.announcement-card h2 {
+  margin: 0 0 0.5rem;
+  color: var(--color-heading-soft);
+  font-size: 1.19rem;
+  line-height: 1.3;
+}
+
+.announcement-card p {
+  margin: 0;
+  color: var(--color-text-soft);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.announcement-card small {
+  display: block;
+  margin-top: 0.75rem;
+  color: var(--color-text-faint);
+  font-size: 0.78rem;
+}
+
+.announcement-arrow {
+  color: var(--color-brand);
+  font-size: 1.5rem;
+}
+
+/* Announcement type accents */
+
+.announcement-service-alert {
+  border-left-color: var(--color-warning);
+}
+
+.announcement-service-alert .announcement-type {
+  background: var(--color-surface-orange);
+  color: var(--color-warning);
+}
+
+.announcement-schedule-change {
+  border-left-color: var(--color-info);
+}
+
+.announcement-schedule-change .announcement-type {
+  background: var(--color-surface-blue);
+  color: var(--color-info);
+}
+
+.announcement-recycling-change {
+  border-left-color: var(--color-success);
+}
+
+.announcement-recycling-change .announcement-type {
+  background: var(--color-surface-green);
+  color: var(--color-success);
+}
+
+.announcement-emergency {
+  border-left-color: var(--color-danger);
+}
+
+.announcement-emergency .announcement-type {
+  background: var(--color-surface-red);
+  color: var(--color-danger);
+}
+
+.announcements-status {
+  display: grid;
+  place-items: center;
+  max-width: 34rem;
+  margin: 3rem auto;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  background: var(--color-surface);
+  border: 0.065rem solid var(--color-border-soft);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-card);
+}
+
+.announcements-status > svg {
+  margin-bottom: 0.75rem;
+  color: var(--color-brand);
+  font-size: 2rem;
+}
+
+.announcements-status h2 {
+  margin: 0 0 0.5rem;
+  color: var(--color-heading-soft);
+  font-size: 1.25rem;
+}
+
+.announcements-status p {
+  margin: 0;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  .announcements-list {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .announcements-page {
+    padding-top: 2.5rem;
+  }
+
+  .announcements-header {
+    gap: 0.815rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .announcements-heading-icon {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.5rem;
+  }
+
+  .announcements-page h1 {
+    font-size: 1.875rem;
+  }
+
+  .announcements-intro {
+    font-size: 0.94rem;
+  }
+
+  .announcement-card {
+    grid-template-columns: minmax(0, 1fr) 1.25rem;
+    min-height: auto;
+    padding: 1.125rem;
+  }
+
+  .announcement-card-top {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .announcement-card h2 {
+    font-size: 1.065rem;
+  }
+
+  .announcement-card p {
+    font-size: 0.875rem;
+  }
+
+  .announcement-arrow {
+    font-size: 1.25rem;
+  }
+}

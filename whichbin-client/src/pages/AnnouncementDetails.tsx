@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { FiArrowLeft } from 'react-icons/fi'
+import {
+  FiArrowLeft,
+  FiBell,
+  FiCalendar,
+} from 'react-icons/fi'
 import {
   getAnnouncementById,
   type Announcement,
 } from '../services/announcementService'
 import PageLayout from '../components/PageLayout'
+import './AnnouncementDetails.css'
+
+function formatType(type: string) {
+  return type.replaceAll('_', ' ')
+}
 
 function AnnouncementDetails() {
   const { announcementId } = useParams()
@@ -15,6 +24,7 @@ function AnnouncementDetails() {
 
   useEffect(() => {
     if (!announcementId) {
+      setLoading(false)
       return
     }
 
@@ -39,58 +49,92 @@ function AnnouncementDetails() {
     }
   }, [announcementId])
 
-  if (loading && announcementId) {
+  if (loading) {
     return (
       <PageLayout className="announcement-details-page" width="wide">
-        <Link to="/announcements">
+        <Link className="announcement-back-link" to="/announcements">
           <FiArrowLeft aria-hidden="true" />
           Back to Announcements
         </Link>
 
-        <h1>Loading announcement...</h1>
+        <div className="announcement-details-status">
+          <p>Loading announcement...</p>
+        </div>
       </PageLayout>
     )
   }
 
-  if (!announcement || !announcementId) {
+  if (!announcement) {
     return (
       <PageLayout className="announcement-details-page" width="wide">
-        <Link to="/announcements">
+        <Link className="announcement-back-link" to="/announcements">
           <FiArrowLeft aria-hidden="true" />
           Back to Announcements
         </Link>
 
-        <h1>Announcement Not Found</h1>
-        <p>The requested announcement could not be found.</p>
+        <div className="announcement-details-status">
+          <FiBell aria-hidden="true" />
+          <h1>Announcement Not Found</h1>
+          <p>The requested announcement could not be found.</p>
+        </div>
       </PageLayout>
     )
   }
+
+  const typeClass = announcement.type
+    .toLowerCase()
+    .replaceAll('_', '-')
 
   return (
     <PageLayout className="announcement-details-page" width="wide">
-      <Link to="/announcements">
+      <Link className="announcement-back-link" to="/announcements">
         <FiArrowLeft aria-hidden="true" />
         Back to Announcements
       </Link>
 
-      <h1>{announcement.title}</h1>
+      <article
+        className={`announcement-details-card announcement-details-${typeClass}`}
+      >
+        <div className="announcement-details-heading">
+          <div className="announcement-details-icon">
+            <FiBell aria-hidden="true" />
+          </div>
 
-      <p>{announcement.message}</p>
+          <div>
+            <span className="announcement-details-type">
+              {formatType(announcement.type)}
+            </span>
 
-      <p>
-        <strong>Type:</strong>{' '}
-        {announcement.type.replaceAll('_', ' ')}
-      </p>
+            <h1>{announcement.title}</h1>
+          </div>
+        </div>
 
-      <p>
-        <strong>Start Date:</strong> {announcement.startDate}
-      </p>
-
-      {announcement.endDate && (
-        <p>
-          <strong>End Date:</strong> {announcement.endDate}
+        <p className="announcement-details-message">
+          {announcement.message}
         </p>
-      )}
+
+        <div className="announcement-date-section">
+          <div className="announcement-date-item">
+            <FiCalendar aria-hidden="true" />
+
+            <div>
+              <span>Start Date</span>
+              <strong>{announcement.startDate}</strong>
+            </div>
+          </div>
+
+          {announcement.endDate && (
+            <div className="announcement-date-item">
+              <FiCalendar aria-hidden="true" />
+
+              <div>
+                <span>End Date</span>
+                <strong>{announcement.endDate}</strong>
+              </div>
+            </div>
+          )}
+        </div>
+      </article>
     </PageLayout>
   )
 }

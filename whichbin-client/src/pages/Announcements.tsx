@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { FiBell, FiChevronRight } from 'react-icons/fi'
 import {
   getAnnouncements,
   type Announcement,
 } from '../services/announcementService'
 import PageLayout from '../components/PageLayout'
+import './Announcements.css'
+
+function formatType(type: string) {
+  return type.replaceAll('_', ' ')
+}
 
 function Announcements() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
@@ -32,62 +38,78 @@ function Announcements() {
     }
   }, [])
 
-  if (loading) {
-    return (
-      <PageLayout className="announcements-page" width="wide">
-        <h1>Announcements</h1>
-        <p>Loading announcements...</p>
-      </PageLayout>
-    )
-  }
-
-  if (!announcements.length) {
-    return (
-      <PageLayout className="announcements-page" width="wide">
-        <h1>Announcements</h1>
-        <p>No announcements are available right now.</p>
-      </PageLayout>
-    )
-  }
+  const activeAnnouncements = announcements.filter(
+    (announcement) => announcement.active
+  )
 
   return (
     <PageLayout className="announcements-page" width="wide">
-      <h1>Announcements</h1>
+      <div className="announcements-header">
+        <div className="announcements-heading-icon">
+          <FiBell aria-hidden="true" />
+        </div>
 
-      <p>
-        Stay up to date with recycling service changes and important notices.
-      </p>
+        <div>
+          <h1>Announcements</h1>
+          <p className="announcements-intro">
+            Stay up to date with recycling service changes, schedule updates,
+            and important notices from the City of Orlando.
+          </p>
+        </div>
+      </div>
 
-      <div className="announcements-list">
-        {announcements
-          .filter((announcement) => announcement.active)
-          .map((announcement) => (
+      {loading && (
+        <div className="announcements-status">
+          <p>Loading announcements...</p>
+        </div>
+      )}
+
+      {!loading && activeAnnouncements.length === 0 && (
+        <div className="announcements-status">
+          <FiBell aria-hidden="true" />
+          <h2>No announcements right now</h2>
+          <p>Check back later for recycling updates and service notices.</p>
+        </div>
+      )}
+
+      {!loading && activeAnnouncements.length > 0 && (
+        <div className="announcements-list">
+          {activeAnnouncements.map((announcement) => (
             <Link
-              to={'/announcements/' + announcement.id}
-              className="announcement-card"
+              to={`/announcements/${announcement.id}`}
+              className={`announcement-card announcement-${announcement.type.toLowerCase().replaceAll('_', '-')}`}
               key={announcement.id}
             >
-              <h2>{announcement.title}</h2>
+              <div className="announcement-card-content">
+                <div className="announcement-card-top">
+                  <span className="announcement-type">
+                    {formatType(announcement.type)}
+                  </span>
 
-              <p>{announcement.message}</p>
+                  <span className="announcement-date">
+                    {announcement.startDate}
+                  </span>
+                </div>
 
-              <p>
-                <strong>Type:</strong>{' '}
-                {announcement.type.replaceAll('_', ' ')}
-              </p>
+                <h2>{announcement.title}</h2>
 
-              <p>
-                <strong>Start Date:</strong> {announcement.startDate}
-              </p>
+                <p>{announcement.message}</p>
 
-              {announcement.endDate && (
-                <p>
-                  <strong>End Date:</strong> {announcement.endDate}
-                </p>
-              )}
+                {announcement.endDate && (
+                  <small>
+                    Available through {announcement.endDate}
+                  </small>
+                )}
+              </div>
+
+              <FiChevronRight
+                className="announcement-arrow"
+                aria-hidden="true"
+              />
             </Link>
           ))}
-      </div>
+        </div>
+      )}
     </PageLayout>
   )
 }
