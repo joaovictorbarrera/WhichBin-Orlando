@@ -85,6 +85,11 @@
   color: #76529a;
 }
 
+.resource-icon.resource-style-teal {
+  background-color: #e0f2f1;
+  color: #0f766e;
+}
+
 .resource-content {
   min-width: 0;
 }
