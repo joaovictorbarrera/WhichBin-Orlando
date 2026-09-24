@@ -1,7 +1,7 @@
 package com.whichbin.whichbin_api.controller;
 
 import com.whichbin.whichbin_api.auth.Authenticated;
-import com.whichbin.whichbin_api.auth.AuthorizationTokenService;
+import com.whichbin.whichbin_api.service.AuthorizationTokenService;
 import com.whichbin.whichbin_api.auth.CurrentUser;
 import com.whichbin.whichbin_api.dto.auth.LoginRequest;
 import com.whichbin.whichbin_api.dto.auth.LoginResponse;
@@ -9,16 +9,13 @@ import com.whichbin.whichbin_api.dto.auth.MeResponse;
 import com.whichbin.whichbin_api.model.User;
 import com.whichbin.whichbin_api.repository.UserRepository;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.HexFormat;
 
 @RestController
 @RequestMapping("/auth")
@@ -56,17 +53,13 @@ public class AuthController {
             );
         }
 
-        String authorizationToken = authorizationTokenService.generateAuthorizationToken();
-        String authorizationHash = authorizationTokenService.hashAuthorizationToken(authorizationToken);
-
-        user.setAuthorizationHash(authorizationHash);
-        User savedUser = userRepository.save(user);
+        String authorizationToken = authorizationTokenService.createAuthorizationToken(user);
 
         return new LoginResponse(
-                savedUser.getId(),
-                savedUser.getFirstName(),
-                savedUser.getLastName(),
-                savedUser.getEmail(),
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
                 authorizationToken
         );
     }
@@ -80,5 +73,13 @@ public class AuthController {
                 user.getLastName(),
                 user.getEmail()
         );
+    }
+
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION, required = false) String authorizationHeader
+    ) {
+        authorizationTokenService.revokeAuthorizationHeader(authorizationHeader);
     }
 }

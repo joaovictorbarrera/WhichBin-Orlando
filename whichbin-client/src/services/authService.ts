@@ -38,3 +38,7 @@ export async function getCurrentUser(): Promise<CurrentUser> {
 
   return (await response.json()) as CurrentUser
 }
+
+export async function logout(): Promise<void> {
+  await apiFetch('auth/logout', { method: 'POST' }, false)
+}
