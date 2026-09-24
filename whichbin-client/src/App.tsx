@@ -9,6 +9,8 @@ import Help from './pages/Help';
 import AdminLogin from './pages/AdminLogin';
 import NotFound from './pages/NotFound';
 import Navigation from './components/Navigation';
+import Announcements from './pages/Announcements';
+import AnnouncementDetails from './pages/AnnouncementDetails';
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
         <Route path="/resources/:resourceId" element={<ResourceDetails />} />
         <Route path="/about" element={<About />} />
         <Route path="/help" element={<Help />} />
+        <Route path="/announcements" element={<Announcements />} />
+        <Route path="/announcements/:announcementId" element={<AnnouncementDetails />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

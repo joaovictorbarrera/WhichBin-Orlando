@@ -2,6 +2,7 @@ package com.whichbin.whichbin_api.controller;
 
 import com.whichbin.whichbin_api.model.Announcement;
 import com.whichbin.whichbin_api.service.AnnouncementService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +18,13 @@ public class AnnouncementController {
         this.announcementService = announcementService;
     }
 
+    // GET all announcements
     @GetMapping
-    public List<Announcement> getAllAnnouncements() {
-        return announcementService.getAllAnnouncements();
+    public ResponseEntity<List<Announcement>> getAllAnnouncements() {
+        return ResponseEntity.ok(announcementService.getAllAnnouncements());
     }
 
+    // GET announcement by ID
     @GetMapping("/{id}")
     public ResponseEntity<Announcement> getAnnouncementById(@PathVariable Long id) {
         return announcementService.getAnnouncementById(id)
@@ -29,21 +32,53 @@ public class AnnouncementController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // CREATE announcement
     @PostMapping
-    public Announcement createAnnouncement(@RequestBody Announcement announcement) {
-        return announcementService.createAnnouncement(announcement);
+    public ResponseEntity<Announcement> createAnnouncement(
+            @RequestBody Announcement announcement) {
+
+        Announcement createdAnnouncement =
+                announcementService.createAnnouncement(announcement);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdAnnouncement);
     }
 
+    // UPDATE announcement
     @PutMapping("/{id}")
-    public Announcement updateAnnouncement(
+    public ResponseEntity<Announcement> updateAnnouncement(
             @PathVariable Long id,
             @RequestBody Announcement announcement) {
-        return announcementService.updateAnnouncement(id, announcement);
+
+        Announcement updatedAnnouncement =
+                announcementService.updateAnnouncement(id, announcement);
+
+        if (updatedAnnouncement == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(updatedAnnouncement);
     }
 
+    // DELETE announcement
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAnnouncement(@PathVariable Long id) {
-        announcementService.deleteAnnouncement(id);
+
+        boolean deleted = announcementService.deleteAnnouncement(id);
+
+        if (!deleted) {
+            return ResponseEntity.notFound().build();
+        }
+
         return ResponseEntity.noContent().build();
+    }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(
+        IllegalArgumentException exception) {
+
+    return ResponseEntity
+            .badRequest()
+            .body(exception.getMessage());
     }
 }
