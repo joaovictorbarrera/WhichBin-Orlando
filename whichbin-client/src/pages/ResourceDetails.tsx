@@ -59,12 +59,12 @@ function ResourceDetails() {
     getTriviaQuestions()
       .then((questions) => {
         if (isMounted) {
-          setTriviaQuestions(questions ?? [])
+          setTriviaQuestions(questions)
         }
       })
       .catch(() => {
         if (isMounted) {
-          setTriviaQuestions([])
+          setTriviaQuestions(null)
         }
       })
 
@@ -73,7 +73,8 @@ function ResourceDetails() {
     }
   }, [resource])
 
-  const triviaLoading = resource?.title === 'Take the Challenge' && triviaQuestions === null
+  const triviaLoading =
+    resource?.title === 'Take the Challenge' && triviaQuestions === null
 
   function handleAnswer(answer: string) {
     if (selectedAnswer !== null || quizComplete) {
@@ -238,43 +239,43 @@ function ResourceDetails() {
             Question {currentQuestion + 1} of {triviaQuestions?.length ?? 0}
           </p>
 
-<section className="trivia-question">
-  <h2>{question.question}</h2>
+          <section className="trivia-question">
+            <h2>{question.question}</h2>
 
-  <div className="trivia-answers">
-    {answers.map((answer) => (
-      <button
-        type="button"
-        className={getAnswerClass(answer)}
-        onClick={() => handleAnswer(answer)}
-        disabled={selectedAnswer !== null}
-        key={answer}
-      >
-        {answer}
-      </button>
-    ))}
-  </div>
+            <div className="trivia-answers">
+              {answers.map((answer) => (
+                <button
+                  type="button"
+                  className={getAnswerClass(answer)}
+                  onClick={() => handleAnswer(answer)}
+                  disabled={selectedAnswer !== null}
+                  key={answer}
+                >
+                  {answer}
+                </button>
+              ))}
+            </div>
 
-  {selectedAnswer !== null && (
-    <div className="trivia-next">
-      <p>
-        {selectedAnswer === question.correctAnswer
-          ? 'Correct!'
-          : `Not quite. The correct answer is ${question.correctAnswer}.`}
-      </p>
+            {selectedAnswer !== null && (
+              <div className="trivia-next">
+                <p>
+                  {selectedAnswer === question.correctAnswer
+                    ? 'Correct!'
+                    : `Not quite. The correct answer is ${question.correctAnswer}.`}
+                </p>
 
-      <button
-        type="button"
-        className="trivia-button"
-        onClick={handleNextQuestion}
-      >
-        {currentQuestion === triviaQuestions.length - 1
-          ? 'Finish'
-          : 'Next Question'}
-      </button>
-    </div>
-  )}
-</section>
+                <button
+                  type="button"
+                  className="trivia-button"
+                  onClick={handleNextQuestion}
+                >
+                  {currentQuestion === triviaQuestions.length - 1
+                    ? 'Finish'
+                    : 'Next Question'}
+                </button>
+              </div>
+            )}
+          </section>
         </div>
       </PageLayout>
     )
@@ -312,4 +313,3 @@ function ResourceDetails() {
 }
 
 export default ResourceDetails
-

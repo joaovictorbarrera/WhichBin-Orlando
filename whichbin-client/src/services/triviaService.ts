@@ -12,7 +12,7 @@ export type TriviaQuestion = {
 
 export async function getTriviaQuestions(): Promise<TriviaQuestion[] | null> {
   try {
-    const response = await apiFetch('trivia')
+    const response = await apiFetch('resources/trivia')
 
     if (!response.ok) {
       return null
