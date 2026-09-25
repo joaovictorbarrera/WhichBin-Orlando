@@ -10,6 +10,7 @@ import {
   FiHelpCircle,
   FiLock,
   FiLogOut,
+  FiTool,
   FiActivity,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
@@ -81,6 +82,18 @@ function Navigation() {
         </nav>
 
         <div className="menu-container" ref={menuRef}>
+          {isAuthenticated && (
+            <NavLink
+              to="/admin"
+              className="admin-tools-button"
+              onClick={closeMenu}
+              aria-label="Open admin dashboard"
+              title="Admin dashboard"
+            >
+              <FiTool aria-hidden="true" />
+            </NavLink>
+          )}
+
           <button
             className="menu-button"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -109,6 +122,11 @@ function Navigation() {
                 <span>Help / How to Use</span>
               </NavLink>
 
+              <NavLink to="/apistatus" onClick={closeMenu}>
+                <FiActivity />
+                <span>API Status</span>
+              </NavLink>
+
               {!isAuthenticated && (
                 <NavLink to="/admin/login" onClick={closeMenu}>
                   <FiLock />
@@ -122,11 +140,6 @@ function Navigation() {
                   <span>Sign out</span>
                 </button>
               )}
-
-              <NavLink to="/apistatus" onClick={closeMenu}>
-                <FiActivity />
-                <span>API Status</span>
-              </NavLink>
             </div>
           )}
         </div>
