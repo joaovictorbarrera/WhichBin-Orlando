@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FiSettings, FiAlertTriangle, FiFileText, FiChevronRight } from 'react-icons/fi'
+import { FiSettings, FiAlertTriangle, FiFileText, FiChevronRight, FiAward } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
 import { getResources, type Resource } from '../services/resourceService'
 import PageLayout from '../components/PageLayout'
@@ -47,6 +47,10 @@ function EducationalResources() {
 
     if (resource.styleType === 'resource-style-purple') {
       return <FiFileText />
+    }
+
+    if (resource.styleType === 'resource-style-teal') {
+     return <FiAward />
     }
 
     return <FaRecycle />
