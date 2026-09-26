@@ -17,6 +17,8 @@ import Navigation from './components/Navigation';
 import ProtectedRoute from './components/ProtectedRoute';
 import Announcements from './pages/Announcements';
 import AnnouncementDetails from './pages/AnnouncementDetails';
+import ItemSearch from './pages/ItemSearch';
+import ItemDetail from './pages/ItemDetail';
 
 function App() {
   return (
@@ -25,6 +27,9 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/item-search" element={<ItemSearch />} />
+        <Route path="/search" element={<ItemSearch />} />
+        <Route path="/item-search/:itemId" element={<ItemDetail />} />
         <Route path="/apistatus" element={<ApiStatus />} />
         <Route path="/resources" element={<EducationalResources />} />
         <Route path="/resources/:resourceId" element={<ResourceDetails />} />
