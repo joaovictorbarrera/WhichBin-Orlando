@@ -20,6 +20,17 @@ import {
 import PageLayout from '../components/PageLayout'
 import './ResourceDetails.css'
 
+function getPdfPath(title: string) {
+  const pdfPaths: Record<string, string> = {
+    'Recycling Basics': '/pdfs/recycling-basics.pdf',
+    'How to Prepare Items': '/pdfs/how-to-prepare-items.pdf',
+    'Common Mistakes': '/pdfs/common-mistakes.pdf',
+    'Orlando Recycling Guide': '/pdfs/orlando-recycling-guide.pdf',
+  }
+
+  return pdfPaths[title] ?? null
+}
+
 function ResourceDetails() {
   const { resourceId } = useParams()
 
@@ -435,9 +446,32 @@ function ResourceDetails() {
             <p>No information has been added to this resource yet.</p>
           </div>
         )}
+
+        {getPdfPath(resource.title) && (
+           <section className="resource-pdf">
+           <div className="resource-pdf-header">
+           <div>
+             <span className="resource-pdf-label">PDF GUIDE</span>
+        <h2>Additional Information</h2>
+        <p>View the complete guide for this resource.</p>
+      </div>
+
+      <a
+        href={getPdfPath(resource.title) ?? '#'}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="resource-pdf-button"
+              >
+                  Open PDF
+            </a>
+          </div>
+        </section>
+        )}
       </div>
     </PageLayout>
   )
 }
+
+
 
 export default ResourceDetails

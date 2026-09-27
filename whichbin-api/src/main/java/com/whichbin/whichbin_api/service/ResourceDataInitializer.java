@@ -24,7 +24,7 @@ public class ResourceDataInitializer implements CommandLineRunner {
 
     private void seedResources() {
 
-        if (resourceRepository.findByTitle("Recycling Basics").isEmpty()) {
+        if (resourceRepository.findAll().isEmpty()) {
 
             Resource recyclingBasics = new Resource(
                     "Recycling Basics",
@@ -54,11 +54,6 @@ public class ResourceDataInitializer implements CommandLineRunner {
                             )
                     )
             );
-
-            resourceRepository.save(recyclingBasics);
-        }
-
-        if (resourceRepository.findByTitle("How to Prepare Items").isEmpty()) {
 
             Resource howToPrepareItems = new Resource(
                     "How to Prepare Items",
@@ -94,11 +89,6 @@ public class ResourceDataInitializer implements CommandLineRunner {
                     )
             );
 
-            resourceRepository.save(howToPrepareItems);
-        }
-
-        if (resourceRepository.findByTitle("Common Mistakes").isEmpty()) {
-
             Resource commonMistakes = new Resource(
                     "Common Mistakes",
                     "Avoid these common recycling mistakes.",
@@ -132,11 +122,6 @@ public class ResourceDataInitializer implements CommandLineRunner {
                             )
                     )
             );
-
-            resourceRepository.save(commonMistakes);
-        }
-
-        if (resourceRepository.findByTitle("Orlando Recycling Guide").isEmpty()) {
 
             Resource orlandoGuide = new Resource(
                     "Orlando Recycling Guide",
@@ -172,20 +157,10 @@ public class ResourceDataInitializer implements CommandLineRunner {
                     )
             );
 
+            resourceRepository.save(recyclingBasics);
+            resourceRepository.save(howToPrepareItems);
+            resourceRepository.save(commonMistakes);
             resourceRepository.save(orlandoGuide);
-        }
-
-        if (resourceRepository.findByTitle("Take the Challenge").isEmpty()) {
-
-            Resource takeTheChallenge = new Resource(
-                    "Take the Challenge",
-                    "Test your recycling knowledge with a quick recycling challenge.",
-                    "Put your recycling knowledge to the test.",
-                    "resource-style-teal",
-                    List.of()
-            );
-
-            resourceRepository.save(takeTheChallenge);
         }
     }
 }

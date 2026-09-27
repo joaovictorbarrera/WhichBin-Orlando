@@ -114,6 +114,11 @@
 	opacity: 0.9;
 }
 
+.admin-resource-add:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
 .admin-resource-status {
 	margin: 1.5rem 0 0;
 	color: var(--color-text-muted);
@@ -139,6 +144,11 @@
 	border: 0.065rem solid var(--color-border-soft);
 	border-radius: 0.75rem;
 	background: var(--color-page);
+}
+
+.admin-resource-card-editing {
+	display: block;
+	border-color: var(--color-brand);
 }
 
 .admin-resource-card-content {
@@ -180,6 +190,15 @@
 	background: var(--color-page);
 }
 
+.admin-resource-card-actions button:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.admin-resource-card-actions button:disabled:hover {
+	background: var(--color-surface);
+}
+
 .admin-resource-card-actions .admin-resource-delete {
 	color: var(--color-danger);
 }
@@ -194,6 +213,14 @@
 	background: var(--color-page);
 }
 
+.admin-resource-form-inline {
+	margin-top: 0;
+}
+
+.admin-resource-new-form {
+	margin-top: 1.5rem;
+}
+
 .admin-resource-form-header {
 	display: flex;
 	align-items: center;
@@ -206,6 +233,15 @@
 	margin: 0;
 	color: var(--color-heading-deep);
 	font-size: 1.25rem;
+}
+
+.admin-resource-form-eyebrow {
+	margin: 0 0 0.35rem;
+	color: var(--color-accent);
+	font-size: 0.7rem;
+	font-weight: 800;
+	letter-spacing: 0.08rem;
+	text-transform: uppercase;
 }
 
 .admin-resource-form-close {
@@ -224,6 +260,11 @@
 .admin-resource-form-close:hover {
 	background: var(--color-surface);
 	color: var(--color-heading-deep);
+}
+
+.admin-resource-form-close:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
 }
 
 .admin-resource-form label {
@@ -398,6 +439,11 @@
 	opacity: 0.9;
 }
 
+.admin-resource-add-section:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
 .admin-resource-add-section-bottom {
 	display: inline-flex;
 	align-items: center;
@@ -421,6 +467,11 @@
 .admin-resource-add-section-bottom:focus {
 	outline: 0.125rem solid var(--color-brand);
 	outline-offset: 0.1rem;
+}
+
+.admin-resource-add-section-bottom:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
 }
 
 .admin-resource-no-sections {
@@ -472,6 +523,11 @@
 	background: var(--color-surface-red);
 }
 
+.admin-resource-remove-section:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
 .admin-resource-section-editor label {
 	margin-bottom: 1rem;
 }
@@ -491,6 +547,42 @@
 	margin-top: 0.15rem;
 	font-size: 0.85rem;
 	font-weight: 700;
+}
+
+/* Section Ordering */
+
+.admin-resource-section-order {
+	display: flex;
+	gap: 0.4rem;
+}
+
+.admin-resource-section-order button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.3rem;
+	min-height: 2.25rem;
+	padding: 0.4rem 0.65rem;
+	border: 0.065rem solid var(--color-border-soft);
+	border-radius: 0.4rem;
+	background: var(--color-surface);
+	color: var(--color-heading-deep);
+	font-size: 0.85rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.admin-resource-section-order button:hover {
+	background: var(--color-page);
+}
+
+.admin-resource-section-order button:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
+
+.admin-resource-section-order button:disabled:hover {
+	background: var(--color-surface);
 }
 
 /* Form actions */
@@ -560,6 +652,10 @@
 		flex-direction: column;
 	}
 
+	.admin-resource-card-editing {
+		padding: 1rem;
+	}
+
 	.admin-resource-card-actions {
 		width: 100%;
 	}
@@ -591,6 +687,10 @@
 		justify-content: center;
 	}
 
+	.admin-resource-add-section-bottom {
+		width: 100%;
+	}
+
 	.admin-resource-form-actions {
 		flex-direction: column-reverse;
 	}
@@ -613,5 +713,13 @@
 	.admin-resource-remove-section {
 		width: 100%;
 		justify-content: center;
+	}
+
+	.admin-resource-section-order {
+		width: 100%;
+	}
+
+	.admin-resource-section-order button {
+		flex: 1;
 	}
 }
