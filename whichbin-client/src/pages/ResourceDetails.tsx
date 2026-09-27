@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { FiArrowLeft } from 'react-icons/fi'
+import {
+  FiArrowLeft,
+  FiCheckCircle,
+  FiInfo,
+  FiAlertTriangle,
+  FiXCircle,
+  FiList,
+} from 'react-icons/fi'
+import { FaRecycle } from 'react-icons/fa6'
 import {
   getResourceById,
   type Resource,
@@ -121,6 +129,38 @@ function ResourceDetails() {
     return 'trivia-answer'
   }
 
+  function getSectionIcon(styleType: string) {
+    if (styleType.includes('blue')) {
+      return <FiInfo aria-hidden="true" />
+    }
+
+    if (styleType.includes('orange')) {
+      return <FiAlertTriangle aria-hidden="true" />
+    }
+
+    if (styleType.includes('red')) {
+      return <FiXCircle aria-hidden="true" />
+    }
+
+    return <FiCheckCircle aria-hidden="true" />
+  }
+
+  function getSectionClass(styleType: string) {
+    if (styleType.includes('blue')) {
+      return 'resource-section resource-section-blue'
+    }
+
+    if (styleType.includes('orange')) {
+      return 'resource-section resource-section-orange'
+    }
+
+    if (styleType.includes('red')) {
+      return 'resource-section resource-section-red'
+    }
+
+    return 'resource-section resource-section-green'
+  }
+
   if (loading && resourceId) {
     return (
       <PageLayout className="resource-details-page" width="wide">
@@ -145,6 +185,10 @@ function ResourceDetails() {
         </Link>
 
         <div className="resource-details-card">
+          <div className="resource-empty-icon">
+            <FiInfo aria-hidden="true" />
+          </div>
+
           <h1>Resource Not Found</h1>
           <p>Resource not found.</p>
         </div>
@@ -162,9 +206,21 @@ function ResourceDetails() {
           </Link>
 
           <div className="resource-details-card">
-            <h1>{resource.title}</h1>
-            <p>{resource.description}</p>
-            <p>Loading challenge questions...</p>
+            <div className="resource-hero resource-hero-green">
+              <div className="resource-hero-icon">
+                <FaRecycle aria-hidden="true" />
+              </div>
+
+              <div>
+                <p className="resource-hero-label">Interactive Challenge</p>
+                <h1>{resource.title}</h1>
+                <p>{resource.description}</p>
+              </div>
+            </div>
+
+            <div className="resource-loading-message">
+              Loading challenge questions...
+            </div>
           </div>
         </PageLayout>
       )
@@ -179,9 +235,21 @@ function ResourceDetails() {
           </Link>
 
           <div className="resource-details-card">
-            <h1>{resource.title}</h1>
-            <p>{resource.description}</p>
-            <p>There are no challenge questions available right now.</p>
+            <div className="resource-hero resource-hero-green">
+              <div className="resource-hero-icon">
+                <FaRecycle aria-hidden="true" />
+              </div>
+
+              <div>
+                <p className="resource-hero-label">Interactive Challenge</p>
+                <h1>{resource.title}</h1>
+                <p>{resource.description}</p>
+              </div>
+            </div>
+
+            <div className="resource-empty-message">
+              There are no challenge questions available right now.
+            </div>
           </div>
         </PageLayout>
       )
@@ -196,25 +264,33 @@ function ResourceDetails() {
           </Link>
 
           <div className="resource-details-card">
-            <h1>Challenge Complete!</h1>
+            <div className="resource-complete">
+              <div className="resource-complete-icon">
+                <FaRecycle aria-hidden="true" />
+              </div>
 
-            <p>
-              You scored {score} out of {triviaQuestions?.length ?? 0}.
-            </p>
+              <p className="resource-hero-label">Challenge Complete</p>
 
-            <button
-              type="button"
-              className="trivia-button"
-              onClick={restartQuiz}
-            >
-              Try Again
-            </button>
+              <h1>Great Job!</h1>
+
+              <p>
+                You scored {score} out of {triviaQuestions.length}.
+              </p>
+
+              <button
+                type="button"
+                className="trivia-button"
+                onClick={restartQuiz}
+              >
+                Try Again
+              </button>
+            </div>
           </div>
         </PageLayout>
       )
     }
 
-    const question = triviaQuestions![currentQuestion]
+    const question = triviaQuestions[currentQuestion]
 
     const answers = [
       question.answerA,
@@ -231,13 +307,34 @@ function ResourceDetails() {
         </Link>
 
         <div className="resource-details-card">
-          <h1>{resource.title}</h1>
+          <div className="resource-hero resource-hero-green">
+            <div className="resource-hero-icon">
+              <FaRecycle aria-hidden="true" />
+            </div>
 
-          <p>{resource.description}</p>
+            <div>
+              <p className="resource-hero-label">Interactive Challenge</p>
+              <h1>{resource.title}</h1>
+              <p>{resource.description}</p>
+            </div>
+          </div>
 
-          <p>
-            Question {currentQuestion + 1} of {triviaQuestions?.length ?? 0}
-          </p>
+          <div className="trivia-progress">
+            <span>
+              Question {currentQuestion + 1} of {triviaQuestions.length}
+            </span>
+
+            <div className="trivia-progress-bar">
+              <div
+                className="trivia-progress-fill"
+                style={{
+                  width: `${
+                    ((currentQuestion + 1) / triviaQuestions.length) * 100
+                  }%`,
+                }}
+              />
+            </div>
+          </div>
 
           <section className="trivia-question">
             <h2>{question.question}</h2>
@@ -289,24 +386,55 @@ function ResourceDetails() {
       </Link>
 
       <div className="resource-details-card">
-        <h1>{resource.title}</h1>
+        <div className="resource-hero resource-hero-green">
+          <div className="resource-hero-icon">
+            <FaRecycle aria-hidden="true" />
+          </div>
 
-        <p>{resource.description}</p>
+          <div>
+            <p className="resource-hero-label">Educational Resource</p>
 
-        {(resource.sections ?? []).map((section) => (
-          <section
-            className={`resource-section ${section.styleType}`}
-            key={`${section.heading}-${section.styleType}`}
-          >
-            <h2>{section.heading}</h2>
+            <h1>{resource.title}</h1>
 
-            <ul>
-              {section.items.split('|').map((item, itemIndex) => (
-                <li key={itemIndex}>{item}</li>
-              ))}
-            </ul>
-          </section>
-        ))}
+            <p>{resource.description}</p>
+          </div>
+        </div>
+
+        <div className="resource-section-list">
+          {(resource.sections ?? []).map((section, sectionIndex) => (
+            <section
+              className={getSectionClass(section.styleType)}
+              key={`${section.heading}-${sectionIndex}`}
+            >
+              <div className="resource-section-heading">
+                <div className="resource-section-icon">
+                  {getSectionIcon(section.styleType)}
+                </div>
+
+                <div>
+                  <span className="resource-section-number">
+                    {String(sectionIndex + 1).padStart(2, '0')}
+                  </span>
+
+                  <h2>{section.heading}</h2>
+                </div>
+              </div>
+
+              <ul>
+                {section.items.split('|').map((item, itemIndex) => (
+                  <li key={itemIndex}>{item}</li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+
+        {(resource.sections ?? []).length === 0 && (
+          <div className="resource-empty-message">
+            <FiList aria-hidden="true" />
+            <p>No information has been added to this resource yet.</p>
+          </div>
+        )}
       </div>
     </PageLayout>
   )

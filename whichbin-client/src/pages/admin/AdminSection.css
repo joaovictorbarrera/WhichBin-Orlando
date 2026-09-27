@@ -14,8 +14,15 @@
 	text-decoration: none;
 }
 
-.admin-section-back:hover { text-decoration: underline; text-underline-offset: 0.25rem; }
-.admin-section-back svg { width: 1rem; height: 1rem; }
+.admin-section-back:hover {
+	text-decoration: underline;
+	text-underline-offset: 0.25rem;
+}
+
+.admin-section-back svg {
+	width: 1rem;
+	height: 1rem;
+}
 
 .admin-section-panel {
 	max-width: 40rem;
@@ -37,16 +44,574 @@
 	color: var(--color-brand);
 }
 
-.admin-section-items .admin-section-icon { background: var(--color-surface-orange); color: var(--color-accent); }
-.admin-section-resources .admin-section-icon { background: var(--color-surface-blue); color: var(--color-info); }
-.admin-section-announcements .admin-section-icon { background: var(--color-surface-red); color: var(--color-danger); }
-.admin-section-icon svg { width: 1.5rem; height: 1.5rem; }
-.admin-section-eyebrow { margin: 0 0 0.625rem; color: var(--color-accent); font-size: 0.75rem; font-weight: 800; letter-spacing: 0.1rem; text-transform: uppercase; }
-.admin-section-panel h1 { margin: 0; color: var(--color-heading-deep); font-size: clamp(2rem, 4vw, 2.75rem); }
-.admin-section-panel > p { margin: 0.875rem 0 1.5rem; color: var(--color-text-muted); line-height: 1.6; }
-.admin-section-panel small { color: var(--color-text-subtle); line-height: 1.5; }
+.admin-section-items .admin-section-icon {
+	background: var(--color-surface-orange);
+	color: var(--color-accent);
+}
+
+.admin-section-resources .admin-section-icon {
+	background: var(--color-surface-blue);
+	color: var(--color-info);
+}
+
+.admin-section-announcements .admin-section-icon {
+	background: var(--color-surface-red);
+	color: var(--color-danger);
+}
+
+.admin-section-icon svg {
+	width: 1.5rem;
+	height: 1.5rem;
+}
+
+.admin-section-eyebrow {
+	margin: 0 0 0.625rem;
+	color: var(--color-accent);
+	font-size: 0.75rem;
+	font-weight: 800;
+	letter-spacing: 0.1rem;
+	text-transform: uppercase;
+}
+
+.admin-section-panel h1 {
+	margin: 0;
+	color: var(--color-heading-deep);
+	font-size: clamp(2rem, 4vw, 2.75rem);
+}
+
+.admin-section-panel > p {
+	margin: 0.875rem 0 1.5rem;
+	color: var(--color-text-muted);
+	line-height: 1.6;
+}
+
+.admin-section-panel small {
+	color: var(--color-text-subtle);
+	line-height: 1.5;
+}
+
+.admin-resource-actions {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 1.5rem;
+	margin-bottom: 1.5rem;
+}
+
+.admin-resource-add {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.7rem 1rem;
+	border: 0;
+	border-radius: 0.5rem;
+	background: var(--color-brand);
+	color: white;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.admin-resource-add:hover {
+	opacity: 0.9;
+}
+
+.admin-resource-status {
+	margin: 1.5rem 0 0;
+	color: var(--color-text-muted);
+	line-height: 1.5;
+}
+
+.admin-resource-error {
+	color: var(--color-danger);
+}
+
+.admin-resource-list {
+	display: grid;
+	gap: 1rem;
+	margin-top: 1.5rem;
+}
+
+.admin-resource-card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1.5rem;
+	padding: 1.25rem;
+	border: 0.065rem solid var(--color-border-soft);
+	border-radius: 0.75rem;
+	background: var(--color-page);
+}
+
+.admin-resource-card-content {
+	min-width: 0;
+}
+
+.admin-resource-card h2 {
+	margin: 0 0 0.5rem;
+	color: var(--color-heading-deep);
+	font-size: 1.1rem;
+}
+
+.admin-resource-card p {
+	margin: 0;
+	color: var(--color-text-muted);
+	line-height: 1.5;
+}
+
+.admin-resource-card-actions {
+	display: flex;
+	gap: 0.5rem;
+	flex-shrink: 0;
+}
+
+.admin-resource-card-actions button {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.55rem 0.75rem;
+	border: 0.065rem solid var(--color-border-soft);
+	border-radius: 0.45rem;
+	background: var(--color-surface);
+	color: var(--color-heading-deep);
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.admin-resource-card-actions button:hover {
+	background: var(--color-page);
+}
+
+.admin-resource-card-actions .admin-resource-delete {
+	color: var(--color-danger);
+}
+
+/* Resource form */
+
+.admin-resource-form {
+	margin-top: 1.5rem;
+	padding: 1.5rem;
+	border: 0.065rem solid var(--color-border-soft);
+	border-radius: 0.75rem;
+	background: var(--color-page);
+}
+
+.admin-resource-form-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.admin-resource-form-header h2 {
+	margin: 0;
+	color: var(--color-heading-deep);
+	font-size: 1.25rem;
+}
+
+.admin-resource-form-close {
+	display: grid;
+	place-items: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	padding: 0;
+	border: 0;
+	border-radius: 0.45rem;
+	background: transparent;
+	color: var(--color-text-muted);
+	cursor: pointer;
+}
+
+.admin-resource-form-close:hover {
+	background: var(--color-surface);
+	color: var(--color-heading-deep);
+}
+
+.admin-resource-form label {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	margin-bottom: 1.1rem;
+	color: var(--color-heading-deep);
+	font-weight: 700;
+}
+
+.admin-resource-form input,
+.admin-resource-form textarea,
+.admin-resource-form select {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 0.75rem;
+	border: 0.065rem solid var(--color-border-soft);
+	border-radius: 0.45rem;
+	background: var(--color-surface);
+	color: var(--color-heading-deep);
+	font: inherit;
+}
+
+.admin-resource-form input:focus,
+.admin-resource-form textarea:focus,
+.admin-resource-form select:focus {
+	outline: 0.125rem solid var(--color-brand);
+	outline-offset: 0.1rem;
+}
+
+.admin-resource-form textarea {
+	resize: vertical;
+	min-height: 8rem;
+	line-height: 1.5;
+}
+
+/* Custom Style Dropdown */
+
+.admin-resource-style-dropdown {
+	position: relative;
+	width: 100%;
+}
+
+.admin-resource-style-selected {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	width: 100%;
+	min-height: 3rem;
+	padding: 0.75rem;
+	border: 0.065rem solid var(--color-border-soft);
+	border-radius: 0.45rem;
+	background: var(--color-surface);
+	color: var(--color-heading-deep);
+	font: inherit;
+	font-weight: 400;
+	text-align: left;
+	cursor: pointer;
+}
+
+.admin-resource-style-selected:hover {
+	border-color: var(--color-brand);
+}
+
+.admin-resource-style-selected:focus {
+	outline: 0.125rem solid var(--color-brand);
+	outline-offset: 0.1rem;
+}
+
+.admin-resource-style-placeholder {
+	color: var(--color-text-muted);
+}
+
+.admin-resource-style-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 1.5rem;
+	height: 1.5rem;
+	font-size: 1.25rem;
+}
+
+.admin-resource-style-options {
+	position: absolute;
+	top: calc(100% + 0.35rem);
+	left: 0;
+	z-index: 10;
+	width: 100%;
+	overflow: hidden;
+	border: 0.065rem solid var(--color-border-soft);
+	border-radius: 0.5rem;
+	background: var(--color-surface);
+	box-shadow: var(--shadow-card);
+}
+
+.admin-resource-style-option {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	width: 100%;
+	min-height: 3rem;
+	padding: 0.7rem 0.75rem;
+	border: 0;
+	font: inherit;
+	font-weight: 700;
+	text-align: left;
+	cursor: pointer;
+}
+
+.admin-resource-style-option:hover {
+	filter: brightness(0.97);
+}
+
+.admin-resource-style-option:focus {
+	position: relative;
+	z-index: 1;
+	outline: 0.125rem solid var(--color-brand);
+	outline-offset: -0.125rem;
+}
+
+.admin-resource-style-option-selected {
+	font-weight: 800;
+}
+
+/* Resource Sections */
+
+.admin-resource-sections {
+	margin-top: 1.75rem;
+	padding-top: 1.5rem;
+	border-top: 0.065rem solid var(--color-border-soft);
+}
+
+.admin-resource-sections-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.admin-resource-sections-header h3 {
+	margin: 0;
+	color: var(--color-heading-deep);
+	font-size: 1.1rem;
+}
+
+.admin-resource-sections-header p {
+	margin: 0.35rem 0 0;
+	color: var(--color-text-muted);
+	font-size: 0.9rem;
+	font-weight: 400;
+	line-height: 1.5;
+}
+
+.admin-resource-add-section {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	flex-shrink: 0;
+	padding: 0.6rem 0.8rem;
+	border: 0;
+	border-radius: 0.45rem;
+	background: var(--color-surface-green);
+	color: var(--color-brand);
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.admin-resource-add-section:hover {
+	opacity: 0.9;
+}
+
+.admin-resource-add-section-bottom {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	width: 100%;
+	margin-top: 1rem;
+	padding: 0.75rem 1rem;
+	border: 0.065rem dashed var(--color-brand);
+	border-radius: 0.5rem;
+	background: var(--color-surface);
+	color: var(--color-brand);
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.admin-resource-add-section-bottom:hover {
+	background: var(--color-surface-green-soft);
+}
+
+.admin-resource-add-section-bottom:focus {
+	outline: 0.125rem solid var(--color-brand);
+	outline-offset: 0.1rem;
+}
+
+.admin-resource-no-sections {
+	margin: 0;
+	padding: 1rem;
+	border: 0.065rem dashed var(--color-border-soft);
+	border-radius: 0.5rem;
+	color: var(--color-text-muted);
+	font-size: 0.9rem;
+	text-align: center;
+}
+
+.admin-resource-section-editor {
+	margin-top: 1rem;
+	padding: 1.25rem;
+	border: 0.065rem solid var(--color-border-soft);
+	border-radius: 0.625rem;
+	background: var(--color-surface);
+}
+
+.admin-resource-section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.admin-resource-section-header h4 {
+	margin: 0;
+	color: var(--color-heading-deep);
+	font-size: 1rem;
+}
+
+.admin-resource-remove-section {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.45rem 0.65rem;
+	border: 0;
+	border-radius: 0.4rem;
+	background: transparent;
+	color: var(--color-danger);
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.admin-resource-remove-section:hover {
+	background: var(--color-surface-red);
+}
+
+.admin-resource-section-editor label {
+	margin-bottom: 1rem;
+}
+
+.admin-resource-section-editor textarea {
+	min-height: 9rem;
+}
+
+.admin-resource-section-editor small {
+	font-weight: 400;
+}
+
+.admin-resource-section-style-preview {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin-top: 0.15rem;
+	font-size: 0.85rem;
+	font-weight: 700;
+}
+
+/* Form actions */
+
+.admin-resource-form-error {
+	margin: 0 0 1rem;
+	color: var(--color-danger);
+	font-size: 0.9rem;
+	font-weight: 600;
+}
+
+.admin-resource-form-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.75rem;
+	margin-top: 1.5rem;
+}
+
+.admin-resource-cancel,
+.admin-resource-save {
+	padding: 0.7rem 1rem;
+	border-radius: 0.5rem;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.admin-resource-cancel {
+	border: 0.065rem solid var(--color-border-soft);
+	background: var(--color-surface);
+	color: var(--color-heading-deep);
+}
+
+.admin-resource-cancel:hover {
+	background: var(--color-page);
+}
+
+.admin-resource-save {
+	border: 0;
+	background: var(--color-brand);
+	color: white;
+}
+
+.admin-resource-save:hover {
+	opacity: 0.9;
+}
+
+.admin-resource-cancel:disabled,
+.admin-resource-save:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
 
 @media (max-width: 600px) {
-	.admin-section-page { padding-top: 3rem; }
-	.admin-section-panel { padding: 1.5rem; background: transparent; border: 0; box-shadow: none; }
+	.admin-section-page {
+		padding-top: 3rem;
+	}
+
+	.admin-section-panel {
+		padding: 1.5rem;
+		background: transparent;
+		border: 0;
+		box-shadow: none;
+	}
+
+	.admin-resource-card {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+
+	.admin-resource-card-actions {
+		width: 100%;
+	}
+
+	.admin-resource-card-actions button {
+		flex: 1;
+		justify-content: center;
+	}
+
+	.admin-resource-actions {
+		justify-content: stretch;
+	}
+
+	.admin-resource-add {
+		justify-content: center;
+		width: 100%;
+	}
+
+	.admin-resource-form {
+		padding: 1.25rem;
+	}
+
+	.admin-resource-sections-header {
+		flex-direction: column;
+	}
+
+	.admin-resource-add-section {
+		width: 100%;
+		justify-content: center;
+	}
+
+	.admin-resource-form-actions {
+		flex-direction: column-reverse;
+	}
+
+	.admin-resource-cancel,
+	.admin-resource-save {
+		width: 100%;
+	}
+
+	.admin-resource-style-options {
+		position: static;
+		margin-top: 0.35rem;
+	}
+
+	.admin-resource-section-header {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+
+	.admin-resource-remove-section {
+		width: 100%;
+		justify-content: center;
+	}
 }
