@@ -92,4 +92,3 @@ public class Resource {
         this.sections = sections;
     }
 }
-
