@@ -2,7 +2,6 @@ import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import {
 	FiAlertTriangle,
 	FiArrowLeft,
-	FiAward,
 	FiEdit,
 	FiFileText,
 	FiPackage,
