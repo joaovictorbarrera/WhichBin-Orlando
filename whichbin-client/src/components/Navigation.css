@@ -34,7 +34,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0;
 }
 
 .admin-tools-button {
@@ -42,13 +42,14 @@
   place-items: center;
   width: 2.25rem;
   height: 2.25rem;
-  color: var(--color-danger);
+  border-radius: 0.5rem;
+  color: var(--color-brand);
   text-decoration: none;
+  transition: background-color 0.15s ease;
 }
 
-.admin-tools-button:hover,
-.admin-tools-button.active {
-  color: var(--color-status-offline);
+.admin-tools-button:hover {
+  background-color: var(--color-surface-hover);
 }
 
 .admin-tools-button svg {
