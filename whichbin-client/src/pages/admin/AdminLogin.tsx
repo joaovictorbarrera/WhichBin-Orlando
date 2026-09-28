@@ -1,20 +1,19 @@
 import { useState, type FormEvent } from 'react'
 import { FiArrowLeft, FiLock, FiMail } from 'react-icons/fi'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/useAuth'
-import PageLayout from '../components/PageLayout'
+import { Link, Navigate } from 'react-router-dom'
+import { useAuth } from '../../context/useAuth'
+import PageLayout from '../../components/PageLayout'
 import './AdminLogin.css'
 
 function AdminLogin() {
   const { isAuthenticated, login } = useAuth()
-  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/admin" replace />
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -24,7 +23,6 @@ function AdminLogin() {
 
     try {
       await login(email, password)
-      navigate('/', { replace: true })
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : 'Unable to sign in right now.')
     } finally {
