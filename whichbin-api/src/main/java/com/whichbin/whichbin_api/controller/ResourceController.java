@@ -1,5 +1,6 @@
 package com.whichbin.whichbin_api.controller;
 
+import com.whichbin.whichbin_api.auth.Authenticated;
 import com.whichbin.whichbin_api.model.Resource;
 import com.whichbin.whichbin_api.model.TriviaQuestion;
 import com.whichbin.whichbin_api.service.ResourceService;
@@ -35,11 +36,13 @@ public class ResourceController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @Authenticated
     @PostMapping
     public Resource createResource(@RequestBody Resource resource) {
         return resourceService.createResource(resource);
     }
 
+    @Authenticated
     @PutMapping("/{id}")
     public Resource updateResource(
             @PathVariable Long id,
@@ -47,6 +50,7 @@ public class ResourceController {
         return resourceService.updateResource(id, resource);
     }
 
+    @Authenticated
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteResource(@PathVariable Long id) {
         resourceService.deleteResource(id);
@@ -58,12 +62,14 @@ public class ResourceController {
         return triviaQuestionService.getAllQuestions();
     }
 
+    @Authenticated
     @PostMapping("/trivia")
     public TriviaQuestion createTriviaQuestion(
             @RequestBody TriviaQuestion question) {
         return triviaQuestionService.createQuestion(question);
     }
 
+    @Authenticated
     @PutMapping("/trivia/{id}")
     public TriviaQuestion updateTriviaQuestion(
             @PathVariable Long id,
@@ -71,6 +77,7 @@ public class ResourceController {
         return triviaQuestionService.updateQuestion(id, question);
     }
 
+    @Authenticated
     @DeleteMapping("/trivia/{id}")
     public ResponseEntity<Void> deleteTriviaQuestion(@PathVariable Long id) {
         triviaQuestionService.deleteQuestion(id);

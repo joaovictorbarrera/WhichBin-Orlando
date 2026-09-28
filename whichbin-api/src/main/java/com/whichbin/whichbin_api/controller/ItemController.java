@@ -1,5 +1,6 @@
 package com.whichbin.whichbin_api.controller;
 
+import com.whichbin.whichbin_api.auth.Authenticated;
 import com.whichbin.whichbin_api.model.Item;
 import com.whichbin.whichbin_api.service.ItemService;
 import org.springframework.http.ResponseEntity;
@@ -29,11 +30,13 @@ public class ItemController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @Authenticated
     @PostMapping
     public Item createItem(@RequestBody Item item) {
         return itemService.createItem(item);
     }
 
+    @Authenticated
     @PutMapping("/{id}")
     public Item updateItem(
             @PathVariable Long id,
@@ -41,6 +44,7 @@ public class ItemController {
         return itemService.updateItem(id, item);
     }
 
+    @Authenticated
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
         itemService.deleteItem(id);

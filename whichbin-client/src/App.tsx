@@ -6,7 +6,7 @@ import EducationalResources from './pages/EducationalResources';
 import ResourceDetails from './pages/ResourceDetails';
 import About from './pages/About';
 import Help from './pages/Help';
-import AdminLogin from './pages/AdminLogin';
+import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminItems from './pages/admin/AdminItems';

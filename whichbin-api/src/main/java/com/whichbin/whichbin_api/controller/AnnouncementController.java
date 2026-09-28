@@ -1,5 +1,6 @@
 package com.whichbin.whichbin_api.controller;
 
+import com.whichbin.whichbin_api.auth.Authenticated;
 import com.whichbin.whichbin_api.model.Announcement;
 import com.whichbin.whichbin_api.service.AnnouncementService;
 import org.springframework.http.HttpStatus;
@@ -18,13 +19,14 @@ public class AnnouncementController {
         this.announcementService = announcementService;
     }
 
-    // GET all announcements
+    // GETs filtered announcements
+    // TODO rename this to getFiltered announcements
+    // Add new authenticated route for getting all announcements (used by admin panel)
     @GetMapping
     public ResponseEntity<List<Announcement>> getAllAnnouncements() {
         return ResponseEntity.ok(announcementService.getAllAnnouncements());
     }
 
-    // GET announcement by ID
     @GetMapping("/{id}")
     public ResponseEntity<Announcement> getAnnouncementById(@PathVariable Long id) {
         return announcementService.getAnnouncementById(id)
@@ -32,7 +34,7 @@ public class AnnouncementController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // CREATE announcement
+    @Authenticated
     @PostMapping
     public ResponseEntity<Announcement> createAnnouncement(
             @RequestBody Announcement announcement) {
@@ -45,7 +47,7 @@ public class AnnouncementController {
                 .body(createdAnnouncement);
     }
 
-    // UPDATE announcement
+    @Authenticated
     @PutMapping("/{id}")
     public ResponseEntity<Announcement> updateAnnouncement(
             @PathVariable Long id,
@@ -61,7 +63,7 @@ public class AnnouncementController {
         return ResponseEntity.ok(updatedAnnouncement);
     }
 
-    // DELETE announcement
+    @Authenticated
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAnnouncement(@PathVariable Long id) {
 

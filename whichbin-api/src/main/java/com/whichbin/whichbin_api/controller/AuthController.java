@@ -15,13 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.security.SecureRandom;
-
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final AuthorizationTokenService authorizationTokenService;
 
