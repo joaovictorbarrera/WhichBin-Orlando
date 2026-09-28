@@ -423,10 +423,6 @@ function ResourceDetails() {
                 </div>
 
                 <div>
-                  <span className="resource-section-number">
-                    {String(sectionIndex + 1).padStart(2, '0')}
-                  </span>
-
                   <h2>{section.heading}</h2>
                 </div>
               </div>
