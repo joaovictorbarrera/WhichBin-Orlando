@@ -63,6 +63,10 @@ function ItemSearch() {
     }
   }, [searchText, filter, refreshKey])
 
+  function forceRefresh() {
+    setRefreshKey((prev) => prev + 1)
+  }
+
   return (
     <PageLayout className="item-search-page" width="wide">
       <div className="item-search-header">
@@ -153,7 +157,7 @@ function ItemSearch() {
           <button
             type="button"
             className="item-search-retry-btn"
-            onClick={() => setRefreshKey((prev) => prev + 1)}
+            onClick={forceRefresh}
           >
             <FiRefreshCw aria-hidden="true" />
             Try again
