@@ -3,6 +3,12 @@
   color: var(--color-ink);
 }
 
+@media (min-width: 1024px) {
+  .help-page {
+    padding-bottom: 4rem;
+  }
+}
+
 .help-intro {
   max-width: 47.5rem;
   padding: 1.5rem 0 3.625rem;
