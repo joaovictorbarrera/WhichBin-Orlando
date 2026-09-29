@@ -139,13 +139,11 @@
   text-transform: uppercase;
 }
 
-.dropdown-menu a.active,
 .dropdown-menu a.active {
   color: var(--color-brand);
 }
 
-.desktop-nav-item.active,
-.nav-item.active {
+.desktop-nav-item.active {
   color: var(--color-surface);
 }
 
