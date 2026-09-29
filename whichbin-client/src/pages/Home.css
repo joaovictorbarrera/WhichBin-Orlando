@@ -35,15 +35,15 @@
   max-width: 38.75rem;
   margin: 0;
   color: var(--color-heading);
-  font-size: clamp(2.75rem, 6vw, 4.875rem);
-  line-height: 0.99;
+  font-size: clamp(2.5rem, 4.8vw, 3.75rem);
+  line-height: 1;
 }
 
 .home-intro {
   max-width: 30rem;
   margin: 1.69rem 0 2rem;
   color: var(--color-text-api);
-  font-size: 1.19rem;
+  font-size: 1.2rem;
   line-height: 1.6;
 }
 
@@ -232,10 +232,6 @@
     align-self: center;
     width: min(72vw, 18.75rem);
     order: -1;
-  }
-
-  .home-copy h1 {
-    font-size: clamp(2.75rem, 14vw, 4rem);
   }
 
   .home-intro {
