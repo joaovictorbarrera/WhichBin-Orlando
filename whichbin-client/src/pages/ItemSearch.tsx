@@ -24,6 +24,7 @@ function ItemSearch() {
   const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
+    const controller = new AbortController()
     let isMounted = true
 
     const timer = setTimeout(() => {
@@ -37,21 +38,18 @@ function ItemSearch() {
             ? false
             : undefined
 
-      fetchItems(searchText.trim() || undefined, recycleableParam)
+      fetchItems(searchText.trim(), recycleableParam, controller.signal)
         .then((data) => {
           if (!isMounted) return
-
-          if (data === null) {
-            setError('Unable to load items. Please try again later.')
-            setItems([])
-          } else {
-            setItems(data)
-            setError(null)
-          }
+          setItems(data)
+          setError(null)
           setLoading(false)
         })
-        .catch(() => {
+        .catch((err) => {
           if (!isMounted) return
+          if (err instanceof Error && err.name === 'AbortError') {
+            return
+          }
           setError('Unable to load items. Please try again later.')
           setItems([])
           setLoading(false)
@@ -60,6 +58,7 @@ function ItemSearch() {
 
     return () => {
       isMounted = false
+      controller.abort()
       clearTimeout(timer)
     }
   }, [searchText, filter, retryCount])

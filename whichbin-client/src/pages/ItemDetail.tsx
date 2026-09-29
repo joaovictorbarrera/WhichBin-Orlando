@@ -12,29 +12,13 @@ import {
 import { FaRecycle } from 'react-icons/fa'
 import PageLayout from '../components/PageLayout'
 import { fetchItemById, type Item } from '../services/itemService'
+import { formatDateTime } from '../helpers/DateHelper'
 import './ItemDetail.css'
-
-function formatDateTime(dateTime?: string): string | null {
-  if (!dateTime) return null
-  try {
-    const date = new Date(dateTime)
-    if (isNaN(date.getTime())) return null
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    }).format(date)
-  } catch {
-    return null
-  }
-}
 
 function ItemDetail() {
   const { itemId } = useParams<{ itemId: string }>()
   const [item, setItem] = useState<Item | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(Boolean(itemId))
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -42,31 +26,34 @@ function ItemDetail() {
       return
     }
 
+    const controller = new AbortController()
     let isMounted = true
 
-    fetchItemById(itemId)
+    fetchItemById(itemId, controller.signal)
       .then((data) => {
-        if (isMounted) {
-          if (data) {
-            setItem(data)
-            setError(null)
-          } else {
-            setItem(null)
-            setError('The requested item could not be found.')
-          }
-          setLoading(false)
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
+        if (!isMounted) return
+        if (data) {
+          setItem(data)
+          setError(null)
+        } else {
           setItem(null)
-          setError('Failed to load item details. Please check your connection and try again.')
-          setLoading(false)
+          setError('The requested item could not be found.')
         }
+        setLoading(false)
+      })
+      .catch((err) => {
+        if (!isMounted) return
+        if (err instanceof Error && err.name === 'AbortError') {
+          return
+        }
+        setItem(null)
+        setError('Failed to load item details. Please check your connection and try again.')
+        setLoading(false)
       })
 
     return () => {
       isMounted = false
+      controller.abort()
     }
   }, [itemId])
 

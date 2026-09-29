@@ -1,12 +1,12 @@
 export interface Item {
-  id: number;
-  name: string;
-  recycleable: boolean;
-  information: string;
-  createdAt?: string;
+  id: number
+  name: string
+  recycleable: boolean
+  information: string
+  createdAt?: string
 }
 
-const MOCK_ITEMS: Item[] = [
+export const MOCK_ITEMS: Item[] = [
   {
     id: 1,
     name: 'Plastic Water Bottle',
@@ -35,35 +35,69 @@ const MOCK_ITEMS: Item[] = [
     information: 'Single-use alkaline batteries belong in household trash or at designated hazardous drop-off centers.',
     createdAt: '2026-09-04T09:00:00Z',
   },
-];
+]
 
-export async function fetchItems(searchText = '', recycleable?: boolean): Promise<Item[]> {
+export async function fetchItems(
+  searchText = '',
+  recycleable?: boolean,
+  signal?: AbortSignal
+): Promise<Item[]> {
   try {
-    const params = new URLSearchParams();
-    if (searchText) params.append('searchText', searchText);
-    if (recycleable !== undefined) params.append('recycleable', String(recycleable));
+    const params = new URLSearchParams()
+    if (searchText.trim()) {
+      params.append('searchText', searchText.trim())
+    }
+    if (recycleable !== undefined) {
+      params.append('recycleable', String(recycleable))
+    }
 
-    const response = await fetch(`/api/item?${params.toString()}`);
-    if (!response.ok) throw new Error('API offline');
-    return await response.json();
-  } catch {
+    const query = params.toString() ? `?${params.toString()}` : ''
+    const response = await fetch(`/api/items${query}`, { signal })
+
+    if (!response.ok) {
+      throw new Error('API offline')
+    }
+
+    return (await response.json()) as Item[]
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw error
+    }
+
     // Graceful fallback to mock data when backend endpoint isn't ready
     return MOCK_ITEMS.filter((item) => {
-      const matchesSearch = item.name.toLowerCase().includes(searchText.toLowerCase());
-      const matchesFilter = recycleable === undefined || item.recycleable === recycleable;
-      return matchesSearch && matchesFilter;
-    });
+      const matchesSearch = item.name
+        .toLowerCase()
+        .includes(searchText.trim().toLowerCase())
+      const matchesFilter =
+        recycleable === undefined || item.recycleable === recycleable
+      return matchesSearch && matchesFilter
+    })
   }
 }
 
-export async function fetchItemById(id: string | number): Promise<Item> {
+export async function fetchItemById(
+  id: string | number,
+  signal?: AbortSignal
+): Promise<Item> {
   try {
-    const response = await fetch(`/api/item/${id}`);
-    if (!response.ok) throw new Error('API offline');
-    return await response.json();
-  } catch {
-    const item = MOCK_ITEMS.find((i) => i.id === Number(id));
-    if (!item) throw new Error('Item not found');
-    return item;
+    const response = await fetch(`/api/items/${id}`, { signal })
+
+    if (!response.ok) {
+      throw new Error('API offline')
+    }
+
+    return (await response.json()) as Item
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw error
+    }
+
+    const item = MOCK_ITEMS.find((i) => i.id === Number(id))
+    if (!item) {
+      throw new Error('Item not found', { cause: error })
+    }
+
+    return item
   }
 }
