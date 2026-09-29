@@ -95,7 +95,7 @@ export async function fetchItemById(
 
     const item = MOCK_ITEMS.find((i) => i.id === Number(id))
     if (!item) {
-      throw new Error('Item not found', { cause: error })
+      throw new Error('Item not found')
     }
 
     return item

@@ -24,3 +24,4 @@ export function formatDateTime(dateTime?: string | null): string {
     return ''
   }
 }
+
