@@ -11,6 +11,7 @@
   align-items: center;
   gap: 0.5rem;
   min-height: 2.5rem;
+  margin-top: 1rem;
   margin-bottom: 1.125rem;
   color: var(--color-brand);
   text-decoration: none;
