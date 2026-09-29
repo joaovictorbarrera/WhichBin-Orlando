@@ -11,17 +11,27 @@ import {
 import { FaRecycle } from 'react-icons/fa'
 import PageLayout from '../components/PageLayout'
 import { fetchItems, type Item } from '../services/itemService'
+import { isAbortError } from '../helpers/ErrorHelper'
 import './ItemSearch.css'
 
 type FilterOption = 'all' | 'recyclable' | 'non-recyclable'
 
 function ItemSearch() {
   const [searchText, setSearchText] = useState('')
+  const [debouncedSearchText, setDebouncedSearchText] = useState('')
   const [filter, setFilter] = useState<FilterOption>('all')
   const [items, setItems] = useState<Item[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchText(searchText)
+    }, 250)
+
+    return () => clearTimeout(timer)
+  }, [searchText])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -38,30 +48,32 @@ function ItemSearch() {
             ? false
             : undefined
 
-      fetchItems(searchText.trim(), recycleableParam, controller.signal)
+      fetchItems(debouncedSearchText.trim(), recycleableParam, controller.signal)
         .then((data) => {
           if (!isMounted) return
-          setItems(data)
-          setError(null)
+          if (data) {
+            setItems(data)
+            setError(null)
+          } else {
+            setItems([])
+            setError('Unable to load items. Please try again later.')
+          }
           setLoading(false)
         })
         .catch((err) => {
-          if (!isMounted) return
-          if (err instanceof Error && err.name === 'AbortError') {
-            return
-          }
+          if (!isMounted || isAbortError(err)) return
           setError('Unable to load items. Please try again later.')
           setItems([])
           setLoading(false)
         })
-    }, 250)
+    }, 0)
 
     return () => {
       isMounted = false
       controller.abort()
       clearTimeout(timer)
     }
-  }, [searchText, filter, refreshKey])
+  }, [debouncedSearchText, filter, refreshKey])
 
   function forceRefresh() {
     setRefreshKey((prev) => prev + 1)

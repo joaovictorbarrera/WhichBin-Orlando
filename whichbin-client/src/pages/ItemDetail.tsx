@@ -13,6 +13,7 @@ import { FaRecycle } from 'react-icons/fa'
 import PageLayout from '../components/PageLayout'
 import { fetchItemById, type Item } from '../services/itemService'
 import { formatDateTime } from '../helpers/DateHelper'
+import { isAbortError } from '../helpers/ErrorHelper'
 import './ItemDetail.css'
 
 function ItemDetail() {
@@ -42,10 +43,7 @@ function ItemDetail() {
         setLoading(false)
       })
       .catch((err) => {
-        if (!isMounted) return
-        if (err instanceof Error && err.name === 'AbortError') {
-          return
-        }
+        if (!isMounted || isAbortError(err)) return
         setItem(null)
         setError('Failed to load item details. Please check your connection and try again.')
         setLoading(false)

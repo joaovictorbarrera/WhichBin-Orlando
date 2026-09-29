@@ -1,3 +1,6 @@
+import { apiFetch } from './apiClient'
+import { isAbortError } from '../helpers/ErrorHelper'
+
 export interface Item {
   id: number
   name: string
@@ -41,7 +44,17 @@ export async function fetchItems(
   searchText = '',
   recycleable?: boolean,
   signal?: AbortSignal
-): Promise<Item[]> {
+): Promise<Item[] | null> {
+  const fallbackToMockItems = () =>
+    MOCK_ITEMS.filter((item) => {
+      const matchesSearch = item.name
+        .toLowerCase()
+        .includes(searchText.trim().toLowerCase())
+      const matchesFilter =
+        recycleable === undefined || item.recycleable === recycleable
+      return matchesSearch && matchesFilter
+    })
+
   try {
     const params = new URLSearchParams()
     if (searchText.trim()) {
@@ -52,52 +65,44 @@ export async function fetchItems(
     }
 
     const query = params.toString() ? `?${params.toString()}` : ''
-    const response = await fetch(`/api/items${query}`, { signal })
+    const response = await apiFetch(`items${query}`, { signal })
 
+    // Graceful fallback to mock data when backend endpoint isn't ready
     if (!response.ok) {
-      throw new Error('API offline')
+      return fallbackToMockItems()
     }
 
-    return (await response.json()) as Item[]
+    const data = (await response.json()) as Item[]
+
+    // Graceful fallback to mock data when the API responds with no items
+    return data.length > 0 ? data : fallbackToMockItems()
   } catch (error) {
-    if (error instanceof Error && error.name === 'AbortError') {
+    if (isAbortError(error)) {
       throw error
     }
 
-    // Graceful fallback to mock data when backend endpoint isn't ready
-    return MOCK_ITEMS.filter((item) => {
-      const matchesSearch = item.name
-        .toLowerCase()
-        .includes(searchText.trim().toLowerCase())
-      const matchesFilter =
-        recycleable === undefined || item.recycleable === recycleable
-      return matchesSearch && matchesFilter
-    })
+    return fallbackToMockItems()
   }
 }
 
 export async function fetchItemById(
   id: string | number,
   signal?: AbortSignal
-): Promise<Item> {
+): Promise<Item | null> {
   try {
-    const response = await fetch(`/api/items/${id}`, { signal })
+    const response = await apiFetch(`items/${id}`, { signal })
 
+    // Graceful fallback to mock data when backend endpoint isn't ready
     if (!response.ok) {
-      throw new Error('API offline')
+      return MOCK_ITEMS.find((item) => item.id === Number(id)) ?? null
     }
 
     return (await response.json()) as Item
   } catch (error) {
-    if (error instanceof Error && error.name === 'AbortError') {
+    if (isAbortError(error)) {
       throw error
     }
 
-    const item = MOCK_ITEMS.find((i) => i.id === Number(id))
-    if (!item) {
-      throw new Error('Item not found')
-    }
-
-    return item
+    return MOCK_ITEMS.find((item) => item.id === Number(id)) ?? null
   }
 }
