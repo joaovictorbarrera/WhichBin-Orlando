@@ -21,7 +21,7 @@ function ItemSearch() {
   const [items, setItems] = useState<Item[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [retryCount, setRetryCount] = useState(0)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -61,7 +61,7 @@ function ItemSearch() {
       controller.abort()
       clearTimeout(timer)
     }
-  }, [searchText, filter, retryCount])
+  }, [searchText, filter, refreshKey])
 
   return (
     <PageLayout className="item-search-page" width="wide">
@@ -153,7 +153,7 @@ function ItemSearch() {
           <button
             type="button"
             className="item-search-retry-btn"
-            onClick={() => setRetryCount((prev) => prev + 1)}
+            onClick={() => setRefreshKey((prev) => prev + 1)}
           >
             <FiRefreshCw aria-hidden="true" />
             Try again
