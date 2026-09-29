@@ -130,10 +130,6 @@
   text-transform: uppercase;
 }
 
-.label-top { top: 5%; left: 43%; }
-.label-right { top: 48%; right: -3%; }
-.label-bottom { bottom: 5%; left: 37%; }
-
 .home-toolkit {
   max-width: 61.25rem;
   margin: 3.375rem auto 0;
