@@ -2,7 +2,7 @@ import {
   FiArrowRight,
   FiAward,
   FiBell,
-  FiCode,
+  FiCloud,
   FiDatabase,
   FiGitBranch,
   FiGithub,
@@ -163,22 +163,22 @@ function About() {
       <section className="about-technology" aria-labelledby="about-technology-heading">
         <div className="about-section-label">Technology and hosting</div>
         <div className="about-technology-content">
-          <h2 id="about-technology-heading">Purposeful tools behind the experience.</h2>
+          <h2 id="about-technology-heading">From commit to production.</h2>
           <div className="about-technology-grid">
             <article>
-              <FiCode aria-hidden="true" />
-              <h3>Frontend</h3>
-              <p>React, developed in Visual Studio Code and hosted with Vercel.</p>
+              <FiCloud aria-hidden="true" />
+              <h3>Vercel</h3>
+              <p>The React frontend redeploys automatically on every push and is served from a global edge network for fast load times.</p>
+            </article>
+            <article>
+              <FiServer aria-hidden="true" />
+              <h3>Railway</h3>
+              <p>The Spring Boot API and MySQL database are hosted on Railway, with builds triggered directly from GitHub.</p>
             </article>
             <article>
               <FiGitBranch aria-hidden="true" />
-              <h3>Backend</h3>
-              <p>Java Spring Boot and Maven, with the API hosted on Railway.</p>
-            </article>
-            <article>
-              <FiDatabase aria-hidden="true" />
-              <h3>Collaboration</h3>
-              <p>MySQL, Git, and GitHub support persistent data and team delivery.</p>
+              <h3>GitHub Actions</h3>
+              <p>Git and GitHub Actions tie the pipeline together, keeping the frontend and backend in sync with every change.</p>
             </article>
           </div>
         </div>
