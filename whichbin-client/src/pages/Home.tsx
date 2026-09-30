@@ -30,9 +30,6 @@ function Home() {
           <div className="illustration-ring illustration-ring-large" />
           <div className="illustration-ring illustration-ring-small" />
           <div className="recycle-mark"><FaRecycle /></div>
-          <span className="illustration-label label-top">reduce</span>
-          <span className="illustration-label label-right">reuse</span>
-          <span className="illustration-label label-bottom">recycle</span>
         </div>
       </section>
 
