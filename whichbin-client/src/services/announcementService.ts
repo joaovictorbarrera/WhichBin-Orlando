@@ -24,6 +24,20 @@ export async function getAnnouncements(): Promise<Announcement[] | null> {
   }
 }
 
+export async function getAllAnnouncements(): Promise<Announcement[] | null> {
+  try {
+    const response = await apiFetch('announcements/all')
+
+    if (!response.ok) {
+      return null
+    }
+
+    return (await response.json()) as Announcement[]
+  } catch {
+    return null
+  }
+}
+
 export async function getAnnouncementById(
   announcementId: string
 ): Promise<Announcement | null> {
