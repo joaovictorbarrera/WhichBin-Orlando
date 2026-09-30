@@ -4,6 +4,12 @@
   color: var(--color-ink);
 }
 
+@media (min-width: 1024px) {
+  .about-page {
+    padding-bottom: 4rem;
+  }
+}
+
 .about-hero,
 .about-story,
 .about-features,
