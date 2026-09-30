@@ -65,9 +65,9 @@ function Announcements() {
       </div>
 
       {loading && (
-        <div className="announcements-status">
-          <p>Loading announcements...</p>
-        </div>
+        <p className="announcements-loading">
+          Loading announcements...
+        </p>
       )}
 
       {!loading && announcements.length === 0 && (
