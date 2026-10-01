@@ -12,6 +12,7 @@ export type Resource = {
   description: string
   content: string
   styleType: string
+  pdfUrl?: string | null
   sections?: ResourceSection[]
 }
 
@@ -20,6 +21,7 @@ export type CreateResourceRequest = {
   description: string
   content: string
   styleType: string
+  pdfUrl?: string | null
   sections?: ResourceSection[]
 }
 

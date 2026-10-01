@@ -106,6 +106,7 @@ export default function AdminResources() {
 	const [description, setDescription] = useState('')
 	const [content, setContent] = useState('')
 	const [styleType, setStyleType] = useState('')
+	const [pdfUrl, setPdfUrl] = useState('')
 
 	const [sections, setSections] = useState<ResourceSection[]>([])
 
@@ -163,6 +164,7 @@ export default function AdminResources() {
 		setDescription('')
 		setContent('')
 		setStyleType('')
+		setPdfUrl('')
 		setSections([])
 		setFormError(false)
 		setShowStyleDropdown(false)
@@ -238,6 +240,7 @@ export default function AdminResources() {
 		setDescription('')
 		setContent('')
 		setStyleType('')
+		setPdfUrl('')
 		setSections([])
 		setFormError(false)
 		setShowStyleDropdown(false)
@@ -255,6 +258,7 @@ export default function AdminResources() {
 		setDescription(resource.description)
 		setContent(resource.content)
 		setStyleType(resource.styleType)
+		setPdfUrl(resource.pdfUrl ?? '')
 
 		setSections(
 			(resource.sections ?? []).map((section) => ({
@@ -303,6 +307,7 @@ export default function AdminResources() {
 				description: description.trim(),
 				content: content.trim(),
 				styleType,
+				pdfUrl: pdfUrl.trim() || null,
 				sections: cleanedSections,
 			})
 
@@ -325,6 +330,7 @@ export default function AdminResources() {
 				description: description.trim(),
 				content: content.trim(),
 				styleType,
+				pdfUrl: pdfUrl.trim() || null,
 				sections: cleanedSections,
 			})
 
@@ -411,6 +417,21 @@ export default function AdminResources() {
 							setContent(event.target.value)
 						}
 					/>
+				</label>
+
+				<label>
+					PDF URL
+					<input
+						type="url"
+						value={pdfUrl}
+						onChange={(event) =>
+							setPdfUrl(event.target.value)
+						}
+						placeholder="Optional PDF link"
+					/>
+					<small>
+						Leave blank if this resource does not have a PDF.
+					</small>
 				</label>
 
 				<label>
@@ -580,8 +601,7 @@ export default function AdminResources() {
 												}
 												disabled={
 													index ===
-														sections.length -
-															1 ||
+														sections.length - 1 ||
 													saving
 												}
 												aria-label={`Move Section ${

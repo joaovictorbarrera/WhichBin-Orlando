@@ -20,6 +20,7 @@ public class ResourceDataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         seedResources();
+        updatePdfUrls();
     }
 
     private void seedResources() {
@@ -31,6 +32,7 @@ public class ResourceDataInitializer implements CommandLineRunner {
                     "The essentials of what can and cannot be recycled.",
                     "Learn the basics of recycling in Orlando, including what belongs in your recycling bin and what should stay out.",
                     "resource-style-green",
+                    "/pdfs/recycling-basics.pdf",
                     List.of(
                             new ResourceSection(
                                     "What Can Be Recycled?",
@@ -60,6 +62,7 @@ public class ResourceDataInitializer implements CommandLineRunner {
                     "Simple steps to make your items recyclable.",
                     "Learn how to prepare recyclable items before placing them in your recycling bin. Empty containers, rinse them when needed, and keep non-recyclable materials out.",
                     "resource-style-blue",
+                    "/pdfs/how-to-prepare-items.pdf",
                     List.of(
                             new ResourceSection(
                                     "Plastic Containers",
@@ -94,6 +97,7 @@ public class ResourceDataInitializer implements CommandLineRunner {
                     "Avoid these common recycling mistakes.",
                     "Learn about common recycling mistakes such as placing plastic bags, food waste, liquids, and other non-recyclable materials in the recycling bin.",
                     "resource-style-orange",
+                    "/pdfs/common-mistakes.pdf",
                     List.of(
                             new ResourceSection(
                                     "Putting Recyclables in Bags",
@@ -128,6 +132,7 @@ public class ResourceDataInitializer implements CommandLineRunner {
                     "Full details from the City of Orlando.",
                     "Learn the recycling guidelines for Orlando, including what materials are accepted, how to prepare items, and how to avoid contamination.",
                     "resource-style-purple",
+                    "/pdfs/orlando-recycling-guide.pdf",
                     List.of(
                             new ResourceSection(
                                     "What Goes in the Recycling Cart?",
@@ -162,5 +167,32 @@ public class ResourceDataInitializer implements CommandLineRunner {
             resourceRepository.save(commonMistakes);
             resourceRepository.save(orlandoGuide);
         }
+    }
+
+    private void updatePdfUrls() {
+
+        resourceRepository.findByTitle("Recycling Basics")
+                .ifPresent(resource -> {
+                    resource.setPdfUrl("/pdfs/recycling-basics.pdf");
+                    resourceRepository.save(resource);
+                });
+
+        resourceRepository.findByTitle("How to Prepare Items")
+                .ifPresent(resource -> {
+                    resource.setPdfUrl("/pdfs/how-to-prepare-items.pdf");
+                    resourceRepository.save(resource);
+                });
+
+        resourceRepository.findByTitle("Common Mistakes")
+                .ifPresent(resource -> {
+                    resource.setPdfUrl("/pdfs/common-mistakes.pdf");
+                    resourceRepository.save(resource);
+                });
+
+        resourceRepository.findByTitle("Orlando Recycling Guide")
+                .ifPresent(resource -> {
+                    resource.setPdfUrl("/pdfs/orlando-recycling-guide.pdf");
+                    resourceRepository.save(resource);
+                });
     }
 }

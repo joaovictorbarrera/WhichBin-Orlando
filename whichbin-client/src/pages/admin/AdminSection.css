@@ -90,6 +90,31 @@
 	line-height: 1.5;
 }
 
+/* Educational Resources page */
+
+.admin-section-page:has(.admin-section-resources) {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.admin-section-page:has(.admin-section-resources) > .admin-section-back {
+	width: 100%;
+	max-width: 40rem;
+	box-sizing: border-box;
+}
+
+.admin-section-page:has(.admin-section-resources) .admin-section-panel {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.admin-section-resources .admin-section-icon {
+	margin-bottom: 1.25rem;
+}
+
+/* Resource actions */
+
 .admin-resource-actions {
 	display: flex;
 	justify-content: flex-end;
@@ -640,11 +665,23 @@
 		padding-top: 3rem;
 	}
 
+	.admin-section-page:has(.admin-section-resources) {
+		align-items: stretch;
+	}
+
+	.admin-section-page:has(.admin-section-resources) > .admin-section-back {
+		max-width: none;
+	}
+
 	.admin-section-panel {
 		padding: 1.5rem;
 		background: transparent;
 		border: 0;
 		box-shadow: none;
+	}
+
+	.admin-section-page:has(.admin-section-resources) .admin-section-panel {
+		max-width: none;
 	}
 
 	.admin-resource-card {
