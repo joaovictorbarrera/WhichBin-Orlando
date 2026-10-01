@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -6,6 +7,7 @@ import {
   FiFileText,
   FiChevronRight,
   FiAward,
+  FiBookOpen,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
 import {
@@ -18,6 +20,7 @@ import {
 } from '../services/triviaService'
 import PageLayout from '../components/PageLayout'
 import './EducationalResources.css'
+import './Announcements.css'
 
 type ResourceFilter = 'all' | 'articles' | 'trivia'
 
@@ -79,7 +82,20 @@ function EducationalResources() {
     return <FaRecycle />
   }
 
-  const articleResources = resources
+  const pageHeader = (
+    <div className="announcements-header">
+      <div className="announcements-heading-icon">
+        <FiBookOpen aria-hidden="true" />
+      </div>
+
+      <div>
+        <h1>Educational Resources</h1>
+        <p className="resources-intro">
+          Learn more about recycling and how to make a bigger impact.
+        </p>
+      </div>
+    </div>
+  )
 
   const showArticles = filter === 'all' || filter === 'articles'
   const showTrivia = filter === 'all' || filter === 'trivia'
@@ -87,26 +103,16 @@ function EducationalResources() {
   if (loading) {
     return (
       <PageLayout className="resources-page" width="wide">
-        <h1>Educational Resources</h1>
-
-        <p className="resources-intro">
-          Learn more about recycling and how to make a bigger impact.
-        </p>
-
+        {pageHeader}
         <p className="resources-intro">Loading resources...</p>
       </PageLayout>
     )
   }
 
-  if (!articleResources.length && !triviaChallenges.length) {
+  if (!resources.length && !triviaChallenges.length) {
     return (
       <PageLayout className="resources-page" width="wide">
-        <h1>Educational Resources</h1>
-
-        <p className="resources-intro">
-          Learn more about recycling and how to make a bigger impact.
-        </p>
-
+        {pageHeader}
         <p className="resources-intro">
           No educational resources are available right now.
         </p>
@@ -116,11 +122,7 @@ function EducationalResources() {
 
   return (
     <PageLayout className="resources-page" width="wide">
-      <h1>Educational Resources</h1>
-
-      <p className="resources-intro">
-        Learn more about recycling and how to make a bigger impact.
-      </p>
+      {pageHeader}
 
       <div className="resources-filter" role="group" aria-label="Resource type">
         <button
@@ -148,12 +150,12 @@ function EducationalResources() {
         </button>
       </div>
 
-      {showArticles && articleResources.length > 0 && (
+      {showArticles && resources.length > 0 && (
         <section className="resources-section">
           {filter === 'all' && <h2>Articles</h2>}
 
           <div className="resources-list">
-            {articleResources.map((resource) => (
+            {resources.map((resource) => (
               <Link
                 to={`/resources/${resource.id}`}
                 className="resource-card"
@@ -167,9 +169,7 @@ function EducationalResources() {
 
                 <div className="resource-content">
                   <span className="resource-type-label">Article</span>
-
                   <h2>{resource.title}</h2>
-
                   <p>{resource.description}</p>
                 </div>
 
@@ -199,9 +199,7 @@ function EducationalResources() {
 
                 <div className="resource-content">
                   <span className="resource-type-label">Trivia</span>
-
                   <h2>{challenge.title}</h2>
-
                   <p>{challenge.description}</p>
                 </div>
 
