@@ -20,17 +20,6 @@ import {
 import PageLayout from '../components/PageLayout'
 import './ResourceDetails.css'
 
-function getPdfPath(title: string) {
-  const pdfPaths: Record<string, string> = {
-    'Recycling Basics': '/pdfs/recycling-basics.pdf',
-    'How to Prepare Items': '/pdfs/how-to-prepare-items.pdf',
-    'Common Mistakes': '/pdfs/common-mistakes.pdf',
-    'Orlando Recycling Guide': '/pdfs/orlando-recycling-guide.pdf',
-  }
-
-  return pdfPaths[title] ?? null
-}
-
 function ResourceDetails() {
   const { resourceId } = useParams()
 
@@ -40,7 +29,6 @@ function ResourceDetails() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [score, setScore] = useState(0)
   const [quizComplete, setQuizComplete] = useState(false)
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!resourceId) {
@@ -53,13 +41,11 @@ function ResourceDetails() {
       .then((data) => {
         if (isMounted) {
           setResource(data)
-          setLoading(false)
         }
       })
       .catch(() => {
         if (isMounted) {
           setResource(null)
-          setLoading(false)
         }
       })
 
@@ -170,21 +156,6 @@ function ResourceDetails() {
     }
 
     return 'resource-section resource-section-green'
-  }
-
-  if (loading && resourceId) {
-    return (
-      <PageLayout className="resource-details-page" width="wide">
-        <Link to="/resources" className="resource-back-link">
-          <FiArrowLeft aria-hidden="true" />
-          Back to Educational Resources
-        </Link>
-
-        <div className="resource-details-card">
-          <h1 aria-live="polite">Loading resource...</h1>
-        </div>
-      </PageLayout>
-    )
   }
 
   if (!resource || !resourceId) {
@@ -443,31 +414,29 @@ function ResourceDetails() {
           </div>
         )}
 
-        {getPdfPath(resource.title) && (
-           <section className="resource-pdf">
-           <div className="resource-pdf-header">
-           <div>
-             <span className="resource-pdf-label">PDF GUIDE</span>
-        <h2>Additional Information</h2>
-        <p>View the complete guide for this resource.</p>
-      </div>
+        {resource.pdfUrl && resource.pdfUrl.trim() !== '' && (
+          <section className="resource-pdf">
+            <div className="resource-pdf-header">
+              <div>
+                <span className="resource-pdf-label">PDF GUIDE</span>
+                <h2>Additional Information</h2>
+                <p>View the complete guide for this resource.</p>
+              </div>
 
-      <a
-        href={getPdfPath(resource.title) ?? '#'}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="resource-pdf-button"
+              <a
+                href={resource.pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="resource-pdf-button"
               >
-                  Open PDF
-            </a>
-          </div>
-        </section>
+                Open PDF
+              </a>
+            </div>
+          </section>
         )}
       </div>
     </PageLayout>
   )
 }
-
-
 
 export default ResourceDetails
