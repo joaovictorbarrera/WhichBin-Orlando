@@ -1,6 +1,8 @@
 package com.whichbin.whichbin_api.service;
 
+import com.whichbin.whichbin_api.model.TriviaChallenge;
 import com.whichbin.whichbin_api.model.TriviaQuestion;
+import com.whichbin.whichbin_api.repository.TriviaChallengeRepository;
 import com.whichbin.whichbin_api.repository.TriviaQuestionRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -12,9 +14,14 @@ import java.util.List;
 public class TriviaQuestionService {
 
     private final TriviaQuestionRepository triviaQuestionRepository;
+    private final TriviaChallengeRepository triviaChallengeRepository;
 
-    public TriviaQuestionService(TriviaQuestionRepository triviaQuestionRepository) {
+    public TriviaQuestionService(
+            TriviaQuestionRepository triviaQuestionRepository,
+            TriviaChallengeRepository triviaChallengeRepository) {
+
         this.triviaQuestionRepository = triviaQuestionRepository;
+        this.triviaChallengeRepository = triviaChallengeRepository;
     }
 
     public List<TriviaQuestion> getAllQuestions() {
@@ -26,7 +33,27 @@ public class TriviaQuestionService {
         return triviaQuestionRepository.save(question);
     }
 
-    public TriviaQuestion updateQuestion(Long id, TriviaQuestion question) {
+    public TriviaQuestion createQuestion(
+            Long challengeId,
+            TriviaQuestion question) {
+
+        TriviaChallenge challenge = triviaChallengeRepository.findById(challengeId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Challenge does not exist"
+                ));
+
+        validateCorrectAnswer(question);
+
+        question.setChallenge(challenge);
+
+        return triviaQuestionRepository.save(question);
+    }
+
+    public TriviaQuestion updateQuestion(
+            Long id,
+            TriviaQuestion question) {
+
         TriviaQuestion existingQuestion = triviaQuestionRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
@@ -63,6 +90,7 @@ public class TriviaQuestionService {
                 && !correctAnswer.equals(question.getAnswerB())
                 && !correctAnswer.equals(question.getAnswerC())
                 && !correctAnswer.equals(question.getAnswerD())) {
+
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Correct answer must match one of the answer choices"

@@ -2,8 +2,10 @@ package com.whichbin.whichbin_api.controller;
 
 import com.whichbin.whichbin_api.auth.Authenticated;
 import com.whichbin.whichbin_api.model.Resource;
+import com.whichbin.whichbin_api.model.TriviaChallenge;
 import com.whichbin.whichbin_api.model.TriviaQuestion;
 import com.whichbin.whichbin_api.service.ResourceService;
+import com.whichbin.whichbin_api.service.TriviaChallengeService;
 import com.whichbin.whichbin_api.service.TriviaQuestionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +18,16 @@ public class ResourceController {
 
     private final ResourceService resourceService;
     private final TriviaQuestionService triviaQuestionService;
+    private final TriviaChallengeService triviaChallengeService;
 
     public ResourceController(
             ResourceService resourceService,
-            TriviaQuestionService triviaQuestionService) {
+            TriviaQuestionService triviaQuestionService,
+            TriviaChallengeService triviaChallengeService) {
+
         this.resourceService = resourceService;
         this.triviaQuestionService = triviaQuestionService;
+        this.triviaChallengeService = triviaChallengeService;
     }
 
     @GetMapping
@@ -47,6 +53,7 @@ public class ResourceController {
     public Resource updateResource(
             @PathVariable Long id,
             @RequestBody Resource resource) {
+
         return resourceService.updateResource(id, resource);
     }
 
@@ -66,7 +73,20 @@ public class ResourceController {
     @PostMapping("/trivia")
     public TriviaQuestion createTriviaQuestion(
             @RequestBody TriviaQuestion question) {
+
         return triviaQuestionService.createQuestion(question);
+    }
+
+    @Authenticated
+    @PostMapping("/trivia/challenges/{challengeId}/questions")
+    public TriviaQuestion createTriviaQuestionForChallenge(
+            @PathVariable Long challengeId,
+            @RequestBody TriviaQuestion question) {
+
+        return triviaQuestionService.createQuestion(
+                challengeId,
+                question
+        );
     }
 
     @Authenticated
@@ -74,13 +94,62 @@ public class ResourceController {
     public TriviaQuestion updateTriviaQuestion(
             @PathVariable Long id,
             @RequestBody TriviaQuestion question) {
+
         return triviaQuestionService.updateQuestion(id, question);
     }
 
     @Authenticated
     @DeleteMapping("/trivia/{id}")
-    public ResponseEntity<Void> deleteTriviaQuestion(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTriviaQuestion(
+            @PathVariable Long id) {
+
         triviaQuestionService.deleteQuestion(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/trivia/challenges")
+    public List<TriviaChallenge> getAllTriviaChallenges() {
+        return triviaChallengeService.getAllChallenges();
+    }
+
+    @GetMapping("/trivia/challenges/{id}")
+    public ResponseEntity<TriviaChallenge> getTriviaChallengeById(
+            @PathVariable Long id) {
+
+        try {
+            return ResponseEntity.ok(
+                    triviaChallengeService.getChallengeById(id)
+            );
+        } catch (RuntimeException exception) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Authenticated
+    @PostMapping("/trivia/challenges")
+    public TriviaChallenge createTriviaChallenge(
+            @RequestBody TriviaChallenge challenge) {
+
+        return triviaChallengeService.createChallenge(challenge);
+    }
+
+    @Authenticated
+    @PutMapping("/trivia/challenges/{id}")
+    public TriviaChallenge updateTriviaChallenge(
+            @PathVariable Long id,
+            @RequestBody TriviaChallenge challenge) {
+
+        return triviaChallengeService.updateChallenge(id, challenge);
+    }
+
+    @Authenticated
+    @DeleteMapping("/trivia/challenges/{id}")
+    public ResponseEntity<Void> deleteTriviaChallenge(
+            @PathVariable Long id) {
+
+        triviaChallengeService.deleteChallenge(id);
+
         return ResponseEntity.noContent().build();
     }
 }

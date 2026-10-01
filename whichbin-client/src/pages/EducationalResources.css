@@ -162,3 +162,62 @@
     font-size: 1.44rem;
   }
 }
+/* Resource filters */
+
+.resources-filter {
+	display: flex;
+	justify-content: center;
+	gap: 0.5rem;
+	margin: 1.5rem 0 2rem;
+}
+
+.resources-filter button {
+	padding: 0.6rem 1rem;
+	border: 0.065rem solid var(--color-border-soft);
+	border-radius: 999px;
+	background: var(--color-surface);
+	color: var(--color-heading-deep);
+	font: inherit;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.resources-filter button:hover {
+	background: var(--color-page);
+}
+
+.resources-filter button.resources-filter-active {
+	border-color: var(--color-brand);
+	background: var(--color-brand);
+	color: white;
+}
+
+.resources-section {
+	margin-top: 2rem;
+}
+
+.resources-section > h2 {
+	margin: 0 0 1rem;
+	color: var(--color-heading-deep);
+	font-size: 1.35rem;
+}
+
+.resource-type-label {
+	display: inline-block;
+	margin-bottom: 0.35rem;
+	color: var(--color-accent);
+	font-size: 0.7rem;
+	font-weight: 800;
+	letter-spacing: 0.08rem;
+	text-transform: uppercase;
+}
+
+@media (max-width: 600px) {
+	.resources-filter {
+		width: 100%;
+	}
+
+	.resources-filter button {
+		flex: 1;
+	}
+}

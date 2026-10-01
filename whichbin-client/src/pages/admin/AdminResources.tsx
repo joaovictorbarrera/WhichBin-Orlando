@@ -10,10 +10,12 @@ import {
 	FiX,
 	FiArrowUp,
 	FiArrowDown,
+	FiChevronDown,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa6'
 import { Link } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
+import DeleteConfirmModal from '../../components/DeleteConfirmModal'
 import {
 	createResource,
 	deleteResource,
@@ -22,6 +24,18 @@ import {
 	type Resource,
 	type ResourceSection,
 } from '../../services/resourceService'
+import {
+	createTriviaChallenge,
+	createTriviaQuestionForChallenge,
+	deleteTriviaChallenge,
+	deleteTriviaQuestion,
+	getTriviaChallenges,
+	updateTriviaQuestion,
+	type CreateTriviaChallengeRequest,
+	type CreateTriviaQuestionRequest,
+	type TriviaChallenge,
+	type TriviaQuestion,
+} from '../../services/triviaService'
 import './AdminSection.css'
 
 type StyleOption = {
@@ -30,6 +44,12 @@ type StyleOption = {
 	background: string
 	label: string
 	icon: ReactNode
+}
+
+type DeleteTarget = {
+	type: 'resource' | 'challenge' | 'question'
+	id: number
+	title: string
 }
 
 const styleOptions: StyleOption[] = [
@@ -92,6 +112,20 @@ const emptySection: ResourceSection = {
 	items: '',
 }
 
+const emptyTriviaQuestion: CreateTriviaQuestionRequest = {
+	question: '',
+	answerA: '',
+	answerB: '',
+	answerC: '',
+	answerD: '',
+	correctAnswer: '',
+}
+
+const emptyTriviaChallenge: CreateTriviaChallengeRequest = {
+	title: '',
+	description: '',
+}
+
 export default function AdminResources() {
 	const [resources, setResources] = useState<Resource[]>([])
 	const [loading, setLoading] = useState(true)
@@ -112,8 +146,56 @@ export default function AdminResources() {
 
 	const [showStyleDropdown, setShowStyleDropdown] = useState(false)
 
+	const [triviaChallenges, setTriviaChallenges] = useState<
+		TriviaChallenge[]
+	>([])
+	const [triviaLoading, setTriviaLoading] = useState(true)
+	const [triviaError, setTriviaError] = useState(false)
+
+	const [showChallengeForm, setShowChallengeForm] = useState(false)
+	const [savingChallenge, setSavingChallenge] = useState(false)
+	const [challengeFormError, setChallengeFormError] = useState(false)
+
+	const [challengeTitle, setChallengeTitle] = useState(
+		emptyTriviaChallenge.title
+	)
+	const [challengeDescription, setChallengeDescription] = useState(
+		emptyTriviaChallenge.description
+	)
+
+	const [expandedTriviaChallengeId, setExpandedTriviaChallengeId] = useState<
+		number | null
+	>(null)
+
+	const [showTriviaForm, setShowTriviaForm] = useState(false)
+	const [editingTrivia, setEditingTrivia] = useState<TriviaQuestion | null>(
+		null
+	)
+	const [activeTriviaChallengeId, setActiveTriviaChallengeId] = useState<
+		number | null
+	>(null)
+	const [savingTrivia, setSavingTrivia] = useState(false)
+	const [triviaFormError, setTriviaFormError] = useState(false)
+
+	const [triviaQuestion, setTriviaQuestion] = useState(
+		emptyTriviaQuestion.question
+	)
+	const [answerA, setAnswerA] = useState(emptyTriviaQuestion.answerA)
+	const [answerB, setAnswerB] = useState(emptyTriviaQuestion.answerB)
+	const [answerC, setAnswerC] = useState(emptyTriviaQuestion.answerC)
+	const [answerD, setAnswerD] = useState(emptyTriviaQuestion.answerD)
+	const [correctAnswer, setCorrectAnswer] = useState(
+		emptyTriviaQuestion.correctAnswer
+	)
+
+	const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(
+		null
+	)
+	const [deleting, setDeleting] = useState(false)
+
 	useEffect(() => {
 		loadResources()
+		loadTriviaChallenges()
 	}, [])
 
 	async function loadResources() {
@@ -132,29 +214,128 @@ export default function AdminResources() {
 		setLoading(false)
 	}
 
-	async function handleDelete(resource: Resource) {
+	async function loadTriviaChallenges() {
+		setTriviaLoading(true)
+		setTriviaError(false)
+
+		const result = await getTriviaChallenges()
+
+		if (result === null) {
+			setTriviaError(true)
+			setTriviaChallenges([])
+		} else {
+			setTriviaChallenges(result)
+		}
+
+		setTriviaLoading(false)
+	}
+
+	function requestDeleteResource(resource: Resource) {
 		if (editingResource) {
 			return
 		}
 
-		const confirmed = window.confirm(
-			`Are you sure you want to delete "${resource.title}"?`
-		)
+		setDeleteTarget({
+			type: 'resource',
+			id: resource.id,
+			title: resource.title,
+		})
+	}
 
-		if (!confirmed) {
+	function requestDeleteTriviaChallenge(challenge: TriviaChallenge) {
+		if (editingTrivia || showTriviaForm || showChallengeForm) {
 			return
 		}
 
-		const success = await deleteResource(resource.id)
+		setDeleteTarget({
+			type: 'challenge',
+			id: challenge.id,
+			title: challenge.title,
+		})
+	}
 
-		if (!success) {
-			window.alert('The resource could not be deleted.')
+	function requestDeleteTrivia(question: TriviaQuestion) {
+		if (editingTrivia) {
 			return
 		}
 
-		setResources((current) =>
-			current.filter((item) => item.id !== resource.id)
-		)
+		setDeleteTarget({
+			type: 'question',
+			id: question.id,
+			title: question.question,
+		})
+	}
+
+	function handleCloseDeleteModal() {
+		if (deleting) {
+			return
+		}
+
+		setDeleteTarget(null)
+	}
+
+	async function handleConfirmDelete() {
+		if (!deleteTarget || deleting) {
+			return
+		}
+
+		setDeleting(true)
+
+		if (deleteTarget.type === 'resource') {
+			const success = await deleteResource(deleteTarget.id)
+
+			if (!success) {
+				window.alert('The resource could not be deleted.')
+				setDeleting(false)
+				return
+			}
+
+			setResources((current) =>
+				current.filter((item) => item.id !== deleteTarget.id)
+			)
+		}
+
+		if (deleteTarget.type === 'question') {
+			const success = await deleteTriviaQuestion(deleteTarget.id)
+
+			if (!success) {
+				window.alert('The trivia question could not be deleted.')
+				setDeleting(false)
+				return
+			}
+
+			setTriviaChallenges((current) =>
+				current.map((challenge) => ({
+					...challenge,
+					questions: challenge.questions.filter(
+						(item) => item.id !== deleteTarget.id
+					),
+				}))
+			)
+		}
+
+		if (deleteTarget.type === 'challenge') {
+			const success = await deleteTriviaChallenge(deleteTarget.id)
+
+			if (!success) {
+				window.alert(
+					'The trivia challenge could not be deleted.'
+				)
+				setDeleting(false)
+				return
+			}
+
+			setTriviaChallenges((current) =>
+				current.filter((item) => item.id !== deleteTarget.id)
+			)
+
+			if (expandedTriviaChallengeId === deleteTarget.id) {
+				setExpandedTriviaChallengeId(null)
+			}
+		}
+
+		setDeleting(false)
+		setDeleteTarget(null)
 	}
 
 	function handleCancelAdd() {
@@ -345,6 +526,201 @@ export default function AdminResources() {
 
 		setSaving(false)
 		handleCancelAdd()
+	}
+
+	function resetChallengeForm() {
+		setChallengeTitle('')
+		setChallengeDescription('')
+		setChallengeFormError(false)
+	}
+
+	function startAddChallenge() {
+		if (showTriviaForm) {
+			return
+		}
+
+		resetChallengeForm()
+		setShowChallengeForm(true)
+	}
+
+	function handleCancelChallenge() {
+		setShowChallengeForm(false)
+		resetChallengeForm()
+	}
+
+	async function handleSaveChallenge(event: FormEvent<HTMLFormElement>) {
+		event.preventDefault()
+
+		if (!challengeTitle.trim() || !challengeDescription.trim()) {
+			setChallengeFormError(true)
+			return
+		}
+
+		const challengeData: CreateTriviaChallengeRequest = {
+			title: challengeTitle.trim(),
+			description: challengeDescription.trim(),
+		}
+
+		setSavingChallenge(true)
+		setChallengeFormError(false)
+
+		const newChallenge = await createTriviaChallenge(challengeData)
+
+		if (!newChallenge) {
+			setChallengeFormError(true)
+			setSavingChallenge(false)
+			return
+		}
+
+		setTriviaChallenges((current) => [...current, newChallenge])
+
+		setSavingChallenge(false)
+		handleCancelChallenge()
+	}
+
+	function resetTriviaForm() {
+		setEditingTrivia(null)
+		setActiveTriviaChallengeId(null)
+		setTriviaQuestion('')
+		setAnswerA('')
+		setAnswerB('')
+		setAnswerC('')
+		setAnswerD('')
+		setCorrectAnswer('')
+		setTriviaFormError(false)
+	}
+
+	function toggleTriviaChallenge(challengeId: number) {
+		if (showChallengeForm || showTriviaForm || editingTrivia) {
+			return
+		}
+
+		setExpandedTriviaChallengeId((current) =>
+			current === challengeId ? null : challengeId
+		)
+	}
+
+	function startAddTrivia(challengeId: number) {
+		if (editingTrivia || showChallengeForm) {
+			return
+		}
+
+		resetTriviaForm()
+		setExpandedTriviaChallengeId(challengeId)
+		setActiveTriviaChallengeId(challengeId)
+		setShowTriviaForm(true)
+	}
+
+	function startEditTrivia(
+		question: TriviaQuestion,
+		challengeId: number
+	) {
+		if (editingTrivia || showChallengeForm) {
+			return
+		}
+
+		setExpandedTriviaChallengeId(challengeId)
+		setEditingTrivia(question)
+		setActiveTriviaChallengeId(challengeId)
+		setShowTriviaForm(true)
+		setTriviaQuestion(question.question)
+		setAnswerA(question.answerA)
+		setAnswerB(question.answerB)
+		setAnswerC(question.answerC)
+		setAnswerD(question.answerD)
+		setCorrectAnswer(question.correctAnswer)
+		setTriviaFormError(false)
+	}
+
+	function handleCancelTrivia() {
+		setShowTriviaForm(false)
+		resetTriviaForm()
+	}
+
+	async function handleSaveTrivia(event: FormEvent<HTMLFormElement>) {
+		event.preventDefault()
+
+		if (
+			!triviaQuestion.trim() ||
+			!answerA.trim() ||
+			!answerB.trim() ||
+			!answerC.trim() ||
+			!answerD.trim() ||
+			!correctAnswer
+		) {
+			setTriviaFormError(true)
+			return
+		}
+
+		const triviaData: CreateTriviaQuestionRequest = {
+			question: triviaQuestion.trim(),
+			answerA: answerA.trim(),
+			answerB: answerB.trim(),
+			answerC: answerC.trim(),
+			answerD: answerD.trim(),
+			correctAnswer,
+		}
+
+		setSavingTrivia(true)
+		setTriviaFormError(false)
+
+		if (editingTrivia) {
+			const updatedQuestion = await updateTriviaQuestion(
+				editingTrivia.id,
+				triviaData
+			)
+
+			if (!updatedQuestion) {
+				setTriviaFormError(true)
+				setSavingTrivia(false)
+				return
+			}
+
+			setTriviaChallenges((current) =>
+				current.map((challenge) => ({
+					...challenge,
+					questions: challenge.questions.map((question) =>
+						question.id === updatedQuestion.id
+							? updatedQuestion
+							: question
+					),
+				}))
+			)
+		} else {
+			if (activeTriviaChallengeId === null) {
+				setTriviaFormError(true)
+				setSavingTrivia(false)
+				return
+			}
+
+			const newQuestion = await createTriviaQuestionForChallenge(
+				activeTriviaChallengeId,
+				triviaData
+			)
+
+			if (!newQuestion) {
+				setTriviaFormError(true)
+				setSavingTrivia(false)
+				return
+			}
+
+			setTriviaChallenges((current) =>
+				current.map((challenge) =>
+					challenge.id === activeTriviaChallengeId
+						? {
+								...challenge,
+								questions: [
+									...challenge.questions,
+									newQuestion,
+								],
+							}
+						: challenge
+				)
+			)
+		}
+
+		setSavingTrivia(false)
+		handleCancelTrivia()
 	}
 
 	const selectedStyle = styleOptions.find(
@@ -660,9 +1036,7 @@ export default function AdminResources() {
 										{sectionStyleOptions.map(
 											(option) => (
 												<option
-													key={
-														option.value
-													}
+													key={option.value}
 													value={
 														option.value
 													}
@@ -752,145 +1126,736 @@ export default function AdminResources() {
 		)
 	}
 
-	return (
-		<PageLayout>
-			<div className="admin-section-page">
-				<Link to="/admin" className="admin-section-back">
-					<FiArrowLeft />
-					Back to Admin
-				</Link>
+	function renderChallengeForm() {
+		return (
+			<form
+				className="admin-resource-form admin-resource-form-inline"
+				onSubmit={handleSaveChallenge}
+			>
+				<div className="admin-resource-form-header">
+					<div>
+						<p className="admin-resource-form-eyebrow">
+							Educational Activity
+						</p>
 
-				<div className="admin-section-panel admin-section-resources">
-					<div className="admin-section-icon">
-						<FiFileText />
+						<h2>Add Trivia Challenge</h2>
 					</div>
 
-					<p className="admin-section-eyebrow">Admin</p>
+					<button
+						type="button"
+						className="admin-resource-form-close"
+						onClick={handleCancelChallenge}
+						aria-label="Close form"
+						disabled={savingChallenge}
+					>
+						<FiX />
+					</button>
+				</div>
 
-					<h1>Educational Resources</h1>
+				<label>
+					Challenge Title
+					<input
+						type="text"
+						value={challengeTitle}
+						onChange={(event) =>
+							setChallengeTitle(event.target.value)
+						}
+						placeholder="Enter the challenge title"
+					/>
+				</label>
 
-					<p>
-						Add, edit, or remove educational resources for
-						WhichBin Orlando.
+				<label>
+					Description
+					<textarea
+						value={challengeDescription}
+						onChange={(event) =>
+							setChallengeDescription(
+								event.target.value
+							)
+						}
+						placeholder="Describe what this challenge covers"
+					/>
+				</label>
+
+				{challengeFormError && (
+					<p className="admin-resource-form-error">
+						Please enter a title and description for the
+						challenge.
 					</p>
+				)}
 
-					<div className="admin-resource-actions">
-						<button
-							type="button"
-							className="admin-resource-add"
-							onClick={startAddResource}
-							disabled={Boolean(editingResource)}
-						>
-							<FiPlus />
-							Add Resource
-						</button>
-					</div>
+				<div className="admin-resource-form-actions">
+					<button
+						type="button"
+						className="admin-resource-cancel"
+						onClick={handleCancelChallenge}
+						disabled={savingChallenge}
+					>
+						Cancel
+					</button>
 
-					{showAddForm && !editingResource && (
-						<div className="admin-resource-new-form">
-							{renderResourceForm(false)}
-						</div>
-					)}
+					<button
+						type="submit"
+						className="admin-resource-save"
+						disabled={savingChallenge}
+					>
+						{savingChallenge
+							? 'Saving...'
+							: 'Save Challenge'}
+					</button>
+				</div>
+			</form>
+		)
+	}
 
-					{loading && (
-						<p className="admin-resource-status">
-							Loading resources...
-						</p>
-					)}
-
-					{!loading && error && (
-						<p className="admin-resource-status admin-resource-error">
-							Unable to load resources.
-						</p>
-					)}
-
-					{!loading &&
-						!error &&
-						resources.length === 0 && (
-							<p className="admin-resource-status">
-								No resources have been added yet.
+	function renderTriviaForm(isEditing: boolean) {
+		return (
+			<form
+				className="admin-resource-form admin-resource-form-inline"
+				onSubmit={handleSaveTrivia}
+			>
+				<div className="admin-resource-form-header">
+					<div>
+						{isEditing && (
+							<p className="admin-resource-form-eyebrow">
+								Editing Trivia Question
 							</p>
 						)}
 
-					{!loading &&
-						!error &&
-						resources.length > 0 && (
-							<div className="admin-resource-list">
-								{resources.map((resource) => {
-									const isEditing =
-										editingResource?.id ===
-										resource.id
+						<h2>
+							{isEditing
+								? 'Edit Trivia Question'
+								: 'Add Trivia Question'}
+						</h2>
+					</div>
 
-									return (
-										<article
-											key={resource.id}
-											className={`admin-resource-card ${
-												isEditing
-													? 'admin-resource-card-editing'
-													: ''
-											}`}
-										>
-											{isEditing ? (
-												renderResourceForm(
-													true
-												)
-											) : (
-												<>
-													<div className="admin-resource-card-content">
+					<button
+						type="button"
+						className="admin-resource-form-close"
+						onClick={handleCancelTrivia}
+						aria-label={
+							isEditing
+								? 'Cancel editing'
+								: 'Close form'
+						}
+						disabled={savingTrivia}
+					>
+						<FiX />
+					</button>
+				</div>
+
+				<label>
+					Question
+					<textarea
+						value={triviaQuestion}
+						onChange={(event) =>
+							setTriviaQuestion(event.target.value)
+						}
+						placeholder="Enter the trivia question"
+					/>
+				</label>
+
+				<label>
+					Answer A
+					<input
+						type="text"
+						value={answerA}
+						onChange={(event) =>
+							setAnswerA(event.target.value)
+						}
+						placeholder="Enter answer A"
+					/>
+				</label>
+
+				<label>
+					Answer B
+					<input
+						type="text"
+						value={answerB}
+						onChange={(event) =>
+							setAnswerB(event.target.value)
+						}
+						placeholder="Enter answer B"
+					/>
+				</label>
+
+				<label>
+					Answer C
+					<input
+						type="text"
+						value={answerC}
+						onChange={(event) =>
+							setAnswerC(event.target.value)
+						}
+						placeholder="Enter answer C"
+					/>
+				</label>
+
+				<label>
+					Answer D
+					<input
+						type="text"
+						value={answerD}
+						onChange={(event) =>
+							setAnswerD(event.target.value)
+						}
+						placeholder="Enter answer D"
+					/>
+				</label>
+
+				<label>
+					Correct Answer
+					<select
+						value={correctAnswer}
+						onChange={(event) =>
+							setCorrectAnswer(event.target.value)
+						}
+					>
+						<option value="">
+							Select the correct answer
+						</option>
+						<option value={answerA}>
+							{answerA || 'Answer A'}
+						</option>
+						<option value={answerB}>
+							{answerB || 'Answer B'}
+						</option>
+						<option value={answerC}>
+							{answerC || 'Answer C'}
+						</option>
+						<option value={answerD}>
+							{answerD || 'Answer D'}
+						</option>
+					</select>
+					<small>
+						Choose the answer that should be marked
+						correct.
+					</small>
+				</label>
+
+				{triviaFormError && (
+					<p className="admin-resource-form-error">
+						Please complete all trivia fields and try again.
+					</p>
+				)}
+
+				<div className="admin-resource-form-actions">
+					<button
+						type="button"
+						className="admin-resource-cancel"
+						onClick={handleCancelTrivia}
+						disabled={savingTrivia}
+					>
+						Cancel
+					</button>
+
+					<button
+						type="submit"
+						className="admin-resource-save"
+						disabled={savingTrivia}
+					>
+						{savingTrivia
+							? 'Saving...'
+							: isEditing
+								? 'Update Question'
+								: 'Save Question'}
+					</button>
+				</div>
+			</form>
+		)
+	}
+
+	const deleteDescription =
+		deleteTarget?.type === 'challenge'
+			? 'This will also delete all questions inside this challenge.'
+			: deleteTarget?.type === 'question'
+				? 'This action cannot be undone.'
+				: 'This action cannot be undone.'
+
+	const deleteLabel =
+		deleteTarget?.type === 'challenge'
+			? 'Delete Challenge'
+			: deleteTarget?.type === 'question'
+				? 'Delete Question'
+				: 'Delete Resource'
+
+	return (
+		<>
+			<PageLayout>
+				<div className="admin-section-page">
+					<Link to="/admin" className="admin-section-back">
+						<FiArrowLeft />
+						Back to Admin
+					</Link>
+
+					<div className="admin-section-panel admin-section-resources">
+						<div className="admin-section-icon">
+							<FiFileText />
+						</div>
+
+						<p className="admin-section-eyebrow">Admin</p>
+
+						<h1>Educational Resources</h1>
+
+						<p>
+							Add, edit, or remove educational resources
+							for WhichBin Orlando.
+						</p>
+
+						<div className="admin-resource-actions">
+							<button
+								type="button"
+								className="admin-resource-add"
+								onClick={startAddResource}
+								disabled={Boolean(editingResource)}
+							>
+								<FiPlus />
+								Add Resource
+							</button>
+						</div>
+
+						{showAddForm && !editingResource && (
+							<div className="admin-resource-new-form">
+								{renderResourceForm(false)}
+							</div>
+						)}
+
+						{loading && (
+							<p className="admin-resource-status">
+								Loading resources...
+							</p>
+						)}
+
+						{!loading && error && (
+							<p className="admin-resource-status admin-resource-error">
+								Unable to load resources.
+							</p>
+						)}
+
+						{!loading &&
+							!error &&
+							resources.length === 0 && (
+								<p className="admin-resource-status">
+									No resources have been added yet.
+								</p>
+							)}
+
+						{!loading &&
+							!error &&
+							resources.length > 0 && (
+								<div className="admin-resource-list">
+									{resources.map((resource) => {
+										const isEditing =
+											editingResource?.id ===
+											resource.id
+
+										return (
+											<article
+												key={resource.id}
+												className={`admin-resource-card ${
+													isEditing
+														? 'admin-resource-card-editing'
+														: ''
+												}`}
+											>
+												{isEditing ? (
+													renderResourceForm(
+														true
+													)
+												) : (
+													<>
+														<div className="admin-resource-card-content">
+															<h2>
+																{
+																	resource.title
+																}
+															</h2>
+
+															<p>
+																{
+																	resource.description
+																}
+															</p>
+														</div>
+
+														<div className="admin-resource-card-actions">
+															<button
+																type="button"
+																onClick={() =>
+																	startEditResource(
+																		resource
+																	)
+																}
+																disabled={Boolean(
+																	editingResource
+																)}
+															>
+																<FiEdit />
+																Edit
+															</button>
+
+															<button
+																type="button"
+																className="admin-resource-delete"
+																onClick={() =>
+																	requestDeleteResource(
+																		resource
+																	)
+																}
+																disabled={Boolean(
+																	editingResource
+																)}
+															>
+																<FiTrash2 />
+																Delete
+															</button>
+														</div>
+													</>
+												)}
+											</article>
+										)
+									})}
+								</div>
+							)}
+
+						<div className="admin-resource-divider" />
+
+						<div className="admin-resource-trivia-header">
+							<div>
+								<p className="admin-resource-form-eyebrow">
+									Educational Activity
+								</p>
+
+								<h2>Trivia Challenges</h2>
+
+								<p>
+									Create separate trivia challenges
+									and manage the questions inside each
+									one.
+								</p>
+							</div>
+
+							<button
+								type="button"
+								className="admin-resource-add"
+								onClick={startAddChallenge}
+								disabled={
+									Boolean(editingTrivia) ||
+									showChallengeForm
+								}
+							>
+								<FiPlus />
+								Add Trivia Challenge
+							</button>
+						</div>
+
+						{showChallengeForm && (
+							<div className="admin-resource-new-form">
+								{renderChallengeForm()}
+							</div>
+						)}
+
+						{triviaLoading && (
+							<p className="admin-resource-status">
+								Loading trivia challenges...
+							</p>
+						)}
+
+						{!triviaLoading && triviaError && (
+							<p className="admin-resource-status admin-resource-error">
+								Unable to load trivia challenges.
+							</p>
+						)}
+
+						{!triviaLoading &&
+							!triviaError &&
+							triviaChallenges.length === 0 && (
+								<p className="admin-resource-status">
+									No trivia challenges have been added
+									yet.
+								</p>
+							)}
+
+						{!triviaLoading &&
+							!triviaError &&
+							triviaChallenges.length > 0 && (
+								<div className="admin-resource-list">
+									{triviaChallenges.map((challenge) => {
+										const isExpanded =
+											expandedTriviaChallengeId ===
+											challenge.id
+
+										return (
+											<section
+												key={challenge.id}
+												className={`admin-resource-card admin-resource-trivia-challenge ${
+													isExpanded
+														? 'admin-resource-trivia-challenge-expanded'
+														: ''
+												}`}
+											>
+												<button
+													type="button"
+													className="admin-resource-trivia-trigger"
+													onClick={() =>
+														toggleTriviaChallenge(
+															challenge.id
+														)
+													}
+													aria-expanded={
+														isExpanded
+													}
+												>
+													<div className="admin-resource-trivia-trigger-content">
+														<p className="admin-resource-form-eyebrow">
+															Trivia Challenge
+														</p>
+
 														<h2>
 															{
-																resource.title
+																challenge.title
 															}
 														</h2>
 
 														<p>
 															{
-																resource.description
+																challenge.description
 															}
 														</p>
 													</div>
 
-													<div className="admin-resource-card-actions">
-														<button
-															type="button"
-															onClick={() =>
-																startEditResource(
-																	resource
-																)
-															}
-															disabled={Boolean(
-																editingResource
-															)}
-														>
-															<FiEdit />
-															Edit
-														</button>
+													<div className="admin-resource-trivia-trigger-meta">
+														<span>
+															{
+																challenge
+																	.questions
+																	.length
+															}{' '}
+															question
+															{challenge
+																.questions
+																.length ===
+															1
+																? ''
+																: 's'}
+														</span>
 
-														<button
-															type="button"
-															className="admin-resource-delete"
-															onClick={() =>
-																handleDelete(
-																	resource
-																)
+														<FiChevronDown
+															className={
+																isExpanded
+																	? 'admin-resource-trivia-chevron-expanded'
+																	: ''
 															}
-															disabled={Boolean(
-																editingResource
-															)}
-														>
-															<FiTrash2 />
-															Delete
-														</button>
+														/>
 													</div>
-												</>
-											)}
-										</article>
-									)
-								})}
-							</div>
-						)}
+												</button>
+
+												{isExpanded && (
+													<div className="admin-resource-trivia-challenge-body">
+														<div className="admin-resource-trivia-header">
+															<div>
+																<h3>
+																	Questions
+																</h3>
+
+																<p>
+																	Add,
+																	edit,
+																	or
+																	remove
+																	questions
+																	for
+																	this
+																	challenge.
+																</p>
+															</div>
+
+															<button
+																type="button"
+																className="admin-resource-add"
+																onClick={() =>
+																	startAddTrivia(
+																		challenge.id
+																	)
+																}
+																disabled={
+																	Boolean(
+																		editingTrivia
+																	) ||
+																	showChallengeForm
+																}
+															>
+																<FiPlus />
+																Add Trivia
+																Question
+															</button>
+														</div>
+
+														{showTriviaForm &&
+															!editingTrivia &&
+															activeTriviaChallengeId ===
+																challenge.id && (
+																<div className="admin-resource-new-form">
+																	{renderTriviaForm(
+																		false
+																	)}
+																</div>
+															)}
+
+														{showTriviaForm &&
+															editingTrivia &&
+															activeTriviaChallengeId ===
+																challenge.id && (
+																<div className="admin-resource-new-form">
+																	{renderTriviaForm(
+																		true
+																	)}
+																</div>
+															)}
+
+														{challenge.questions
+															.length === 0 ? (
+															<p className="admin-resource-status">
+																No questions
+																have been added
+																to this
+																challenge yet.
+															</p>
+														) : (
+															<div className="admin-resource-list">
+																{challenge.questions.map(
+																	(
+																		question
+																	) => {
+																		const isEditing =
+																			editingTrivia?.id ===
+																			question.id
+
+																		return (
+																			<article
+																				key={
+																					question.id
+																				}
+																				className={`admin-resource-card ${
+																					isEditing
+																						? 'admin-resource-card-editing'
+																						: ''
+																				}`}
+																			>
+																				{isEditing ? (
+																					renderTriviaForm(
+																						true
+																					)
+																				) : (
+																					<>
+																						<div className="admin-resource-card-content">
+																							<h2>
+																								{
+																									question.question
+																								}
+																							</h2>
+
+																							<p>
+																								<strong>
+																									Correct Answer:
+																								</strong>{' '}
+																								{
+																									question.correctAnswer
+																								}
+																							</p>
+																						</div>
+
+																						<div className="admin-resource-card-actions">
+																							<button
+																								type="button"
+																								onClick={() =>
+																									startEditTrivia(
+																										question,
+																										challenge.id
+																									)
+																								}
+																								disabled={
+																									Boolean(
+																										editingTrivia
+																									) ||
+																									showChallengeForm
+																								}
+																							>
+																								<FiEdit />
+																								Edit
+																							</button>
+
+																							<button
+																								type="button"
+																								className="admin-resource-delete"
+																								onClick={() =>
+																									requestDeleteTrivia(
+																										question
+																									)
+																								}
+																								disabled={
+																									Boolean(
+																										editingTrivia
+																									) ||
+																									showChallengeForm
+																								}
+																							>
+																								<FiTrash2 />
+																								Delete
+																							</button>
+																						</div>
+																					</>
+																				)}
+																			</article>
+																		)
+																	}
+																)}
+															</div>
+														)}
+
+														<div className="admin-resource-card-actions admin-resource-trivia-challenge-actions">
+															<button
+																type="button"
+																className="admin-resource-delete"
+																onClick={() =>
+																	requestDeleteTriviaChallenge(
+																		challenge
+																	)
+																}
+																disabled={
+																	Boolean(
+																		editingTrivia
+																	) ||
+																	showTriviaForm ||
+																	showChallengeForm
+																}
+															>
+																<FiTrash2 />
+																Delete Challenge
+															</button>
+														</div>
+													</div>
+												)}
+											</section>
+										)
+									})}
+								</div>
+							)}
+					</div>
 				</div>
-			</div>
-		</PageLayout>
+			</PageLayout>
+
+			{deleteTarget && (
+				<DeleteConfirmModal
+					title={`Delete ${deleteTarget.type === 'challenge' ? 'Trivia Challenge' : deleteTarget.type === 'question' ? 'Trivia Question' : 'Resource'}?`}
+					itemName={deleteTarget.title}
+					description={deleteDescription}
+					confirmLabel={deleteLabel}
+					loading={deleting}
+					onCancel={handleCloseDeleteModal}
+					onConfirm={handleConfirmDelete}
+				/>
+			)}
+		</>
 	)
 }
