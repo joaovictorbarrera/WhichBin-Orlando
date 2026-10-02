@@ -19,10 +19,15 @@ public class AnnouncementController {
         this.announcementService = announcementService;
     }
 
-    // GETs filtered announcements
-    // TODO rename this to getFiltered announcements
-    // Add new authenticated route for getting all announcements (used by admin panel)
+    // Public route - returns only currently visible announcements
     @GetMapping
+    public ResponseEntity<List<Announcement>> getCurrentAnnouncements() {
+        return ResponseEntity.ok(announcementService.getCurrentAnnouncements());
+    }
+
+    // Admin route - returns all announcements
+    @Authenticated
+    @GetMapping("/all")
     public ResponseEntity<List<Announcement>> getAllAnnouncements() {
         return ResponseEntity.ok(announcementService.getAllAnnouncements());
     }
