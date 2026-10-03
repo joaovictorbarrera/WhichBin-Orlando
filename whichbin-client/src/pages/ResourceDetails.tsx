@@ -1,315 +1,255 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { FiArrowLeft } from 'react-icons/fi'
 import {
-  getResourceById,
-  type Resource,
+	FiArrowLeft,
+	FiCheckCircle,
+	FiInfo,
+	FiAlertTriangle,
+	FiXCircle,
+	FiList,
+} from 'react-icons/fi'
+import { FaRecycle } from 'react-icons/fa6'
+import {
+	getResourceById,
+	type Resource,
 } from '../services/resourceService'
-import {
-  getTriviaQuestions,
-  type TriviaQuestion,
-} from '../services/triviaService'
 import PageLayout from '../components/PageLayout'
 import './ResourceDetails.css'
+import './Announcements.css'
 
 function ResourceDetails() {
-  const { resourceId } = useParams()
+	const { resourceId } = useParams()
 
-  const [resource, setResource] = useState<Resource | null>(null)
-  const [triviaQuestions, setTriviaQuestions] = useState<TriviaQuestion[] | null>(null)
-  const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
-  const [score, setScore] = useState(0)
-  const [quizComplete, setQuizComplete] = useState(false)
-  const [loading, setLoading] = useState(true)
+	const [resource, setResource] = useState<Resource | null>(null)
+	const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!resourceId) {
-      return
-    }
+	useEffect(() => {
+		if (!resourceId) {
+			setLoading(false)
+			return
+		}
 
-    let isMounted = true
+		let isMounted = true
 
-    getResourceById(resourceId)
-      .then((data) => {
-        if (isMounted) {
-          setResource(data)
-          setLoading(false)
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setResource(null)
-          setLoading(false)
-        }
-      })
+		getResourceById(resourceId)
+			.then((data) => {
+				if (isMounted) {
+					setResource(data)
+					setLoading(false)
+				}
+			})
+			.catch(() => {
+				if (isMounted) {
+					setResource(null)
+					setLoading(false)
+				}
+			})
 
-    return () => {
-      isMounted = false
-    }
-  }, [resourceId])
+		return () => {
+			isMounted = false
+		}
+	}, [resourceId])
 
-  useEffect(() => {
-    if (resource?.title !== 'Take the Challenge') {
-      return
-    }
+	function getSectionIcon(styleType: string) {
+		if (styleType.includes('blue')) {
+			return <FiInfo aria-hidden="true" />
+		}
 
-    let isMounted = true
+		if (styleType.includes('orange')) {
+			return <FiAlertTriangle aria-hidden="true" />
+		}
 
-    getTriviaQuestions()
-      .then((questions) => {
-        if (isMounted) {
-          setTriviaQuestions(questions)
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setTriviaQuestions(null)
-        }
-      })
+		if (styleType.includes('red')) {
+			return <FiXCircle aria-hidden="true" />
+		}
 
-    return () => {
-      isMounted = false
-    }
-  }, [resource])
+		return <FiCheckCircle aria-hidden="true" />
+	}
 
-  const triviaLoading =
-    resource?.title === 'Take the Challenge' && triviaQuestions === null
+	function getSectionClass(styleType: string) {
+		if (styleType.includes('blue')) {
+			return 'resource-section resource-section-blue'
+		}
 
-  function handleAnswer(answer: string) {
-    if (selectedAnswer !== null || quizComplete) {
-      return
-    }
+		if (styleType.includes('orange')) {
+			return 'resource-section resource-section-orange'
+		}
 
-    setSelectedAnswer(answer)
+		if (styleType.includes('red')) {
+			return 'resource-section resource-section-red'
+		}
 
-    if (answer === triviaQuestions?.[currentQuestion]?.correctAnswer) {
-      setScore((currentScore) => currentScore + 1)
-    }
-  }
+		return 'resource-section resource-section-green'
+	}
 
-  function handleNextQuestion() {
-    if (currentQuestion === (triviaQuestions?.length ?? 0) - 1) {
-      setQuizComplete(true)
-      return
-    }
+	if (loading) {
+		return (
+			<PageLayout
+				className="resource-details-page"
+				width="wide"
+			>
+				<Link
+					to="/resources"
+					className="resource-back-link"
+				>
+					<FiArrowLeft aria-hidden="true" />
+					Back to Educational Resources
+				</Link>
 
-    setCurrentQuestion((current) => current + 1)
-    setSelectedAnswer(null)
-  }
+				<div className="announcements-status">
+					<p>Loading resource...</p>
+				</div>
+			</PageLayout>
+		)
+	}
 
-  function restartQuiz() {
-    setCurrentQuestion(0)
-    setSelectedAnswer(null)
-    setScore(0)
-    setQuizComplete(false)
-  }
+	if (!resource || !resourceId) {
+		return (
+			<PageLayout
+				className="resource-details-page"
+				width="wide"
+			>
+				<Link
+					to="/resources"
+					className="resource-back-link"
+				>
+					<FiArrowLeft aria-hidden="true" />
+					Back to Educational Resources
+				</Link>
 
-  function getAnswerClass(answer: string) {
-    if (selectedAnswer === null) {
-      return 'trivia-answer'
-    }
+				<div className="resource-details-card">
+					<div className="resource-empty-icon">
+						<FiInfo aria-hidden="true" />
+					</div>
 
-    if (answer === triviaQuestions?.[currentQuestion]?.correctAnswer) {
-      return 'trivia-answer trivia-answer-correct'
-    }
+					<h1>Resource Not Found</h1>
 
-    if (answer === selectedAnswer) {
-      return 'trivia-answer trivia-answer-wrong'
-    }
+					<p>Resource not found.</p>
+				</div>
+			</PageLayout>
+		)
+	}
 
-    return 'trivia-answer'
-  }
+	return (
+		<PageLayout
+			className="resource-details-page"
+			width="wide"
+		>
+			<Link
+				to="/resources"
+				className="resource-back-link"
+			>
+				<FiArrowLeft aria-hidden="true" />
+				Back to Educational Resources
+			</Link>
 
-  if (loading && resourceId) {
-    return (
-      <PageLayout className="resource-details-page" width="wide">
-        <Link to="/resources" className="resource-back-link">
-          <FiArrowLeft aria-hidden="true" />
-          Back to Educational Resources
-        </Link>
+			<div className="resource-details-card">
+				<div className="resource-hero resource-hero-green">
+					<div className="resource-hero-icon">
+						<FaRecycle aria-hidden="true" />
+					</div>
 
-        <div className="resource-details-card">
-          <h1 aria-live="polite">Loading resource...</h1>
-        </div>
-      </PageLayout>
-    )
-  }
+					<div>
+						<p className="resource-hero-label">
+							Educational Resource
+						</p>
 
-  if (!resource || !resourceId) {
-    return (
-      <PageLayout className="resource-details-page" width="wide">
-        <Link to="/resources" className="resource-back-link">
-          <FiArrowLeft aria-hidden="true" />
-          Back to Educational Resources
-        </Link>
+						<h1>{resource.title}</h1>
 
-        <div className="resource-details-card">
-          <h1>Resource Not Found</h1>
-          <p>Resource not found.</p>
-        </div>
-      </PageLayout>
-    )
-  }
+						<p>{resource.description}</p>
+					</div>
+				</div>
 
-  if (resource.title === 'Take the Challenge') {
-    if (triviaLoading) {
-      return (
-        <PageLayout className="resource-details-page" width="wide">
-          <Link to="/resources" className="resource-back-link">
-            <FiArrowLeft aria-hidden="true" />
-            Back to Educational Resources
-          </Link>
+				<div className="resource-section-list">
+					{(resource.sections ?? []).map(
+						(section, sectionIndex) => (
+							<section
+								className={getSectionClass(
+									section.styleType
+								)}
+								key={`${section.heading}-${sectionIndex}`}
+							>
+								<div className="resource-section-heading">
+									<div className="resource-section-icon">
+										{getSectionIcon(
+											section.styleType
+										)}
+									</div>
 
-          <div className="resource-details-card">
-            <h1>{resource.title}</h1>
-            <p>{resource.description}</p>
-            <p>Loading challenge questions...</p>
-          </div>
-        </PageLayout>
-      )
-    }
+									<div>
+										<h2>{section.heading}</h2>
+									</div>
+								</div>
 
-    if (!triviaQuestions?.length) {
-      return (
-        <PageLayout className="resource-details-page" width="wide">
-          <Link to="/resources" className="resource-back-link">
-            <FiArrowLeft aria-hidden="true" />
-            Back to Educational Resources
-          </Link>
+								<ul>
+									{section.items
+										.split('|')
+										.map(
+											(
+												item,
+												itemIndex
+											) => (
+												<li
+													key={
+														itemIndex
+													}
+												>
+													{item}
+												</li>
+											)
+										)}
+								</ul>
+							</section>
+						)
+					)}
+				</div>
 
-          <div className="resource-details-card">
-            <h1>{resource.title}</h1>
-            <p>{resource.description}</p>
-            <p>There are no challenge questions available right now.</p>
-          </div>
-        </PageLayout>
-      )
-    }
+				{(resource.sections ?? []).length === 0 && (
+					<div className="resource-empty-message">
+						<FiList aria-hidden="true" />
 
-    if (quizComplete) {
-      return (
-        <PageLayout className="resource-details-page" width="wide">
-          <Link to="/resources" className="resource-back-link">
-            <FiArrowLeft aria-hidden="true" />
-            Back to Educational Resources
-          </Link>
+						<p>
+							No information has been added
+							to this resource yet.
+						</p>
+					</div>
+				)}
 
-          <div className="resource-details-card">
-            <h1>Challenge Complete!</h1>
+				{resource.pdfUrl &&
+					resource.pdfUrl.trim() !== '' && (
+						<section className="resource-pdf">
+							<div className="resource-pdf-header">
+								<div>
+									<span className="resource-pdf-label">
+										PDF GUIDE
+									</span>
 
-            <p>
-              You scored {score} out of {triviaQuestions?.length ?? 0}.
-            </p>
+									<h2>
+										Additional
+										Information
+									</h2>
 
-            <button
-              type="button"
-              className="trivia-button"
-              onClick={restartQuiz}
-            >
-              Try Again
-            </button>
-          </div>
-        </PageLayout>
-      )
-    }
+									<p>
+										View the complete
+										guide for this
+										resource.
+									</p>
+								</div>
 
-    const question = triviaQuestions![currentQuestion]
-
-    const answers = [
-      question.answerA,
-      question.answerB,
-      question.answerC,
-      question.answerD,
-    ]
-
-    return (
-      <PageLayout className="resource-details-page" width="wide">
-        <Link to="/resources" className="resource-back-link">
-          <FiArrowLeft aria-hidden="true" />
-          Back to Educational Resources
-        </Link>
-
-        <div className="resource-details-card">
-          <h1>{resource.title}</h1>
-
-          <p>{resource.description}</p>
-
-          <p>
-            Question {currentQuestion + 1} of {triviaQuestions?.length ?? 0}
-          </p>
-
-          <section className="trivia-question">
-            <h2>{question.question}</h2>
-
-            <div className="trivia-answers">
-              {answers.map((answer) => (
-                <button
-                  type="button"
-                  className={getAnswerClass(answer)}
-                  onClick={() => handleAnswer(answer)}
-                  disabled={selectedAnswer !== null}
-                  key={answer}
-                >
-                  {answer}
-                </button>
-              ))}
-            </div>
-
-            {selectedAnswer !== null && (
-              <div className="trivia-next">
-                <p>
-                  {selectedAnswer === question.correctAnswer
-                    ? 'Correct!'
-                    : `Not quite. The correct answer is ${question.correctAnswer}.`}
-                </p>
-
-                <button
-                  type="button"
-                  className="trivia-button"
-                  onClick={handleNextQuestion}
-                >
-                  {currentQuestion === triviaQuestions.length - 1
-                    ? 'Finish'
-                    : 'Next Question'}
-                </button>
-              </div>
-            )}
-          </section>
-        </div>
-      </PageLayout>
-    )
-  }
-
-  return (
-    <PageLayout className="resource-details-page" width="wide">
-      <Link to="/resources" className="resource-back-link">
-        <FiArrowLeft aria-hidden="true" />
-        Back to Educational Resources
-      </Link>
-
-      <div className="resource-details-card">
-        <h1>{resource.title}</h1>
-
-        <p>{resource.description}</p>
-
-        {(resource.sections ?? []).map((section) => (
-          <section
-            className={`resource-section ${section.styleType}`}
-            key={`${section.heading}-${section.styleType}`}
-          >
-            <h2>{section.heading}</h2>
-
-            <ul>
-              {section.items.split('|').map((item, itemIndex) => (
-                <li key={itemIndex}>{item}</li>
-              ))}
-            </ul>
-          </section>
-        ))}
-      </div>
-    </PageLayout>
-  )
+								<a
+									href={resource.pdfUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="resource-pdf-button"
+								>
+									Open PDF
+								</a>
+							</div>
+						</section>
+					)}
+			</div>
+		</PageLayout>
+	)
 }
 
 export default ResourceDetails
