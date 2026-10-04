@@ -1,5 +1,6 @@
 package com.whichbin.whichbin_api.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -21,6 +22,11 @@ public class TriviaQuestion {
     private String answerD;
 
     private String correctAnswer;
+
+    @ManyToOne
+    @JoinColumn(name = "challenge_id")
+    @JsonBackReference
+    private TriviaChallenge challenge;
 
     public TriviaQuestion() {
     }
@@ -95,5 +101,13 @@ public class TriviaQuestion {
 
     public void setCorrectAnswer(String correctAnswer) {
         this.correctAnswer = correctAnswer;
+    }
+
+    public TriviaChallenge getChallenge() {
+        return challenge;
+    }
+
+    public void setChallenge(TriviaChallenge challenge) {
+        this.challenge = challenge;
     }
 }
