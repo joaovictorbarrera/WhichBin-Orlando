@@ -9,7 +9,6 @@ import {
 } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
-import { useAuth } from '../../context/useAuth'
 import {
   createAnnouncement,
   deleteAnnouncement,
@@ -19,6 +18,7 @@ import {
   type AnnouncementInput,
 } from '../../services/announcementService'
 import './AdminSection.css'
+import DeleteConfirmModal from '../../components/DeleteConfirmModal'
 
 const announcementTypes = [
   { value: 'GENERAL', label: 'General' },
@@ -35,9 +35,6 @@ type AnnouncementStatus =
   | 'Inactive'
 
 function AdminAnnouncements() {
-  const { user } = useAuth()
-  const authenticatedUser = user!
-
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -56,6 +53,7 @@ function AdminAnnouncements() {
   const [active, setActive] = useState(true)
 
   const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Announcement | null>(null)
 
   useEffect(() => {
     loadAnnouncements()
@@ -180,31 +178,42 @@ function AdminAnnouncements() {
     setShowForm(false)
   }
 
-  async function handleDeleteAnnouncement(announcement: Announcement) {
-    if (
-      !window.confirm(
-        `Delete "${announcement.title}"? This action cannot be undone.`
-      )
-    ) {
-      return
-    }
+function handleDeleteAnnouncement(announcement: Announcement) {
+  setDeleteTarget(announcement)
+}
 
-    setDeletingId(announcement.id)
-
-    const success = await deleteAnnouncement(announcement.id)
-
-    if (!success) {
-      window.alert('The announcement could not be deleted.')
-      setDeletingId(null)
-      return
-    }
-
-    setAnnouncements((current) =>
-      current.filter((item) => item.id !== announcement.id)
-    )
-
-    setDeletingId(null)
+function handleCloseDeleteModal() {
+  if (deletingId !== null) {
+    return
   }
+
+  setDeleteTarget(null)
+}
+
+async function handleConfirmDelete() {
+  if (!deleteTarget) {
+    return
+  }
+
+  const announcementId = deleteTarget.id
+
+  setDeletingId(announcementId)
+
+  const success = await deleteAnnouncement(announcementId)
+
+  if (!success) {
+    window.alert('The announcement could not be deleted.')
+    setDeletingId(null)
+    return
+  }
+
+  setAnnouncements((current) =>
+    current.filter((item) => item.id !== announcementId)
+  )
+
+  setDeletingId(null)
+  setDeleteTarget(null)
+}
 
   return (
     <PageLayout
@@ -506,9 +515,17 @@ function AdminAnnouncements() {
         )}
       </section>
 
-      <p className="admin-announcements-user">
-        Signed in as {authenticatedUser.firstName}.
-      </p>
+      {deleteTarget && (
+        <DeleteConfirmModal
+        title="Delete Announcement?"
+        itemName={deleteTarget.title}
+        description="This announcement will be permanently deleted. This action cannot be undone."
+        confirmLabel="Delete Announcement"
+        loading={deletingId === deleteTarget.id}
+        onCancel={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+      />
+     )}
     </PageLayout>
   )
 }

@@ -1187,12 +1187,6 @@
         margin: 0 0 1rem;
 }
 
-.admin-announcements-user {
-        margin: 1.25rem 0 0;
-        color: var(--color-text-subtle);
-        font-size: 0.8rem;
-
-}
 @media (max-width: 600px) {
 	.admin-section-page {
 		padding-top: 3rem;
@@ -1483,4 +1477,81 @@
 	.admin-resource-trivia-challenge-body {
 		padding: 0 1rem 1rem;
 	}
+}
+
+/* Admin Announcements responsive layout */
+
+@media (max-width: 700px) {
+    .admin-announcements-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.25rem;
+    }
+
+    .admin-announcements-heading {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .admin-announcements-heading > div {
+        min-width: 0;
+    }
+
+    .admin-announcements-add {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .admin-announcement-card {
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .admin-announcement-content {
+        width: 100%;
+    }
+
+    .admin-announcement-actions {
+        width: 100%;
+    }
+
+    .admin-announcement-actions button {
+        flex: 1;
+        justify-content: center;
+        min-width: 0;
+    }
+
+    .admin-announcement-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-announcements-heading {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .admin-announcement-form-panel,
+    .admin-announcements-list-section {
+        padding: 1.25rem;
+        box-sizing: border-box;
+    }
+
+    .admin-announcements-list-heading {
+        flex-direction: column;
+    }
+
+    .admin-announcement-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .admin-announcement-form-actions button {
+        width: 100%;
+    }
+
+    .admin-announcement-dates {
+        flex-direction: column;
+        gap: 0.4rem;
+    }
 }
