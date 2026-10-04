@@ -3,6 +3,7 @@ import { Outlet, NavLink } from 'react-router-dom'
 import { FiHome, FiSearch, FiBell } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
 import Footer from './Footer'
+import './Layout.css'
 
 export function BottomNav() {
   return (
@@ -37,18 +38,6 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   return (
     <div className="layout-shell flex min-h-screen flex-col">
-      <style>{`
-        .layout-shell {
-          display: flex;
-          flex-direction: column;
-          min-height: 100vh;
-          width: 100%;
-        }
-        .layout-main-content {
-          flex: 1 0 auto;
-          width: 100%;
-        }
-      `}</style>
       <main className="layout-main-content flex-1">
         {children || <Outlet />}
       </main>
