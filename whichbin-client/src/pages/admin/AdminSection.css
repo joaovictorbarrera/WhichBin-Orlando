@@ -841,6 +841,352 @@
 	}
 }
 
+/* Admin Announcements */
+.admin-announcements-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+        margin-bottom: 2rem;
+}
+
+.admin-announcements-heading {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.25rem;
+}
+
+.admin-announcements-heading .admin-section-icon {
+        flex: 0 0 auto;
+        margin-bottom: 0;
+}
+
+.admin-announcements-heading h1 {
+        margin: 0;
+        color: var(--color-heading-deep);
+        font-size: clamp(2rem, 4vw, 2.75rem);
+}
+
+.admin-announcements-heading > div > p:last-child {
+        margin: 0.75rem 0 0;
+        color: var(--color-text-muted);
+        line-height: 1.6;
+}
+
+.admin-announcements-add {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-height: 2.75rem;
+        padding: 0.75rem 1.1rem;
+        border: 0;
+        border-radius: 0.625rem;
+        background: var(--color-brand);
+        color: white;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+}
+
+.admin-announcements-add:hover:not(:disabled) {
+        opacity: 0.9;
+}
+
+.admin-announcements-add:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+}
+
+.admin-announcements-add svg {
+        width: 1rem;
+        height: 1rem;
+}
+
+.admin-announcement-form-panel,
+.admin-announcements-list-section {
+        padding: 2rem;
+        border: 0.065rem solid var(--color-border-soft);
+        border-radius: 0.875rem;
+        background: var(--color-surface);
+        box-shadow: var(--shadow-card);
+}
+
+.admin-announcement-form-panel {
+        margin-bottom: 2rem;
+}
+
+.admin-announcement-form-header,
+.admin-announcements-list-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+}
+
+.admin-announcement-form-header {
+        margin-bottom: 1.5rem;
+}
+
+.admin-announcement-form-header h2,
+.admin-announcements-list-heading h2 {
+        margin: 0;
+        color: var(--color-heading-deep);
+}
+
+.admin-announcements-list-heading {
+        padding-bottom: 1.25rem;
+        border-bottom: 0.065rem solid var(--color-border-soft);
+}
+
+.admin-announcements-list-heading p {
+        margin: 0.4rem 0 0;
+        color: var(--color-text-muted);
+}
+
+.admin-announcements-list-heading > span {
+        flex: 0 0 auto;
+        color: var(--color-text-subtle);
+        font-size: 0.875rem;
+        font-weight: 700;
+}
+
+.admin-announcement-close {
+        display: grid;
+        place-items: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: var(--color-text-muted);
+        cursor: pointer;
+}
+
+.admin-announcement-close:hover:not(:disabled) {
+        background: var(--color-page);
+        color: var(--color-heading-deep);
+}
+
+.admin-announcement-close svg {
+        width: 1.25rem;
+        height: 1.25rem;
+}
+
+.admin-announcement-form {
+        display: grid;
+        gap: 1.25rem;
+}
+
+.admin-announcement-form label {
+        display: grid;
+        gap: 0.5rem;
+        color: var(--color-heading-deep);
+        font-size: 0.9rem;
+        font-weight: 700;
+}
+
+.admin-announcement-form input,
+.admin-announcement-form textarea,
+.admin-announcement-form select {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0.8rem 0.9rem;
+        border: 0.065rem solid var(--color-border-soft);
+        border-radius: 0.5rem;
+        background: var(--color-surface);
+        color: var(--color-heading-deep);
+        font: inherit;
+}
+
+.admin-announcement-form textarea {
+        resize: vertical;
+        line-height: 1.5;
+}
+
+.admin-announcement-form input:focus,
+.admin-announcement-form textarea:focus,
+.admin-announcement-form select:focus {
+        outline: 0.125rem solid var(--color-brand);
+        outline-offset: 0.1rem;
+}
+
+.admin-announcement-form-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+}
+
+.admin-announcement-active {
+        display: flex !important;
+        align-items: flex-start;
+        gap: 0.75rem !important;
+        padding: 1rem;
+        border-radius: 0.625rem;
+        background: var(--color-page);
+        cursor: pointer;
+}
+
+.admin-announcement-active input {
+        width: auto;
+        margin-top: 0.2rem;
+}
+
+.admin-announcement-active span {
+        display: grid;
+        gap: 0.2rem;
+}
+
+.admin-announcement-active small {
+        color: var(--color-text-muted);
+        font-weight: 400;
+        line-height: 1.5;
+}
+
+.admin-announcement-form-error {
+        margin: 0;
+        color: var(--color-danger);
+        font-weight: 700;
+}
+
+.admin-announcement-form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+}
+
+.admin-announcement-cancel,
+.admin-announcement-actions button,
+.admin-announcements-empty button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        padding: 0.65rem 0.9rem;
+        border: 0.065rem solid var(--color-border-soft);
+        border-radius: 0.5rem;
+        background: var(--color-surface);
+        color: var(--color-heading-deep);
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+}
+
+.admin-announcement-cancel:hover:not(:disabled),
+.admin-announcement-actions button:hover:not(:disabled),
+.admin-announcements-empty button:hover {
+        background: var(--color-page);
+}
+
+.admin-announcements-list {
+        display: grid;
+}
+
+.admin-announcement-card {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 2rem;
+        padding: 1.5rem 0;
+        border-bottom: 0.065rem solid var(--color-border-soft);
+}
+
+.admin-announcement-card:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+}
+
+.admin-announcement-content {
+        min-width: 0;
+        flex: 1;
+}
+
+.admin-announcement-meta {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        margin-bottom: 0.65rem;
+        color: var(--color-text-subtle);
+        font-size: 0.78rem;
+        font-weight: 700;
+}
+
+.admin-announcement-status {
+        display: inline-flex;
+        padding: 0.3rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 800;
+}
+
+.admin-announcement-status-active {
+        background: var(--color-surface-green-soft);
+        color: var(--color-brand);
+}
+
+.admin-announcement-status-scheduled {
+        background: var(--color-surface-blue);
+        color: var(--color-info);
+}
+
+.admin-announcement-status-expired,
+.admin-announcement-status-inactive {
+        background: var(--color-page);
+        color: var(--color-text-muted);
+}
+
+.admin-announcement-card h3 {
+        margin: 0;
+        color: var(--color-heading-deep);
+        font-size: 1.1rem;
+}
+
+.admin-announcement-message {
+        display: -webkit-box;
+        overflow: hidden;
+        margin: 0.55rem 0 0;
+        color: var(--color-text-muted);
+        line-height: 1.55;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+}
+
+.admin-announcement-dates {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.5rem;
+        margin-top: 0.9rem;
+        color: var(--color-text-subtle);
+        font-size: 0.82rem;
+}
+
+.admin-announcement-actions {
+        display: flex;
+        flex: 0 0 auto;
+        gap: 0.5rem;
+}
+
+.admin-announcement-actions button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+}
+
+.admin-announcement-actions .admin-announcement-delete {
+        color: var(--color-danger);
+}
+
+.admin-announcements-loading,
+.admin-announcements-empty {
+        margin: 1.5rem 0 0;
+        color: var(--color-text-muted);
+}
+
+.admin-announcements-empty p {
+        margin: 0 0 1rem;
+}
+
 @media (max-width: 600px) {
 	.admin-section-page {
 		padding-top: 3rem;
@@ -1131,4 +1477,81 @@
 	.admin-resource-trivia-challenge-body {
 		padding: 0 1rem 1rem;
 	}
+}
+
+/* Admin Announcements responsive layout */
+
+@media (max-width: 700px) {
+    .admin-announcements-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.25rem;
+    }
+
+    .admin-announcements-heading {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .admin-announcements-heading > div {
+        min-width: 0;
+    }
+
+    .admin-announcements-add {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .admin-announcement-card {
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .admin-announcement-content {
+        width: 100%;
+    }
+
+    .admin-announcement-actions {
+        width: 100%;
+    }
+
+    .admin-announcement-actions button {
+        flex: 1;
+        justify-content: center;
+        min-width: 0;
+    }
+
+    .admin-announcement-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-announcements-heading {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .admin-announcement-form-panel,
+    .admin-announcements-list-section {
+        padding: 1.25rem;
+        box-sizing: border-box;
+    }
+
+    .admin-announcements-list-heading {
+        flex-direction: column;
+    }
+
+    .admin-announcement-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .admin-announcement-form-actions button {
+        width: 100%;
+    }
+
+    .admin-announcement-dates {
+        flex-direction: column;
+        gap: 0.4rem;
+    }
 }
