@@ -9,9 +9,9 @@ import {
   FiRefreshCw,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
-import PageLayout from '../components/PageLayout'
-import { fetchItems, type Item } from '../services/itemService'
-import { isAbortError } from '../helpers/ErrorHelper'
+import PageLayout from '../../components/PageLayout'
+import { fetchItems, type Item } from '../../services/itemService'
+import { isAbortError } from '../../helpers/ErrorHelper'
 import './ItemSearch.css'
 
 type FilterOption = 'all' | 'recyclable' | 'non-recyclable'
@@ -246,4 +246,3 @@ function ItemSearch() {
 }
 
 export default ItemSearch
-

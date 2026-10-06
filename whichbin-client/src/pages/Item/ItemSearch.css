@@ -183,7 +183,7 @@
 }
 
 .item-card-trash {
-  border-left-color: var(--color-accent);
+  border-left-color: var(--color-danger);
 }
 
 .item-card:hover {
@@ -222,8 +222,8 @@
 }
 
 .badge-trash {
-  background: var(--color-surface-orange);
-  color: var(--color-accent);
+  background: var(--color-surface-red);
+  color: var(--color-danger);
 }
 
 .item-card-title {

@@ -13,14 +13,14 @@ import { FaRecycle } from 'react-icons/fa'
 import {
   getResources,
   type Resource,
-} from '../services/resourceService'
+} from '../../services/resourceService'
 import {
   getTriviaChallenges,
   type TriviaChallenge,
-} from '../services/triviaService'
-import PageLayout from '../components/PageLayout'
+} from '../../services/triviaService'
+import PageLayout from '../../components/PageLayout'
 import './EducationalResources.css'
-import './Announcements.css'
+import '../Announcements/Announcements.css'
 
 type ResourceFilter = 'all' | 'articles' | 'trivia'
 

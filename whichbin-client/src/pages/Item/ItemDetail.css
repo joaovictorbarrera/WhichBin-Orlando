@@ -63,8 +63,8 @@
 }
 
 .item-detail-card.item-detail-trash {
-  --item-accent: var(--color-accent);
-  --item-tint: var(--color-surface-orange);
+  --item-accent: var(--color-danger);
+  --item-tint: var(--color-surface-red);
 }
 
 .item-detail-card::before {
@@ -124,20 +124,34 @@
 
 /* Classification Highlight Banner */
 .item-detail-classification-banner {
+  --classification-accent: var(--item-accent);
+
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-bottom: 2rem;
   padding: 1.15rem 1.25rem;
   background: var(--item-tint);
-  border: 0.065rem solid color-mix(in srgb, var(--item-accent) 25%, transparent);
+  border: 0.065rem solid color-mix(in srgb, var(--classification-accent) 25%, transparent);
   border-radius: 0.65rem;
+}
+
+.item-detail-card.item-detail-recyclable .item-detail-classification-banner {
+  --classification-accent: #2675a8;
+
+  background: var(--color-surface-blue);
+}
+
+.item-detail-card.item-detail-trash .item-detail-classification-banner {
+  --classification-accent: var(--color-warning);
+
+  background: var(--color-surface-orange);
 }
 
 .item-detail-classification-banner svg {
   flex-shrink: 0;
   font-size: 1.5rem;
-  color: var(--item-accent);
+  color: var(--classification-accent);
 }
 
 .item-detail-classification-banner .item-detail-bin-icon-blue {
@@ -167,14 +181,14 @@
 }
 
 .item-detail-large-item-banner {
-  --large-item-accent: var(--color-info);
+  --large-item-accent: var(--color-warning);
 
   display: flex;
   align-items: flex-start;
   gap: 1rem;
   margin-bottom: 2rem;
   padding: 1.15rem 1.25rem;
-  background: var(--color-surface-blue);
+  background: var(--color-surface-orange);
   border: 0.065rem solid color-mix(in srgb, var(--large-item-accent) 25%, transparent);
   border-radius: 0.65rem;
 }
@@ -239,7 +253,7 @@
 }
 
 .item-detail-section-title svg {
-  color: var(--item-accent);
+  color: var(--color-heading-soft);
   font-size: 1.15rem;
 }
 
@@ -249,6 +263,41 @@
   font-size: 1.05rem;
   line-height: 1.65;
   white-space: pre-wrap;
+}
+
+.item-detail-reuse-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-top: 1.75rem;
+  padding: 1.15rem 1.25rem;
+  background: var(--color-surface-green);
+  border: 0.065rem solid color-mix(in srgb, var(--color-brand) 25%, transparent);
+  border-radius: 0.65rem;
+}
+
+.item-detail-reuse-banner > svg {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  color: var(--color-brand);
+  font-size: 1.5rem;
+}
+
+.item-detail-reuse-banner div {
+  min-width: 0;
+}
+
+.item-detail-reuse-banner h2 {
+  margin: 0 0 0.35rem;
+  color: var(--color-heading-deep);
+  font-size: 1rem;
+}
+
+.item-detail-reuse-banner p {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 /* Status Cards: Loading, Error */

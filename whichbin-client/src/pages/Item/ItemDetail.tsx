@@ -9,9 +9,9 @@ import {
   FiTrash2,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
-import PageLayout from '../components/PageLayout'
-import { fetchItemById, type Item } from '../services/itemService'
-import { isAbortError } from '../helpers/ErrorHelper'
+import PageLayout from '../../components/PageLayout'
+import { fetchItemById, type Item } from '../../services/itemService'
+import { isAbortError } from '../../helpers/ErrorHelper'
 import './ItemDetail.css'
 
 function ItemDetail() {
@@ -186,6 +186,18 @@ function ItemDetail() {
           </h2>
           <p className="item-detail-instructions">{item.information}</p>
         </section>
+
+        <aside className="item-detail-reuse-banner" aria-labelledby="reuse-heading">
+          <FaRecycle aria-hidden="true" />
+          <div>
+            <h2 id="reuse-heading">Consider Reuse</h2>
+            <p>
+              Many items don&apos;t need to be thrown away - they can be reused! Donate items to
+              reuse centers, and always call ahead to ensure the item can be donated. You
+              can also upcycle the item into something new.
+            </p>
+          </div>
+        </aside>
 
       </article>
     </PageLayout>
