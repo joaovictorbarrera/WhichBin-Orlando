@@ -5,6 +5,7 @@ export interface Item {
   id: number
   name: string
   recyclable: boolean
+  largeItem?: boolean
   information: string
   createdAt?: string
 }
@@ -37,6 +38,14 @@ export const MOCK_ITEMS: Item[] = [
     recyclable: false,
     information: 'Single-use alkaline batteries belong in household trash or at designated hazardous drop-off centers.',
     createdAt: '2026-09-04T09:00:00Z',
+  },
+  {
+    id: 5,
+    name: 'Chair',
+    recyclable: true,
+    largeItem: true,
+    information: 'Place at the curb before 6 a.m. on your scheduled yard waste collection day for free large item pickup.',
+    createdAt: '2026-09-05T10:00:00Z',
   },
 ]
 

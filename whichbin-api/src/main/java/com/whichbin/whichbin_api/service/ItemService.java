@@ -82,6 +82,7 @@ public class ItemService {
     private void copyEditableFields(Item source, Item target) {
         target.setName(source.getName());
         target.setRecyclable(source.getRecyclable());
+        target.setLargeItem(source.getLargeItem());
         target.setInformation(source.getInformation());
 
         target.getKeywords().clear();
