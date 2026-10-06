@@ -5,7 +5,7 @@
 
 .page-layout {
   min-height: calc(100dvh - var(--top-navigation-height));
-  padding: 2.5rem 1.25rem calc(var(--bottom-navigation-height) + 1.5rem);
+  padding: 2.5rem 1.25rem clamp(2rem, 4vw, 3rem);
 }
 
 .page-layout-wide {
@@ -32,8 +32,10 @@
 .layout-shell {
   display: flex;
   flex-direction: column;
+  flex: 1 0 auto;
   min-height: 100vh;
   width: 100%;
+  gap: clamp(1.5rem, 2vw, 2.5rem);
 }
 
 .layout-main-content {
