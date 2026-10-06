@@ -4,8 +4,8 @@ import { FiBell, FiChevronRight } from 'react-icons/fi'
 import {
   getAnnouncements,
   type Announcement,
-} from '../services/announcementService'
-import PageLayout from '../components/PageLayout'
+} from '../../services/announcementService'
+import PageLayout from '../../components/PageLayout'
 import './Announcements.css'
 
 function formatType(type: string) {
@@ -65,9 +65,9 @@ function Announcements() {
       </div>
 
       {loading && (
-        <div className="announcements-status">
-          <p>Loading announcements...</p>
-        </div>
+        <p className="announcements-loading">
+          Loading announcements...
+        </p>
       )}
 
       {!loading && announcements.length === 0 && (

@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom'
-import { FaRecycle } from 'react-icons/fa'
-import { FiExternalLink } from 'react-icons/fi'
-import './Footer.css'
+import { Link } from 'react-router-dom';
+import { FaRecycle } from 'react-icons/fa';
+import { FiExternalLink } from 'react-icons/fi';
+import './Footer.css';
 
 /**
  * Global Footer Component (Ticket #003)

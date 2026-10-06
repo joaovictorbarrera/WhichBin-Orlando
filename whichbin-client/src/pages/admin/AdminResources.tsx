@@ -30,6 +30,7 @@ import {
 	deleteTriviaChallenge,
 	deleteTriviaQuestion,
 	getTriviaChallenges,
+	updateTriviaChallenge,
 	updateTriviaQuestion,
 	type CreateTriviaChallengeRequest,
 	type CreateTriviaQuestionRequest,
@@ -37,6 +38,7 @@ import {
 	type TriviaQuestion,
 } from '../../services/triviaService'
 import './AdminSection.css'
+import './AdminResources.css'
 
 type StyleOption = {
 	value: string
@@ -153,6 +155,8 @@ export default function AdminResources() {
 	const [triviaError, setTriviaError] = useState(false)
 
 	const [showChallengeForm, setShowChallengeForm] = useState(false)
+	const [editingTriviaChallenge, setEditingTriviaChallenge] =
+		useState<TriviaChallenge | null>(null)
 	const [savingChallenge, setSavingChallenge] = useState(false)
 	const [challengeFormError, setChallengeFormError] = useState(false)
 
@@ -243,7 +247,12 @@ export default function AdminResources() {
 	}
 
 	function requestDeleteTriviaChallenge(challenge: TriviaChallenge) {
-		if (editingTrivia || showTriviaForm || showChallengeForm) {
+		if (
+			editingTrivia ||
+			showTriviaForm ||
+			showChallengeForm ||
+			editingTriviaChallenge
+		) {
 			return
 		}
 
@@ -255,7 +264,7 @@ export default function AdminResources() {
 	}
 
 	function requestDeleteTrivia(question: TriviaQuestion) {
-		if (editingTrivia) {
+		if (editingTrivia || editingTriviaChallenge) {
 			return
 		}
 
@@ -532,14 +541,36 @@ export default function AdminResources() {
 		setChallengeTitle('')
 		setChallengeDescription('')
 		setChallengeFormError(false)
+		setEditingTriviaChallenge(null)
 	}
 
 	function startAddChallenge() {
-		if (showTriviaForm) {
+		if (
+			showTriviaForm ||
+			editingTrivia ||
+			editingTriviaChallenge
+		) {
 			return
 		}
 
 		resetChallengeForm()
+		setShowChallengeForm(true)
+	}
+
+	function startEditChallenge(challenge: TriviaChallenge) {
+		if (
+			showTriviaForm ||
+			editingTrivia ||
+			showChallengeForm ||
+			editingTriviaChallenge
+		) {
+			return
+		}
+
+		setEditingTriviaChallenge(challenge)
+		setChallengeTitle(challenge.title)
+		setChallengeDescription(challenge.description)
+		setChallengeFormError(false)
 		setShowChallengeForm(true)
 	}
 
@@ -564,15 +595,42 @@ export default function AdminResources() {
 		setSavingChallenge(true)
 		setChallengeFormError(false)
 
-		const newChallenge = await createTriviaChallenge(challengeData)
+		if (editingTriviaChallenge) {
+			const updatedChallenge = await updateTriviaChallenge(
+				editingTriviaChallenge.id,
+				challengeData
+			)
 
-		if (!newChallenge) {
-			setChallengeFormError(true)
-			setSavingChallenge(false)
-			return
+			if (!updatedChallenge) {
+				setChallengeFormError(true)
+				setSavingChallenge(false)
+				return
+			}
+
+			setTriviaChallenges((current) =>
+				current.map((challenge) =>
+					challenge.id === updatedChallenge.id
+						? {
+								...updatedChallenge,
+								questions: challenge.questions,
+							}
+						: challenge
+				)
+			)
+		} else {
+			const newChallenge = await createTriviaChallenge(challengeData)
+
+			if (!newChallenge) {
+				setChallengeFormError(true)
+				setSavingChallenge(false)
+				return
+			}
+
+			setTriviaChallenges((current) => [
+				...current,
+				newChallenge,
+			])
 		}
-
-		setTriviaChallenges((current) => [...current, newChallenge])
 
 		setSavingChallenge(false)
 		handleCancelChallenge()
@@ -591,7 +649,12 @@ export default function AdminResources() {
 	}
 
 	function toggleTriviaChallenge(challengeId: number) {
-		if (showChallengeForm || showTriviaForm || editingTrivia) {
+		if (
+			showChallengeForm ||
+			showTriviaForm ||
+			editingTrivia ||
+			editingTriviaChallenge
+		) {
 			return
 		}
 
@@ -601,7 +664,11 @@ export default function AdminResources() {
 	}
 
 	function startAddTrivia(challengeId: number) {
-		if (editingTrivia || showChallengeForm) {
+		if (
+			editingTrivia ||
+			showChallengeForm ||
+			editingTriviaChallenge
+		) {
 			return
 		}
 
@@ -615,7 +682,11 @@ export default function AdminResources() {
 		question: TriviaQuestion,
 		challengeId: number
 	) {
-		if (editingTrivia || showChallengeForm) {
+		if (
+			editingTrivia ||
+			showChallengeForm ||
+			editingTriviaChallenge
+		) {
 			return
 		}
 
@@ -1127,6 +1198,8 @@ export default function AdminResources() {
 	}
 
 	function renderChallengeForm() {
+		const isEditing = Boolean(editingTriviaChallenge)
+
 		return (
 			<form
 				className="admin-resource-form admin-resource-form-inline"
@@ -1135,17 +1208,27 @@ export default function AdminResources() {
 				<div className="admin-resource-form-header">
 					<div>
 						<p className="admin-resource-form-eyebrow">
-							Educational Activity
+							{isEditing
+								? 'Editing Trivia Challenge'
+								: 'Educational Activity'}
 						</p>
 
-						<h2>Add Trivia Challenge</h2>
+						<h2>
+							{isEditing
+								? 'Edit Trivia Challenge'
+								: 'Add Trivia Challenge'}
+						</h2>
 					</div>
 
 					<button
 						type="button"
 						className="admin-resource-form-close"
 						onClick={handleCancelChallenge}
-						aria-label="Close form"
+						aria-label={
+							isEditing
+								? 'Cancel editing'
+								: 'Close form'
+						}
 						disabled={savingChallenge}
 					>
 						<FiX />
@@ -1201,7 +1284,9 @@ export default function AdminResources() {
 					>
 						{savingChallenge
 							? 'Saving...'
-							: 'Save Challenge'}
+							: isEditing
+								? 'Update Challenge'
+								: 'Save Challenge'}
 					</button>
 				</div>
 			</form>
@@ -1381,44 +1466,59 @@ export default function AdminResources() {
 
 	return (
 		<>
-			<PageLayout>
-				<div className="admin-section-page">
-					<Link to="/admin" className="admin-section-back">
-						<FiArrowLeft />
-						Back to Admin
-					</Link>
+			<PageLayout
+				className="admin-section-page admin-section-resources"
+				width="wide"
+			>
+				<Link to="/admin" className="admin-section-back">
+					<FiArrowLeft />
+					Back to dashboard
+				</Link>
 
-					<div className="admin-section-panel admin-section-resources">
-						<div className="admin-section-icon">
+				<section className="admin-resources-header">
+					<div className="admin-resources-heading">
+						<span className="admin-section-icon">
 							<FiFileText />
+						</span>
+						<div>
+							<p className="admin-section-eyebrow">Admin workspace</p>
+							<h1>Manage Resources</h1>
+							<p>
+								Add, edit, or remove educational resources for WhichBin Orlando.
+							</p>
 						</div>
+					</div>
+					<button
+						type="button"
+						className="admin-resource-add"
+						onClick={startAddResource}
+						disabled={Boolean(editingResource)}
+					>
+						<FiPlus />
+						Add Resource
+					</button>
+				</section>
 
-						<p className="admin-section-eyebrow">Admin</p>
-
-						<h1>Educational Resources</h1>
-
-						<p>
-							Add, edit, or remove educational resources
-							for WhichBin Orlando.
-						</p>
-
-						<div className="admin-resource-actions">
-							<button
-								type="button"
-								className="admin-resource-add"
-								onClick={startAddResource}
-								disabled={Boolean(editingResource)}
-							>
-								<FiPlus />
-								Add Resource
-							</button>
-						</div>
+				<div className="admin-resources-content">
 
 						{showAddForm && !editingResource && (
 							<div className="admin-resource-new-form">
 								{renderResourceForm(false)}
 							</div>
 						)}
+
+						<div className="admin-resource-list-heading">
+							<div>
+								<h2>Educational Resources</h2>
+								<p>Manage articles available to WhichBin Orlando residents.</p>
+							</div>
+							{!loading && !error && (
+								<span>
+									{resources.length}{' '}
+									{resources.length === 1 ? 'resource' : 'resources'}
+								</span>
+							)}
+						</div>
 
 						{loading && (
 							<p className="admin-resource-status">
@@ -1541,7 +1641,9 @@ export default function AdminResources() {
 								onClick={startAddChallenge}
 								disabled={
 									Boolean(editingTrivia) ||
-									showChallengeForm
+									showTriviaForm ||
+									showChallengeForm ||
+									Boolean(editingTriviaChallenge)
 								}
 							>
 								<FiPlus />
@@ -1594,61 +1696,120 @@ export default function AdminResources() {
 														: ''
 												}`}
 											>
-												<button
-													type="button"
-													className="admin-resource-trivia-trigger"
-													onClick={() =>
-														toggleTriviaChallenge(
-															challenge.id
-														)
-													}
-													aria-expanded={
-														isExpanded
-													}
-												>
-													<div className="admin-resource-trivia-trigger-content">
-														<p className="admin-resource-form-eyebrow">
-															Trivia Challenge
-														</p>
+												<div className="admin-resource-trivia-challenge-top-row">
+													<button
+														type="button"
+														className="admin-resource-trivia-trigger"
+														onClick={() =>
+															toggleTriviaChallenge(
+																challenge.id
+															)
+														}
+														aria-expanded={
+															isExpanded
+														}
+														disabled={
+															Boolean(
+																editingTriviaChallenge
+															) ||
+															Boolean(
+																editingTrivia
+															) ||
+															showTriviaForm ||
+															showChallengeForm
+														}
+													>
+														<div className="admin-resource-trivia-trigger-content">
+															<p className="admin-resource-form-eyebrow">
+																Trivia Challenge
+															</p>
 
-														<h2>
-															{
-																challenge.title
-															}
-														</h2>
+															<h2>
+																{
+																	challenge.title
+																}
+															</h2>
 
-														<p>
-															{
-																challenge.description
-															}
-														</p>
-													</div>
+															<p>
+																{
+																	challenge.description
+																}
+															</p>
+														</div>
 
-													<div className="admin-resource-trivia-trigger-meta">
-														<span>
-															{
-																challenge
+														<div className="admin-resource-trivia-trigger-meta">
+															<span>
+																{
+																	challenge
+																		.questions
+																		.length
+																}{' '}
+																question
+																{challenge
 																	.questions
-																	.length
-															}{' '}
-															question
-															{challenge
-																.questions
-																.length ===
-															1
-																? ''
-																: 's'}
-														</span>
+																	.length ===
+																1
+																	? ''
+																	: 's'}
+															</span>
 
-														<FiChevronDown
-															className={
-																isExpanded
-																	? 'admin-resource-trivia-chevron-expanded'
-																	: ''
+															<FiChevronDown
+																className={
+																	isExpanded
+																		? 'admin-resource-trivia-chevron-expanded'
+																		: ''
+																}
+															/>
+														</div>
+													</button>
+
+													<div className="admin-resource-trivia-challenge-top-actions">
+														<button
+															type="button"
+															onClick={() =>
+																startEditChallenge(
+																	challenge
+																)
 															}
-														/>
+															disabled={
+																Boolean(
+																	editingTrivia
+																) ||
+																showTriviaForm ||
+																showChallengeForm ||
+																Boolean(
+																	editingTriviaChallenge
+																)
+															}
+														>
+															<FiEdit />
+															Edit
+														</button>
+
+														<button
+															type="button"
+															className="admin-resource-delete"
+															onClick={() =>
+																requestDeleteTriviaChallenge(
+																	challenge
+																)
+															}
+															disabled={
+																Boolean(
+																	editingTrivia
+																) ||
+																showTriviaForm ||
+																showChallengeForm ||
+																Boolean(
+																	editingTriviaChallenge
+																)
+															}
+														>
+															<FiTrash2 />
+															Delete
+														</button>
 													</div>
-												</button>
+												</div>
 
 												{isExpanded && (
 													<div className="admin-resource-trivia-challenge-body">
@@ -1682,7 +1843,10 @@ export default function AdminResources() {
 																	Boolean(
 																		editingTrivia
 																	) ||
-																	showChallengeForm
+																	showChallengeForm ||
+																	Boolean(
+																		editingTriviaChallenge
+																	)
 																}
 															>
 																<FiPlus />
@@ -1698,17 +1862,6 @@ export default function AdminResources() {
 																<div className="admin-resource-new-form">
 																	{renderTriviaForm(
 																		false
-																	)}
-																</div>
-															)}
-
-														{showTriviaForm &&
-															editingTrivia &&
-															activeTriviaChallengeId ===
-																challenge.id && (
-																<div className="admin-resource-new-form">
-																	{renderTriviaForm(
-																		true
 																	)}
 																</div>
 															)}
@@ -1778,7 +1931,10 @@ export default function AdminResources() {
 																									Boolean(
 																										editingTrivia
 																									) ||
-																									showChallengeForm
+																									showChallengeForm ||
+																									Boolean(
+																										editingTriviaChallenge
+																									)
 																								}
 																							>
 																								<FiEdit />
@@ -1797,7 +1953,10 @@ export default function AdminResources() {
 																									Boolean(
 																										editingTrivia
 																									) ||
-																									showChallengeForm
+																									showChallengeForm ||
+																									Boolean(
+																										editingTriviaChallenge
+																									)
 																								}
 																							>
 																								<FiTrash2 />
@@ -1812,28 +1971,6 @@ export default function AdminResources() {
 																)}
 															</div>
 														)}
-
-														<div className="admin-resource-card-actions admin-resource-trivia-challenge-actions">
-															<button
-																type="button"
-																className="admin-resource-delete"
-																onClick={() =>
-																	requestDeleteTriviaChallenge(
-																		challenge
-																	)
-																}
-																disabled={
-																	Boolean(
-																		editingTrivia
-																	) ||
-																	showTriviaForm ||
-																	showChallengeForm
-																}
-															>
-																<FiTrash2 />
-																Delete Challenge
-															</button>
-														</div>
 													</div>
 												)}
 											</section>
@@ -1841,7 +1978,6 @@ export default function AdminResources() {
 									})}
 								</div>
 							)}
-					</div>
 				</div>
 			</PageLayout>
 

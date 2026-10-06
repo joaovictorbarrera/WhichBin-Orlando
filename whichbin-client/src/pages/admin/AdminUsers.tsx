@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
 import { useAuth } from '../../context/useAuth'
 import './AdminSection.css'
+import './AdminUsers.css'
 
 function AdminUsers() {
   const { user } = useAuth()

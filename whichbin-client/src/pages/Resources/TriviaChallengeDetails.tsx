@@ -8,8 +8,8 @@ import { FaRecycle } from 'react-icons/fa6'
 import {
   getTriviaChallengeById,
   type TriviaChallenge,
-} from '../services/triviaService'
-import PageLayout from '../components/PageLayout'
+} from '../../services/triviaService'
+import PageLayout from '../../components/PageLayout'
 import './ResourceDetails.css'
 
 function TriviaChallengeDetails() {
