@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FiBell, FiChevronRight } from 'react-icons/fi'
 import {
+  announcementTypes,
   getAnnouncements,
+  type AnnouncementType,
   type Announcement,
 } from '../../services/announcementService'
 import PageLayout from '../../components/PageLayout'
@@ -25,11 +27,13 @@ function formatDateTime(dateTime: string) {
 function Announcements() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
   const [loading, setLoading] = useState(true)
+  const [filterType, setFilterType] = useState<AnnouncementType | ''>('')
 
   useEffect(() => {
     let isMounted = true
+    setLoading(true)
 
-    getAnnouncements()
+    getAnnouncements(filterType || undefined)
       .then((data) => {
         if (isMounted) {
           setAnnouncements(data ?? [])
@@ -46,7 +50,7 @@ function Announcements() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [filterType])
 
   return (
     <PageLayout className="announcements-page" width="wide">
@@ -64,6 +68,24 @@ function Announcements() {
         </div>
       </div>
 
+      <div className="announcements-filter">
+        <label htmlFor="announcements-type-filter">Filter by type</label>
+        <select
+          id="announcements-type-filter"
+          value={filterType}
+          onChange={(event) =>
+            setFilterType(event.target.value as AnnouncementType | '')
+          }
+        >
+          <option value="">All types</option>
+          {announcementTypes.map((announcementType) => (
+            <option key={announcementType.value} value={announcementType.value}>
+              {announcementType.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {loading && (
         <p className="announcements-loading">
           Loading announcements...
@@ -73,8 +95,14 @@ function Announcements() {
       {!loading && announcements.length === 0 && (
         <div className="announcements-status">
           <FiBell aria-hidden="true" />
-          <h2>No announcements right now</h2>
-          <p>Check back later for recycling updates and service notices.</p>
+          <h2>
+            {filterType ? 'No announcements of this type' : 'No announcements right now'}
+          </h2>
+          <p>
+            {filterType
+              ? 'Try selecting another type to see more announcements.'
+              : 'Check back later for recycling updates and service notices.'}
+          </p>
         </div>
       )}
 

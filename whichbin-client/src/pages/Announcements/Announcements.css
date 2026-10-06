@@ -38,6 +38,34 @@
   line-height: 1.6;
 }
 
+.announcements-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.announcements-filter label {
+  color: var(--color-heading-soft);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.announcements-filter select {
+  min-width: 12rem;
+  padding: 0.65rem 2.25rem 0.65rem 0.8rem;
+  border: 0.065rem solid var(--color-border-soft);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-heading-deep);
+  font: inherit;
+}
+
+.announcements-filter select:focus-visible {
+  outline: 0.125rem solid var(--color-brand);
+  outline-offset: 0.1rem;
+}
+
 .announcements-list {
   display: grid;
   grid-template-columns: 1fr;

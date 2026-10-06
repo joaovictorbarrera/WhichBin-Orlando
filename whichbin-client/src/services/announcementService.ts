@@ -1,5 +1,15 @@
 import { apiFetch } from './apiClient'
 
+export const announcementTypes = [
+  { value: 'GENERAL', label: 'General' },
+  { value: 'EMERGENCY', label: 'Emergency' },
+  { value: 'SCHEDULE_CHANGE', label: 'Schedule Change' },
+  { value: 'SERVICE_ALERT', label: 'Service Alert' },
+  { value: 'RECYCLING_CHANGE', label: 'Recycling Change' },
+] as const
+
+export type AnnouncementType = (typeof announcementTypes)[number]['value']
+
 export type Announcement = {
   id: number
   title: string
@@ -10,9 +20,12 @@ export type Announcement = {
   active: boolean
 }
 
-export async function getAnnouncements(): Promise<Announcement[] | null> {
+export async function getAnnouncements(
+  type?: AnnouncementType
+): Promise<Announcement[] | null> {
   try {
-    const response = await apiFetch('announcements')
+    const query = type ? `?type=${encodeURIComponent(type)}` : ''
+    const response = await apiFetch(`announcements${query}`)
 
     if (!response.ok) {
       return null
@@ -24,9 +37,12 @@ export async function getAnnouncements(): Promise<Announcement[] | null> {
   }
 }
 
-export async function getAllAnnouncements(): Promise<Announcement[] | null> {
+export async function getAllAnnouncements(
+  type?: AnnouncementType
+): Promise<Announcement[] | null> {
   try {
-    const response = await apiFetch('announcements/all')
+    const query = type ? `?type=${encodeURIComponent(type)}` : ''
+    const response = await apiFetch(`announcements/all${query}`)
 
     if (!response.ok) {
       return null

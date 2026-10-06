@@ -2,6 +2,7 @@ package com.whichbin.whichbin_api.controller;
 
 import com.whichbin.whichbin_api.auth.Authenticated;
 import com.whichbin.whichbin_api.model.Announcement;
+import com.whichbin.whichbin_api.model.AnnouncementType;
 import com.whichbin.whichbin_api.service.AnnouncementService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,15 +22,19 @@ public class AnnouncementController {
 
     // Public route - returns only currently visible announcements
     @GetMapping
-    public ResponseEntity<List<Announcement>> getCurrentAnnouncements() {
-        return ResponseEntity.ok(announcementService.getCurrentAnnouncements());
+    public ResponseEntity<List<Announcement>> getCurrentAnnouncements(
+            @RequestParam(name = "type", required = false) AnnouncementType type
+    ) {
+        return ResponseEntity.ok(announcementService.getCurrentAnnouncements(type));
     }
 
     // Admin route - returns all announcements
     @Authenticated
     @GetMapping("/all")
-    public ResponseEntity<List<Announcement>> getAllAnnouncements() {
-        return ResponseEntity.ok(announcementService.getAllAnnouncements());
+    public ResponseEntity<List<Announcement>> getAllAnnouncements(
+            @RequestParam(name = "type", required = false) AnnouncementType type
+    ) {
+        return ResponseEntity.ok(announcementService.getAllAnnouncements(type));
     }
 
     @GetMapping("/{id}")
