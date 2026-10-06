@@ -19,13 +19,13 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
                 OR LOCATE(:searchText, LOWER(keyword)) > 0
             )
             AND (
-                :recycleable IS NULL
-                OR i.recycleable = :recycleable
+                :recyclable IS NULL
+                OR i.recyclable = :recyclable
             )
             ORDER BY i.name ASC
             """)
     List<Item> searchItems(
             @Param("searchText") String searchText,
-            @Param("recycleable") Boolean recycleable
+            @Param("recyclable") Boolean recyclable
     );
 }

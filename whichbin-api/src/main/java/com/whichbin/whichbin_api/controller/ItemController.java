@@ -26,11 +26,11 @@ public class ItemController {
                     defaultValue = ""
             ) String searchText,
             @RequestParam(
-                    name = "recycleable",
+                    name = "recyclable",
                     required = false
-            ) Boolean recycleable
+            ) Boolean recyclable
     ) {
-        return itemService.searchItems(searchText, recycleable);
+        return itemService.searchItems(searchText, recyclable);
     }
 
     @GetMapping("/{id}")

@@ -102,12 +102,12 @@ function ItemDetail() {
 
       <article
         className={`item-detail-card ${
-          item.recycleable ? 'item-detail-recyclable' : 'item-detail-trash'
+          item.recyclable ? 'item-detail-recyclable' : 'item-detail-trash'
         }`}
       >
         <div className="item-detail-header">
           <div className="item-detail-icon">
-            {item.recycleable ? (
+            {item.recyclable ? (
               <FaRecycle aria-hidden="true" />
             ) : (
               <FiTrash2 aria-hidden="true" />
@@ -116,7 +116,7 @@ function ItemDetail() {
 
           <div className="item-detail-heading-content">
             <span className="item-detail-badge">
-              {item.recycleable ? (
+              {item.recyclable ? (
                 <>
                   <FaRecycle aria-hidden="true" />
                   Recyclable
@@ -134,7 +134,7 @@ function ItemDetail() {
         </div>
 
         <div className="item-detail-classification-banner">
-          {item.recycleable ? (
+          {item.recyclable ? (
             <>
               <FiCheckCircle aria-hidden="true" />
               <div>

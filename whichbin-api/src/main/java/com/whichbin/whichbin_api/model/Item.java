@@ -21,7 +21,7 @@ public class Item {
     private String name;
 
     @Column(nullable = false)
-    private Boolean recycleable;
+    private Boolean recyclable;
 
     @Column(nullable = false, length = 5000)
     private String information;
@@ -73,12 +73,12 @@ public class Item {
         this.name = name;
     }
 
-    public Boolean getRecycleable() {
-        return recycleable;
+    public Boolean getRecyclable() {
+        return recyclable;
     }
 
-    public void setRecycleable(Boolean recycleable) {
-        this.recycleable = recycleable;
+    public void setRecyclable(Boolean recyclable) {
+        this.recyclable = recyclable;
     }
 
     public String getInformation() {

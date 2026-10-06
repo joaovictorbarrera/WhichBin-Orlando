@@ -41,14 +41,14 @@ function ItemSearch() {
       setLoading(true)
       setError(null)
 
-      const recycleableParam =
+      const recyclableParam =
         filter === 'recyclable'
           ? true
           : filter === 'non-recyclable'
             ? false
             : undefined
 
-      fetchItems(debouncedSearchText.trim(), recycleableParam, controller.signal)
+      fetchItems(debouncedSearchText.trim(), recyclableParam, controller.signal)
         .then((data) => {
           if (!isMounted) return
           if (data) {
@@ -207,7 +207,7 @@ function ItemSearch() {
             <Link
               to={`/item-search/${item.id}`}
               className={`item-card ${
-                item.recycleable ? 'item-card-recyclable' : 'item-card-trash'
+                item.recyclable ? 'item-card-recyclable' : 'item-card-trash'
               }`}
               key={item.id}
             >
@@ -215,10 +215,10 @@ function ItemSearch() {
                 <div className="item-card-header">
                   <span
                     className={`item-badge ${
-                      item.recycleable ? 'badge-recyclable' : 'badge-trash'
+                      item.recyclable ? 'badge-recyclable' : 'badge-trash'
                     }`}
                   >
-                    {item.recycleable ? (
+                    {item.recyclable ? (
                       <>
                         <FaRecycle aria-hidden="true" />
                         <span>Recyclable</span>

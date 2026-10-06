@@ -29,7 +29,7 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<Item> searchItems(String searchText, Boolean recycleable) {
+    public List<Item> searchItems(String searchText, Boolean recyclable) {
         String text = searchText == null ? "" : searchText.trim();
 
         if (text.length() > 150) {
@@ -38,7 +38,7 @@ public class ItemService {
 
         return itemRepository.searchItems(
                 text.toLowerCase(Locale.ROOT),
-                recycleable
+                recyclable
         );
     }
 
@@ -81,7 +81,7 @@ public class ItemService {
 
     private void copyEditableFields(Item source, Item target) {
         target.setName(source.getName());
-        target.setRecycleable(source.getRecycleable());
+        target.setRecyclable(source.getRecyclable());
         target.setInformation(source.getInformation());
 
         target.getKeywords().clear();
@@ -109,9 +109,9 @@ public class ItemService {
             throw badRequest("Item name cannot exceed 150 characters.");
         }
 
-        if (item.getRecycleable() == null) {
+        if (item.getRecyclable() == null) {
             throw badRequest(
-                    "Recycleable must be provided as true or false."
+                    "Recyclable must be provided as true or false."
             );
         }
 
