@@ -4,7 +4,7 @@ import { isAbortError } from '../helpers/ErrorHelper'
 export interface Item {
   id: number
   name: string
-  recycleable: boolean
+  recyclable: boolean
   information: string
   createdAt?: string
 }
@@ -13,28 +13,28 @@ export const MOCK_ITEMS: Item[] = [
   {
     id: 1,
     name: 'Plastic Water Bottle',
-    recycleable: true,
+    recyclable: true,
     information: 'Empty, rinse, and replace the cap before placing in the blue bin.',
     createdAt: '2026-09-01T10:00:00Z',
   },
   {
     id: 2,
     name: 'Pizza Box (Greasy)',
-    recycleable: false,
+    recyclable: false,
     information: 'Soiled cardboard cannot be recycled due to grease contamination. Dispose in regular trash.',
     createdAt: '2026-09-02T11:30:00Z',
   },
   {
     id: 3,
     name: 'Aluminum Soda Can',
-    recycleable: true,
+    recyclable: true,
     information: 'Rinse lightly. Accepted in all curbside recycling containers.',
     createdAt: '2026-09-03T14:15:00Z',
   },
   {
     id: 4,
     name: 'Alkaline Batteries',
-    recycleable: false,
+    recyclable: false,
     information: 'Single-use alkaline batteries belong in household trash or at designated hazardous drop-off centers.',
     createdAt: '2026-09-04T09:00:00Z',
   },
@@ -42,7 +42,7 @@ export const MOCK_ITEMS: Item[] = [
 
 export async function fetchItems(
   searchText = '',
-  recycleable?: boolean,
+  recyclable?: boolean,
   signal?: AbortSignal
 ): Promise<Item[] | null> {
   const fallbackToMockItems = () =>
@@ -51,7 +51,7 @@ export async function fetchItems(
         .toLowerCase()
         .includes(searchText.trim().toLowerCase())
       const matchesFilter =
-        recycleable === undefined || item.recycleable === recycleable
+        recyclable === undefined || item.recyclable === recyclable
       return matchesSearch && matchesFilter
     })
 
@@ -60,8 +60,8 @@ export async function fetchItems(
     if (searchText.trim()) {
       params.append('searchText', searchText.trim())
     }
-    if (recycleable !== undefined) {
-      params.append('recycleable', String(recycleable))
+    if (recyclable !== undefined) {
+      params.append('recyclable', String(recyclable))
     }
 
     const query = params.toString() ? `?${params.toString()}` : ''
