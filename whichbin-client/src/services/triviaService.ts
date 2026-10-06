@@ -31,42 +31,6 @@ export type CreateTriviaChallengeRequest = {
   description: string
 }
 
-export async function getTriviaQuestions(): Promise<TriviaQuestion[] | null> {
-  try {
-    const response = await apiFetch('resources/trivia')
-
-    if (!response.ok) {
-      return null
-    }
-
-    return (await response.json()) as TriviaQuestion[]
-  } catch {
-    return null
-  }
-}
-
-export async function createTriviaQuestion(
-  question: CreateTriviaQuestionRequest
-): Promise<TriviaQuestion | null> {
-  try {
-    const response = await apiFetch('resources/trivia', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(question),
-    })
-
-    if (!response.ok) {
-      return null
-    }
-
-    return (await response.json()) as TriviaQuestion
-  } catch {
-    return null
-  }
-}
-
 export async function createTriviaQuestionForChallenge(
   challengeId: number,
   question: CreateTriviaQuestionRequest
