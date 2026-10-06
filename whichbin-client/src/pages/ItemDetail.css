@@ -188,46 +188,6 @@
   white-space: pre-wrap;
 }
 
-/* Timestamps / Metadata section */
-.item-detail-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-top: 1.75rem;
-  padding-top: 1.5rem;
-  border-top: 0.065rem solid var(--color-border-soft);
-}
-
-.item-detail-meta-item {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-}
-
-.item-detail-meta-item svg {
-  color: var(--color-text-faint);
-  font-size: 1.1rem;
-}
-
-.item-detail-meta-item div {
-  display: flex;
-  flex-direction: column;
-}
-
-.item-detail-meta-item span {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--color-text-faint);
-}
-
-.item-detail-meta-item strong {
-  color: var(--color-heading-soft);
-  font-weight: 600;
-}
-
 /* Status Cards: Loading, Error */
 .item-detail-status {
   display: grid;

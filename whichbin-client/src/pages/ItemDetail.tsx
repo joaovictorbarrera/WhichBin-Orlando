@@ -3,8 +3,6 @@ import { useParams, Link } from 'react-router-dom'
 import {
   FiArrowLeft,
   FiAlertCircle,
-  FiCalendar,
-  FiClock,
   FiInfo,
   FiTrash2,
   FiCheckCircle,
@@ -12,7 +10,6 @@ import {
 import { FaRecycle } from 'react-icons/fa'
 import PageLayout from '../components/PageLayout'
 import { fetchItemById, type Item } from '../services/itemService'
-import { formatDateTime } from '../helpers/DateHelper'
 import { isAbortError } from '../helpers/ErrorHelper'
 import './ItemDetail.css'
 
@@ -91,8 +88,6 @@ function ItemDetail() {
     )
   }
 
-  const formattedDate = formatDateTime(item.createdAt)
-
   return (
     <PageLayout className="item-detail-page" width="wide">
       <Link className="item-detail-back-link" to="/item-search">
@@ -167,25 +162,6 @@ function ItemDetail() {
           <p className="item-detail-instructions">{item.information}</p>
         </section>
 
-        <section className="item-detail-meta" aria-label="Item metadata">
-          <div className="item-detail-meta-item">
-            <FiCalendar aria-hidden="true" />
-            <div>
-              <span>Record ID</span>
-              <strong>#{item.id}</strong>
-            </div>
-          </div>
-
-          {formattedDate && (
-            <div className="item-detail-meta-item">
-              <FiClock aria-hidden="true" />
-              <div>
-                <span>Added on</span>
-                <strong>{formattedDate}</strong>
-              </div>
-            </div>
-          )}
-        </section>
       </article>
     </PageLayout>
   )
