@@ -1466,44 +1466,59 @@ export default function AdminResources() {
 
 	return (
 		<>
-			<PageLayout>
-				<div className="admin-section-page">
-					<Link to="/admin" className="admin-section-back">
-						<FiArrowLeft />
-						Back to Admin
-					</Link>
+			<PageLayout
+				className="admin-section-page admin-section-resources"
+				width="wide"
+			>
+				<Link to="/admin" className="admin-section-back">
+					<FiArrowLeft />
+					Back to dashboard
+				</Link>
 
-					<div className="admin-section-panel admin-section-resources">
-						<div className="admin-section-icon">
+				<section className="admin-resources-header">
+					<div className="admin-resources-heading">
+						<span className="admin-section-icon">
 							<FiFileText />
+						</span>
+						<div>
+							<p className="admin-section-eyebrow">Admin workspace</p>
+							<h1>Manage Resources</h1>
+							<p>
+								Add, edit, or remove educational resources for WhichBin Orlando.
+							</p>
 						</div>
+					</div>
+					<button
+						type="button"
+						className="admin-resource-add"
+						onClick={startAddResource}
+						disabled={Boolean(editingResource)}
+					>
+						<FiPlus />
+						Add Resource
+					</button>
+				</section>
 
-						<p className="admin-section-eyebrow">Admin</p>
-
-						<h1>Educational Resources</h1>
-
-						<p>
-							Add, edit, or remove educational resources
-							for WhichBin Orlando.
-						</p>
-
-						<div className="admin-resource-actions">
-							<button
-								type="button"
-								className="admin-resource-add"
-								onClick={startAddResource}
-								disabled={Boolean(editingResource)}
-							>
-								<FiPlus />
-								Add Resource
-							</button>
-						</div>
+				<div className="admin-resources-content">
 
 						{showAddForm && !editingResource && (
 							<div className="admin-resource-new-form">
 								{renderResourceForm(false)}
 							</div>
 						)}
+
+						<div className="admin-resource-list-heading">
+							<div>
+								<h2>Educational Resources</h2>
+								<p>Manage articles available to WhichBin Orlando residents.</p>
+							</div>
+							{!loading && !error && (
+								<span>
+									{resources.length}{' '}
+									{resources.length === 1 ? 'resource' : 'resources'}
+								</span>
+							)}
+						</div>
 
 						{loading && (
 							<p className="admin-resource-status">
@@ -1963,7 +1978,6 @@ export default function AdminResources() {
 									})}
 								</div>
 							)}
-					</div>
 				</div>
 			</PageLayout>
 

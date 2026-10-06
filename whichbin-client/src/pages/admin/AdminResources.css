@@ -1,24 +1,46 @@
-.admin-section-resources .admin-section-icon {
+.admin-section-page.admin-section-resources .admin-section-icon {
 	background: var(--color-surface-blue);
 	color: var(--color-info);
-	margin-bottom: 1.25rem;
 }
 
-.admin-section-page:has(.admin-section-resources) {
+.admin-resources-header {
 	display: flex;
-	flex-direction: column;
 	align-items: center;
+	justify-content: space-between;
+	gap: 2rem;
+	margin-bottom: 2rem;
 }
 
-.admin-section-page:has(.admin-section-resources) > .admin-section-back {
-	width: 100%;
-	max-width: 40rem;
-	box-sizing: border-box;
+.admin-resources-heading {
+	display: flex;
+	align-items: flex-start;
+	gap: 1.25rem;
 }
 
-.admin-section-page:has(.admin-section-resources) .admin-section-panel {
+.admin-resources-heading .admin-section-icon {
+	flex: 0 0 auto;
+	margin-bottom: 0;
+}
+
+.admin-resources-heading h1 {
+	margin: 0;
+	color: var(--color-heading-deep);
+	font-size: clamp(2rem, 4vw, 2.75rem);
+}
+
+.admin-resources-heading > div > p:last-child {
+	margin: 0.75rem 0 0;
+	color: var(--color-text-muted);
+	line-height: 1.6;
+}
+
+.admin-resources-content {
 	width: 100%;
-	box-sizing: border-box;
+	padding: 2rem;
+	border: 0.065rem solid var(--color-border-soft);
+	border-radius: 0.875rem;
+	background: var(--color-surface);
+	box-shadow: var(--shadow-card);
 }
 
 .admin-resource-actions {
@@ -54,6 +76,32 @@
 	margin: 1.5rem 0 0;
 	color: var(--color-text-muted);
 	line-height: 1.5;
+}
+
+.admin-resource-list-heading {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+	padding-bottom: 1.25rem;
+	border-bottom: 0.065rem solid var(--color-border-soft);
+}
+
+.admin-resource-list-heading h2 {
+	margin: 0;
+	color: var(--color-heading-deep);
+}
+
+.admin-resource-list-heading p {
+	margin: 0.4rem 0 0;
+	color: var(--color-text-muted);
+}
+
+.admin-resource-list-heading > span {
+	flex: 0 0 auto;
+	color: var(--color-text-subtle);
+	font-size: 0.875rem;
+	font-weight: 700;
 }
 
 .admin-resource-error {
@@ -761,6 +809,17 @@
 }
 
 @media (max-width: 700px) {
+	.admin-resources-header {
+		align-items: stretch;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.admin-resources-header > .admin-resource-add {
+		width: 100%;
+		justify-content: center;
+	}
+
 	.admin-resource-trivia-header {
 		flex-direction: column;
 		align-items: stretch;
@@ -804,23 +863,12 @@
 		padding-top: 3rem;
 	}
 
-	.admin-section-page:has(.admin-section-resources) {
-		align-items: stretch;
+	.admin-resources-heading {
+		gap: 0.875rem;
 	}
 
-	.admin-section-page:has(.admin-section-resources) > .admin-section-back {
-		max-width: none;
-	}
-
-	.admin-section-panel {
-		padding: 1.5rem;
-		background: transparent;
-		border: 0;
-		box-shadow: none;
-	}
-
-	.admin-section-page:has(.admin-section-resources) .admin-section-panel {
-		max-width: none;
+	.admin-resources-content {
+		padding: 1.25rem;
 	}
 
 	.admin-resource-card {
