@@ -20,6 +20,8 @@ public class Resource {
 
     private String styleType;
 
+    private String pdfUrl;
+
     @ElementCollection
     @CollectionTable(
             name = "resource_sections",
@@ -35,12 +37,14 @@ public class Resource {
             String description,
             String content,
             String styleType,
+            String pdfUrl,
             List<ResourceSection> sections
     ) {
         this.title = title;
         this.description = description;
         this.content = content;
         this.styleType = styleType;
+        this.pdfUrl = pdfUrl;
         this.sections = sections;
     }
 
@@ -84,6 +88,14 @@ public class Resource {
         this.styleType = styleType;
     }
 
+    public String getPdfUrl() {
+        return pdfUrl;
+    }
+
+    public void setPdfUrl(String pdfUrl) {
+        this.pdfUrl = pdfUrl;
+    }
+
     public List<ResourceSection> getSections() {
         return sections;
     }
@@ -92,4 +104,3 @@ public class Resource {
         this.sections = sections;
     }
 }
-

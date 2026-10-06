@@ -178,7 +178,7 @@ function About() {
             <article>
               <FiGitBranch aria-hidden="true" />
               <h3>GitHub Actions</h3>
-              <p>Git and GitHub Actions tie the pipeline together, keeping the frontend and backend in sync with every change.</p>
+              <p>GitHub Actions reports Vercel and Railway production deployment results to the team in Discord.</p>
             </article>
           </div>
         </div>

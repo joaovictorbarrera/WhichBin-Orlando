@@ -1,5 +1,6 @@
 .top-navigation {
-  position: relative;
+  position: sticky;
+  top: 0;
   height: var(--top-navigation-height);
   display: flex;
   justify-content: space-between;

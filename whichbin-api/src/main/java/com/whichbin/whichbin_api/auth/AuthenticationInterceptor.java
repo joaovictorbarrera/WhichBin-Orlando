@@ -1,7 +1,6 @@
 package com.whichbin.whichbin_api.auth;
 
 import com.whichbin.whichbin_api.model.User;
-import com.whichbin.whichbin_api.repository.UserRepository;
 import com.whichbin.whichbin_api.service.AuthorizationTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

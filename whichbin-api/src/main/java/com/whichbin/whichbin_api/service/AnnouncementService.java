@@ -17,8 +17,12 @@ public class AnnouncementService {
         this.announcementRepository = announcementRepository;
     }
 
-    public List<Announcement> getAllAnnouncements() {
+    public List<Announcement> getCurrentAnnouncements() {
         return announcementRepository.findCurrentAnnouncements(LocalDateTime.now());
+    }
+
+    public List<Announcement> getAllAnnouncements() {
+        return announcementRepository.findAll();
     }
 
     public Optional<Announcement> getAnnouncementById(Long id) {
