@@ -8,8 +8,8 @@ import {
 import {
   getAnnouncementById,
   type Announcement,
-} from '../services/announcementService'
-import PageLayout from '../components/PageLayout'
+} from '../../services/announcementService'
+import PageLayout from '../../components/PageLayout'
 import './AnnouncementDetails.css'
 
 function formatType(type: string) {

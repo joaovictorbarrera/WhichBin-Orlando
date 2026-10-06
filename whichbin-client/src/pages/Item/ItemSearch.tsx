@@ -4,14 +4,15 @@ import {
   FiSearch,
   FiX,
   FiTrash2,
+  FiBox,
   FiAlertCircle,
   FiChevronRight,
   FiRefreshCw,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
-import PageLayout from '../components/PageLayout'
-import { fetchItems, type Item } from '../services/itemService'
-import { isAbortError } from '../helpers/ErrorHelper'
+import PageLayout from '../../components/PageLayout'
+import { fetchItems, type Item } from '../../services/itemService'
+import { isAbortError } from '../../helpers/ErrorHelper'
 import './ItemSearch.css'
 
 type FilterOption = 'all' | 'recyclable' | 'non-recyclable'
@@ -155,7 +156,7 @@ function ItemSearch() {
       </section>
 
       {loading && (
-        <div className="item-search-status" role="status">
+        <div className="item-search-status item-search-loading" role="status">
           <div className="loading-spinner" aria-hidden="true" />
           <p>Loading items...</p>
         </div>
@@ -179,11 +180,9 @@ function ItemSearch() {
 
       {!loading && !error && items.length === 0 && (
         <div className="item-search-status item-search-empty">
-          <FiSearch className="status-icon" aria-hidden="true" />
-          <h2>No items found</h2>
           <p>
             {searchText.trim()
-              ? `No items matched "${searchText}". Try searching for another item or adjust your filter.`
+              ? `No items matched "${debouncedSearchText.trim()}". Try another search or adjust the filter.`
               : 'There are no items matching the selected filter.'}
           </p>
           {(searchText.trim() || filter !== 'all') && (
@@ -230,6 +229,12 @@ function ItemSearch() {
                       </>
                     )}
                   </span>
+                  {item.recyclable && item.largeItem && (
+                    <span className="item-badge badge-large-item">
+                      <FiBox aria-hidden="true" />
+                      <span>Large item pickup</span>
+                    </span>
+                  )}
                 </div>
 
                 <h2 className="item-card-title">{item.name}</h2>
@@ -246,4 +251,3 @@ function ItemSearch() {
 }
 
 export default ItemSearch
-

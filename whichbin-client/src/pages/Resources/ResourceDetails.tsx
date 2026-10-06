@@ -12,10 +12,10 @@ import { FaRecycle } from 'react-icons/fa6'
 import {
 	getResourceById,
 	type Resource,
-} from '../services/resourceService'
-import PageLayout from '../components/PageLayout'
+} from '../../services/resourceService'
+import PageLayout from '../../components/PageLayout'
 import './ResourceDetails.css'
-import './Announcements.css'
+import '../Announcements/Announcements.css'
 
 function ResourceDetails() {
 	const { resourceId } = useParams()

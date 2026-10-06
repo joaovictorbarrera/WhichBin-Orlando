@@ -3,17 +3,15 @@ import { useParams, Link } from 'react-router-dom'
 import {
   FiArrowLeft,
   FiAlertCircle,
-  FiCalendar,
-  FiClock,
   FiInfo,
+  FiBox,
+  FiClock,
   FiTrash2,
-  FiCheckCircle,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
-import PageLayout from '../components/PageLayout'
-import { fetchItemById, type Item } from '../services/itemService'
-import { formatDateTime } from '../helpers/DateHelper'
-import { isAbortError } from '../helpers/ErrorHelper'
+import PageLayout from '../../components/PageLayout'
+import { fetchItemById, type Item } from '../../services/itemService'
+import { isAbortError } from '../../helpers/ErrorHelper'
 import './ItemDetail.css'
 
 function ItemDetail() {
@@ -91,8 +89,6 @@ function ItemDetail() {
     )
   }
 
-  const formattedDate = formatDateTime(item.createdAt)
-
   return (
     <PageLayout className="item-detail-page" width="wide">
       <Link className="item-detail-back-link" to="/item-search">
@@ -136,7 +132,7 @@ function ItemDetail() {
         <div className="item-detail-classification-banner">
           {item.recyclable ? (
             <>
-              <FiCheckCircle aria-hidden="true" />
+              <FiTrash2 className="item-detail-bin-icon item-detail-bin-icon-blue" aria-hidden="true" />
               <div>
                 <strong>Orlando Recycling Cart (Blue Bin)</strong>
                 <p>
@@ -147,7 +143,7 @@ function ItemDetail() {
             </>
           ) : (
             <>
-              <FiTrash2 aria-hidden="true" />
+              <FiTrash2 className="item-detail-bin-icon item-detail-bin-icon-gray" aria-hidden="true" />
               <div>
                 <strong>Regular Trash Cart (Garbage)</strong>
                 <p>
@@ -159,6 +155,30 @@ function ItemDetail() {
           )}
         </div>
 
+        {item.recyclable && item.largeItem && (
+          <section className="item-detail-large-item-banner" aria-labelledby="large-item-heading">
+            <FiBox aria-hidden="true" />
+            <div>
+              <h2 id="large-item-heading">Large Item Pick Up</h2>
+              <p>
+                The City of Orlando picks up some large items for free on your yard waste
+                collection day, without scheduling.{' '}
+                <a
+                  href="https://www.orlando.gov/Trash-Recycling/Get-Large-Items-Picked-Up"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn more about this collection process.
+                </a>
+              </p>
+              <p className="item-detail-large-item-time">
+                <FiClock aria-hidden="true" />
+                Place items at the curb before 6 a.m. on your scheduled yard waste collection day.
+              </p>
+            </div>
+          </section>
+        )}
+
         <section className="item-detail-section" aria-labelledby="instructions-heading">
           <h2 id="instructions-heading" className="item-detail-section-title">
             <FiInfo aria-hidden="true" />
@@ -167,25 +187,18 @@ function ItemDetail() {
           <p className="item-detail-instructions">{item.information}</p>
         </section>
 
-        <section className="item-detail-meta" aria-label="Item metadata">
-          <div className="item-detail-meta-item">
-            <FiCalendar aria-hidden="true" />
-            <div>
-              <span>Record ID</span>
-              <strong>#{item.id}</strong>
-            </div>
+        <aside className="item-detail-reuse-banner" aria-labelledby="reuse-heading">
+          <FaRecycle aria-hidden="true" />
+          <div>
+            <h2 id="reuse-heading">Consider Reuse</h2>
+            <p>
+              Many items don&apos;t need to be thrown away - they can be reused! Donate items to
+              reuse centers, and always call ahead to ensure the item can be donated. You
+              can also upcycle the item into something new.
+            </p>
           </div>
+        </aside>
 
-          {formattedDate && (
-            <div className="item-detail-meta-item">
-              <FiClock aria-hidden="true" />
-              <div>
-                <span>Added on</span>
-                <strong>{formattedDate}</strong>
-              </div>
-            </div>
-          )}
-        </section>
       </article>
     </PageLayout>
   )

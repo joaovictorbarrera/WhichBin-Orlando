@@ -23,6 +23,9 @@ public class Item {
     @Column(nullable = false)
     private Boolean recyclable;
 
+    @Column
+    private Boolean largeItem = false;
+
     @Column(nullable = false, length = 5000)
     private String information;
 
@@ -79,6 +82,14 @@ public class Item {
 
     public void setRecyclable(Boolean recyclable) {
         this.recyclable = recyclable;
+    }
+
+    public Boolean getLargeItem() {
+        return Boolean.TRUE.equals(largeItem);
+    }
+
+    public void setLargeItem(Boolean largeItem) {
+        this.largeItem = Boolean.TRUE.equals(largeItem);
     }
 
     public String getInformation() {
