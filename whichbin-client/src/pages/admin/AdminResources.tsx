@@ -38,6 +38,7 @@ import {
 	type TriviaQuestion,
 } from '../../services/triviaService'
 import './AdminSection.css'
+import './AdminResources.css'
 
 type StyleOption = {
 	value: string

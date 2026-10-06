@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
 import { useAuth } from '../../context/useAuth'
 import './AdminSection.css'
+import './AdminItems.css'
 
 function AdminItems() {
   const { user } = useAuth()

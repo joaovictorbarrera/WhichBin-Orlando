@@ -18,6 +18,7 @@ import {
   type AnnouncementInput,
 } from '../../services/announcementService'
 import './AdminSection.css'
+import './AdminAnnouncements.css'
 import DeleteConfirmModal from '../../components/DeleteConfirmModal'
 
 const announcementTypes = [
