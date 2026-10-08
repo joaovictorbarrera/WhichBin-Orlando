@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import {
   FiArrowLeft,
   FiBell,
@@ -16,18 +16,12 @@ import {
   updateAnnouncement,
   type Announcement,
   type AnnouncementInput,
+  announcementTypes,
+  type AnnouncementType,
 } from '../../services/announcementService'
 import './AdminSection.css'
 import './AdminAnnouncements.css'
 import DeleteConfirmModal from '../../components/DeleteConfirmModal'
-
-const announcementTypes = [
-  { value: 'GENERAL', label: 'General' },
-  { value: 'EMERGENCY', label: 'Emergency' },
-  { value: 'SCHEDULE_CHANGE', label: 'Schedule Change' },
-  { value: 'SERVICE_ALERT', label: 'Service Alert' },
-  { value: 'RECYCLING_CHANGE', label: 'Recycling Change' },
-]
 
 type AnnouncementStatus =
   | 'Active'
@@ -37,8 +31,10 @@ type AnnouncementStatus =
 
 function AdminAnnouncements() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
+  const [announcementFilter, setAnnouncementFilter] = useState<AnnouncementType | ''>('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const announcementLoadRequest = useRef(0)
 
   const [showForm, setShowForm] = useState(false)
   const [editingAnnouncement, setEditingAnnouncement] =
@@ -57,14 +53,18 @@ function AdminAnnouncements() {
   const [deleteTarget, setDeleteTarget] = useState<Announcement | null>(null)
 
   useEffect(() => {
-    loadAnnouncements()
-  }, [])
+    void loadAnnouncements(announcementFilter || undefined)
+  }, [announcementFilter])
 
-  async function loadAnnouncements() {
+  async function loadAnnouncements(type?: AnnouncementType) {
+    const requestId = ++announcementLoadRequest.current
     setLoading(true)
     setError(false)
 
-    const result = await getAllAnnouncements()
+    const result = await getAllAnnouncements(type)
+    if (requestId !== announcementLoadRequest.current) {
+      return
+    }
 
     if (result === null) {
       setError(true)
@@ -163,12 +163,15 @@ function AdminAnnouncements() {
     if (editingAnnouncement) {
       setAnnouncements((current) =>
         sortAnnouncements(
-          current.map((announcement) =>
-            announcement.id === result.id ? result : announcement
-          )
+          current.flatMap((announcement) => {
+            if (announcement.id !== result.id) return [announcement]
+            return !announcementFilter || result.type === announcementFilter
+              ? [result]
+              : []
+          })
         )
       )
-    } else {
+    } else if (!announcementFilter || result.type === announcementFilter) {
       setAnnouncements((current) =>
         sortAnnouncements([...current, result])
       )
@@ -402,14 +405,35 @@ async function handleConfirmDelete() {
             </p>
           </div>
 
-          {!loading && !error && (
-            <span>
-              {announcements.length}{' '}
-              {announcements.length === 1
-                ? 'announcement'
-                : 'announcements'}
-            </span>
-          )}
+          <div className="admin-announcements-list-tools">
+            <label htmlFor="admin-announcements-type-filter">Type</label>
+            <select
+              id="admin-announcements-type-filter"
+              value={announcementFilter}
+              onChange={(event) =>
+                setAnnouncementFilter(
+                  event.target.value as AnnouncementType | ''
+                )
+              }
+              disabled={loading}
+            >
+              <option value="">All types</option>
+              {announcementTypes.map((announcementType) => (
+                <option
+                  key={announcementType.value}
+                  value={announcementType.value}
+                >
+                  {announcementType.label}
+                </option>
+              ))}
+            </select>
+            {!loading && !error && (
+              <span>
+                {announcements.length}{' '}
+                {announcements.length === 1 ? 'announcement' : 'announcements'}
+              </span>
+            )}
+          </div>
         </div>
 
         {loading && (
@@ -421,7 +445,7 @@ async function handleConfirmDelete() {
         {!loading && error && (
           <div className="admin-announcements-empty">
             <p>Announcements could not be loaded.</p>
-            <button type="button" onClick={loadAnnouncements}>
+            <button type="button" onClick={() => void loadAnnouncements(announcementFilter || undefined)}>
               Try Again
             </button>
           </div>
@@ -429,7 +453,11 @@ async function handleConfirmDelete() {
 
         {!loading && !error && announcements.length === 0 && (
           <div className="admin-announcements-empty">
-            <p>No announcements have been created yet.</p>
+            <p>
+              {announcementFilter
+                ? 'No announcements match the selected type.'
+                : 'No announcements have been created yet.'}
+            </p>
           </div>
         )}
 

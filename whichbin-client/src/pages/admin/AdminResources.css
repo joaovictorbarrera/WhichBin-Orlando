@@ -43,13 +43,6 @@
 	box-shadow: var(--shadow-card);
 }
 
-.admin-resource-actions {
-	display: flex;
-	justify-content: flex-end;
-	margin-top: 1.5rem;
-	margin-bottom: 1.5rem;
-}
-
 .admin-resource-add {
 	display: inline-flex;
 	align-items: center;
@@ -887,10 +880,6 @@
 	.admin-resource-card-actions button {
 		flex: 1;
 		justify-content: center;
-	}
-
-	.admin-resource-actions {
-		justify-content: stretch;
 	}
 
 	.admin-resource-add {
