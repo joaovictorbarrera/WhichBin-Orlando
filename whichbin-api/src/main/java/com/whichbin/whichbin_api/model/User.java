@@ -34,8 +34,11 @@ public class User {
     @Column(nullable = false, unique = true, length = 255)
     private String email;
 
-    @Column(name = "password_hash", nullable = false, length = 255)
+    @Column(name = "password_hash", nullable = true, length = 255)
     private String passwordHash;
+
+    @Column(name = "invitation_token", length = 64)
+    private String invitationToken;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
@@ -46,11 +49,11 @@ public class User {
     protected User() {
     }
 
-    public User(String firstName, String lastName, String email, String passwordHash) {
+    public User(String firstName, String lastName, String email, String invitationToken) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.passwordHash = passwordHash;
+        this.invitationToken = invitationToken;
     }
 
     @PrePersist
@@ -99,6 +102,14 @@ public class User {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public String getInvitationToken() {
+        return invitationToken;
+    }
+
+    public void setInvitationToken(String invitationToken) {
+        this.invitationToken = invitationToken;
     }
 
     public OffsetDateTime getCreatedAt() {

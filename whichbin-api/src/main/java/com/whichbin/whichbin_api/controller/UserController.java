@@ -2,6 +2,7 @@ package com.whichbin.whichbin_api.controller;
 
 import com.whichbin.whichbin_api.auth.Authenticated;
 import com.whichbin.whichbin_api.dto.user.CreateUserRequest;
+import com.whichbin.whichbin_api.dto.user.CreateUserResponse;
 import com.whichbin.whichbin_api.dto.user.UpdateUserRequest;
 import com.whichbin.whichbin_api.dto.user.UserResponse;
 import com.whichbin.whichbin_api.service.UserService;
@@ -41,8 +42,8 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
-        UserResponse createdUser = userService.createUser(request);
+    public ResponseEntity<CreateUserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
+        CreateUserResponse createdUser = userService.createUser(request);
 
         return ResponseEntity
                 .created(URI.create("/api/users/" + createdUser.id()))

@@ -1,4 +1,417 @@
-.admin-section-users .admin-section-icon {
-	background: var(--color-surface-green-soft);
-	color: var(--color-brand);
+.admin-users-page {
+  padding-top: 4rem;
+  padding-bottom: calc(var(--bottom-navigation-height) + 4rem);
+  background: var(--color-page);
+}
+
+.admin-users-panel {
+  padding: 2rem;
+  border: 0.065rem solid var(--color-border-soft);
+  border-radius: 0.875rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.admin-users-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-users-header .admin-section-icon {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.admin-users-header > div {
+  flex: 1;
+}
+
+.admin-users-header .admin-section-eyebrow {
+  margin-bottom: 0.4rem;
+}
+
+.admin-users-header h1 {
+  margin: 0;
+  color: var(--color-heading-deep);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+}
+
+.admin-users-header > div > p:last-child {
+  margin: 0.4rem 0 0;
+  color: var(--color-text-muted);
+}
+
+.admin-users-primary,
+.admin-users-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border-radius: 0.6rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-users-primary {
+  border: 1px solid var(--color-brand);
+  background: var(--color-brand);
+  color: var(--color-surface);
+}
+
+.admin-users-primary:hover:not(:disabled) {
+  border-color: var(--color-brand-dark);
+  background: var(--color-brand-dark);
+}
+
+.admin-users-secondary {
+  border: 1px solid var(--color-border-soft);
+  background: var(--color-surface);
+  color: var(--color-heading-deep);
+}
+
+.admin-users-secondary:hover:not(:disabled) {
+  background: var(--color-page);
+}
+
+.admin-users-primary:disabled,
+.admin-users-secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.admin-users-signed-in {
+  margin: 1rem 0 0;
+  color: var(--color-text-subtle);
+  font-size: 0.875rem;
+}
+
+.admin-users-error,
+.admin-users-load-error {
+  margin: 1rem 0 0;
+  padding: 0.8rem 1rem;
+  border: 1px solid #f2caca;
+  border-radius: 0.6rem;
+  background: var(--color-surface-red);
+  color: #a22d2d;
+  line-height: 1.5;
+}
+
+.admin-users-load-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-users-load-error p {
+  margin: 0;
+}
+
+.admin-users-load-error button {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: var(--color-brand);
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.admin-user-form {
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border-green);
+  border-radius: 0.75rem;
+  background: var(--color-page-warm);
+}
+
+.admin-user-form-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-user-form-heading h2 {
+  margin: 0;
+  color: var(--color-heading-deep);
+  font-size: 1.15rem;
+}
+
+.admin-user-form-heading > button {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.admin-user-form-heading > button:hover:not(:disabled) {
+  background: var(--color-surface);
+}
+
+.admin-user-form-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.admin-user-form-fields label {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--color-heading-soft);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.admin-user-form-fields label:last-child {
+  grid-column: 1 / -1;
+}
+
+.admin-user-form-fields input,
+.admin-users-share-controls input {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.admin-user-form-fields input:focus,
+.admin-users-share-controls input:focus {
+  border-color: var(--color-brand);
+  outline: 0.15rem solid color-mix(in srgb, var(--color-brand) 16%, transparent);
+}
+
+.admin-user-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.125rem;
+}
+
+.admin-users-share {
+  display: grid;
+  gap: 0.875rem;
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid #cde3d2;
+  border-radius: 0.75rem;
+  background: var(--color-surface-green-soft);
+}
+
+.admin-users-share h2 {
+  margin: 0;
+  color: var(--color-heading-deep);
+  font-size: 1.1rem;
+}
+
+.admin-users-share p {
+  margin: 0.25rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.admin-users-share-controls {
+  display: flex;
+  gap: 0.625rem;
+}
+
+.admin-users-share-controls input {
+  flex: 1;
+  background: var(--color-surface);
+  font-size: 0.85rem;
+}
+
+.admin-users-share-controls button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--color-brand);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-brand);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-users-share-controls button:hover {
+  background: var(--color-page);
+}
+
+.admin-users-list-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.admin-users-list-heading h2 {
+  margin: 0;
+  color: var(--color-heading-deep);
+  font-size: 1.3rem;
+}
+
+.admin-users-list-heading span {
+  color: var(--color-text-subtle);
+  font-size: 0.875rem;
+}
+
+.admin-users-status {
+  margin: 1.25rem 0 0;
+  color: var(--color-text-muted);
+}
+
+.admin-users-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.admin-user-card {
+  padding: 1rem;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 0.7rem;
+  background: var(--color-surface);
+}
+
+.admin-user-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-user-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  min-width: 0;
+}
+
+.admin-user-avatar {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--color-surface-green-soft);
+  color: var(--color-brand);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-user-identity h3 {
+  margin: 0;
+  color: var(--color-heading-deep);
+  font-size: 1rem;
+}
+
+.admin-user-identity p {
+  margin: 0.2rem 0 0;
+  overflow-wrap: anywhere;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.admin-user-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.admin-user-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.4rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-heading-soft);
+  font-size: 0.825rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-user-actions button:hover:not(:disabled) {
+  border-color: var(--color-brand);
+  background: var(--color-surface-hover);
+}
+
+.admin-user-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.admin-user-actions button:nth-child(2) {
+  color: #a22d2d;
+}
+
+@media (max-width: 760px) {
+  .admin-users-page {
+    padding-top: 2rem;
+  }
+
+  .admin-users-panel {
+    padding: 1.25rem;
+  }
+
+  .admin-users-header {
+    flex-wrap: wrap;
+  }
+
+  .admin-users-header .admin-users-primary {
+    width: 100%;
+  }
+
+  .admin-user-summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-user-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 540px) {
+  .admin-user-form-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-user-form-fields label:last-child {
+    grid-column: auto;
+  }
+
+  .admin-users-share-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-users-share-controls button {
+    width: 100%;
+  }
 }

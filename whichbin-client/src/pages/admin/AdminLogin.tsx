@@ -1,18 +1,23 @@
 import { useState, type FormEvent } from 'react'
 import { FiArrowLeft, FiLock, FiMail } from 'react-icons/fi'
-import { Link, Navigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/useAuth'
 import PageLayout from '../../components/PageLayout'
 import './AdminLogin.css'
 
 function AdminLogin() {
   const { isAuthenticated, login } = useAuth()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const showLogin = Boolean(
+    (location.state as { showLogin?: boolean } | null)?.showLogin
+  )
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  if (isAuthenticated) {
+  if (isAuthenticated && !showLogin) {
     return <Navigate to="/admin" replace />
   }
 
@@ -23,6 +28,7 @@ function AdminLogin() {
 
     try {
       await login(email, password)
+      navigate('/admin', { replace: true })
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : 'Unable to sign in right now.')
     } finally {

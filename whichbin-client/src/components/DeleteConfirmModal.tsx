@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { FiAlertTriangle, FiTrash2, FiX } from 'react-icons/fi'
+import { createPortal } from 'react-dom'
 import './DeleteConfirmModal.css'
 
 type DeleteConfirmModalProps = {
@@ -35,7 +36,7 @@ export default function DeleteConfirmModal({
 		}
 	}, [loading, onCancel])
 
-	return (
+	return createPortal(
 		<div
 			className="delete-confirm-overlay"
 			role="presentation"
@@ -102,6 +103,7 @@ export default function DeleteConfirmModal({
 					</button>
 				</div>
 			</div>
-		</div>
+		</div>,
+		document.body
 	)
 }
