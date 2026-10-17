@@ -1,12 +1,14 @@
 package com.whichbin.whichbin_api.controller;
 
 import com.whichbin.whichbin_api.auth.Authenticated;
+import com.whichbin.whichbin_api.dto.CreateQuestionRequest;
 import com.whichbin.whichbin_api.model.Resource;
 import com.whichbin.whichbin_api.model.TriviaChallenge;
 import com.whichbin.whichbin_api.model.TriviaQuestion;
 import com.whichbin.whichbin_api.service.ResourceService;
 import com.whichbin.whichbin_api.service.TriviaChallengeService;
 import com.whichbin.whichbin_api.service.TriviaQuestionService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -69,20 +71,20 @@ public class ResourceController {
         return ResponseEntity.noContent().build();
     }
 
-    // Public route: active challenges only.
+    // Public route: returns active challenges only.
     @GetMapping("/trivia/challenges")
     public List<TriviaChallenge> getActiveTriviaChallenges() {
         return triviaChallengeService.getActiveChallenges();
     }
 
-    // Admin route: all challenges, including inactive ones.
+    // Admin route: returns both active and inactive challenges.
     @Authenticated
     @GetMapping("/trivia/challenges/all")
     public List<TriviaChallenge> getAllTriviaChallenges() {
         return triviaChallengeService.getAllChallenges();
     }
 
-    // Public route: inactive challenges cannot be opened by direct URL.
+    // Public route: an inactive challenge cannot be opened directly.
     @GetMapping("/trivia/challenges/{id}")
     public ResponseEntity<TriviaChallenge> getTriviaChallengeById(
             @PathVariable Long id) {
@@ -92,8 +94,16 @@ public class ResourceController {
                     triviaChallengeService.getActiveChallengeById(id)
             );
         } catch (ResponseStatusException exception) {
-            if (exception.getStatusCode().value() == 404) {
+            if (exception.getStatusCode().value()
+                    == HttpStatus.NOT_FOUND.value()) {
                 return ResponseEntity.notFound().build();
+            }
+
+            if (exception.getStatusCode().value()
+                    == HttpStatus.UNAUTHORIZED.value()) {
+                return ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build();
             }
 
             throw exception;
@@ -126,16 +136,24 @@ public class ResourceController {
         return ResponseEntity.noContent().build();
     }
 
-    // Trivia question routes are grouped under /question.
+    // Creates a question using the challenge ID and question DTO.
     @Authenticated
-    @PostMapping("/trivia/question/challenges/{challengeId}")
-    public TriviaQuestion createTriviaQuestionForChallenge(
-            @PathVariable Long challengeId,
-            @RequestBody TriviaQuestion question) {
+    @PostMapping("/trivia/question")
+    public TriviaQuestion createTriviaQuestion(
+            @RequestBody CreateQuestionRequest request) {
+
+        if (request == null
+                || request.getChallengeId() == null
+                || request.getQuestion() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Challenge ID and question are required"
+            );
+        }
 
         return triviaQuestionService.createQuestion(
-                challengeId,
-                question
+                request.getChallengeId(),
+                request.getQuestion()
         );
     }
 

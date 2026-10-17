@@ -19,6 +19,11 @@ export type CreateTriviaQuestionRequest = {
   correctAnswer: string
 }
 
+export type CreateQuestionRequest = {
+  challengeId: number
+  question: CreateTriviaQuestionRequest
+}
+
 export type TriviaChallenge = {
   id: number
   title: string
@@ -42,17 +47,19 @@ export async function createTriviaQuestionForChallenge(
   challengeId: number,
   question: CreateTriviaQuestionRequest
 ): Promise<TriviaQuestion | null> {
+  const requestBody: CreateQuestionRequest = {
+    challengeId,
+    question,
+  }
+
   try {
-    const response = await apiFetch(
-      `resources/trivia/question/challenges/${challengeId}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(question),
-      }
-    )
+    const response = await apiFetch('resources/trivia/question', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    })
 
     if (!response.ok) {
       return null
@@ -107,7 +114,7 @@ export async function deleteTriviaQuestion(
   }
 }
 
-// Public list: the backend returns active challenges only.
+// Public list: returns active challenges only.
 export async function getTriviaChallenges(): Promise<TriviaChallenge[] | null> {
   try {
     const response = await apiFetch('resources/trivia/challenges')
@@ -122,7 +129,7 @@ export async function getTriviaChallenges(): Promise<TriviaChallenge[] | null> {
   }
 }
 
-// Admin list: the backend returns active and inactive challenges.
+// Admin list: returns active and inactive challenges.
 export async function getAllTriviaChallenges(): Promise<TriviaChallenge[] | null> {
   try {
     const response = await apiFetch('resources/trivia/challenges/all')

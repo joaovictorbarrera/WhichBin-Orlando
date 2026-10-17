@@ -18,33 +18,36 @@ public class TriviaChallengeService {
         this.triviaChallengeRepository = triviaChallengeRepository;
     }
 
-    // Public listing: return active challenges only.
     public List<TriviaChallenge> getActiveChallenges() {
         return triviaChallengeRepository.findByActiveTrueOrderByIdAsc();
     }
 
-    // Admin listing: return active and inactive challenges.
     public List<TriviaChallenge> getAllChallenges() {
         return triviaChallengeRepository.findAll();
     }
 
-    // Public detail: inactive challenges cannot be opened directly.
     public TriviaChallenge getActiveChallengeById(Long id) {
-        return triviaChallengeRepository.findById(id)
-                .filter(TriviaChallenge::isActive)
+        TriviaChallenge challenge = triviaChallengeRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "Active challenge does not exist"
+                        "Challenge does not exist"
                 ));
+
+        if (!challenge.isActive()) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Challenge is inactive"
+            );
+        }
+
+        return challenge;
     }
 
-    // New challenges must always start inactive.
     public TriviaChallenge createChallenge(TriviaChallenge challenge) {
         challenge.setActive(false);
         return triviaChallengeRepository.save(challenge);
     }
 
-    // The active status can be changed when editing a challenge.
     public TriviaChallenge updateChallenge(
             Long id,
             TriviaChallenge challenge) {
