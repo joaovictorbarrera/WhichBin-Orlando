@@ -18,6 +18,9 @@ public class TriviaChallenge {
 
     private String description;
 
+    @Column(nullable = false)
+    private boolean active = false;
+
     @OneToMany(
             mappedBy = "challenge",
             cascade = CascadeType.ALL,
@@ -32,6 +35,7 @@ public class TriviaChallenge {
     public TriviaChallenge(String title, String description) {
         this.title = title;
         this.description = description;
+        this.active = false;
     }
 
     public Long getId() {
@@ -56,6 +60,14 @@ public class TriviaChallenge {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public List<TriviaQuestion> getQuestions() {

@@ -13,45 +13,60 @@ public class TriviaChallengeService {
 
     private final TriviaChallengeRepository triviaChallengeRepository;
 
-    public TriviaChallengeService(TriviaChallengeRepository triviaChallengeRepository) {
+    public TriviaChallengeService(
+            TriviaChallengeRepository triviaChallengeRepository) {
         this.triviaChallengeRepository = triviaChallengeRepository;
     }
 
+    // Public listing: return active challenges only.
+    public List<TriviaChallenge> getActiveChallenges() {
+        return triviaChallengeRepository.findByActiveTrueOrderByIdAsc();
+    }
+
+    // Admin listing: return active and inactive challenges.
     public List<TriviaChallenge> getAllChallenges() {
         return triviaChallengeRepository.findAll();
     }
 
-    public TriviaChallenge getChallengeById(Long id) {
+    // Public detail: inactive challenges cannot be opened directly.
+    public TriviaChallenge getActiveChallengeById(Long id) {
         return triviaChallengeRepository.findById(id)
+                .filter(TriviaChallenge::isActive)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "Challenge does not exist"
+                        "Active challenge does not exist"
                 ));
     }
 
+    // New challenges must always start inactive.
     public TriviaChallenge createChallenge(TriviaChallenge challenge) {
+        challenge.setActive(false);
         return triviaChallengeRepository.save(challenge);
     }
 
-    public TriviaChallenge updateChallenge(Long id, TriviaChallenge challenge) {
+    // The active status can be changed when editing a challenge.
+    public TriviaChallenge updateChallenge(
+            Long id,
+            TriviaChallenge challenge) {
 
-        TriviaChallenge existingChallenge = triviaChallengeRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Challenge does not exist"
-                ));
+        TriviaChallenge existingChallenge =
+                triviaChallengeRepository.findById(id)
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Challenge does not exist"
+                        ));
 
         existingChallenge.setTitle(challenge.getTitle());
         existingChallenge.setDescription(challenge.getDescription());
+        existingChallenge.setActive(challenge.isActive());
 
         return triviaChallengeRepository.save(existingChallenge);
     }
 
     public void deleteChallenge(Long id) {
-
         if (!triviaChallengeRepository.existsById(id)) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
+                    HttpStatus.NOT_FOUND,
                     "Challenge does not exist"
             );
         }

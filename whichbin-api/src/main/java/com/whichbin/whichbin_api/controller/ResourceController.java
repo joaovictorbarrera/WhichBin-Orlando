@@ -9,6 +9,7 @@ import com.whichbin.whichbin_api.service.TriviaChallengeService;
 import com.whichbin.whichbin_api.service.TriviaQuestionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -36,7 +37,9 @@ public class ResourceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Resource> getResourceById(@PathVariable Long id) {
+    public ResponseEntity<Resource> getResourceById(
+            @PathVariable Long id) {
+
         return resourceService.getResourceById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -59,70 +62,41 @@ public class ResourceController {
 
     @Authenticated
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteResource(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteResource(
+            @PathVariable Long id) {
+
         resourceService.deleteResource(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/trivia")
-    public List<TriviaQuestion> getAllTriviaQuestions() {
-        return triviaQuestionService.getAllQuestions();
-    }
-
-    @Authenticated
-    @PostMapping("/trivia")
-    public TriviaQuestion createTriviaQuestion(
-            @RequestBody TriviaQuestion question) {
-
-        return triviaQuestionService.createQuestion(question);
-    }
-
-    @Authenticated
-    @PostMapping("/trivia/challenges/{challengeId}/questions")
-    public TriviaQuestion createTriviaQuestionForChallenge(
-            @PathVariable Long challengeId,
-            @RequestBody TriviaQuestion question) {
-
-        return triviaQuestionService.createQuestion(
-                challengeId,
-                question
-        );
-    }
-
-    @Authenticated
-    @PutMapping("/trivia/{id}")
-    public TriviaQuestion updateTriviaQuestion(
-            @PathVariable Long id,
-            @RequestBody TriviaQuestion question) {
-
-        return triviaQuestionService.updateQuestion(id, question);
-    }
-
-    @Authenticated
-    @DeleteMapping("/trivia/{id}")
-    public ResponseEntity<Void> deleteTriviaQuestion(
-            @PathVariable Long id) {
-
-        triviaQuestionService.deleteQuestion(id);
-
-        return ResponseEntity.noContent().build();
-    }
-
+    // Public route: active challenges only.
     @GetMapping("/trivia/challenges")
+    public List<TriviaChallenge> getActiveTriviaChallenges() {
+        return triviaChallengeService.getActiveChallenges();
+    }
+
+    // Admin route: all challenges, including inactive ones.
+    @Authenticated
+    @GetMapping("/trivia/challenges/all")
     public List<TriviaChallenge> getAllTriviaChallenges() {
         return triviaChallengeService.getAllChallenges();
     }
 
+    // Public route: inactive challenges cannot be opened by direct URL.
     @GetMapping("/trivia/challenges/{id}")
     public ResponseEntity<TriviaChallenge> getTriviaChallengeById(
             @PathVariable Long id) {
 
         try {
             return ResponseEntity.ok(
-                    triviaChallengeService.getChallengeById(id)
+                    triviaChallengeService.getActiveChallengeById(id)
             );
-        } catch (RuntimeException exception) {
-            return ResponseEntity.notFound().build();
+        } catch (ResponseStatusException exception) {
+            if (exception.getStatusCode().value() == 404) {
+                return ResponseEntity.notFound().build();
+            }
+
+            throw exception;
         }
     }
 
@@ -149,7 +123,37 @@ public class ResourceController {
             @PathVariable Long id) {
 
         triviaChallengeService.deleteChallenge(id);
+        return ResponseEntity.noContent().build();
+    }
 
+    // Trivia question routes are grouped under /question.
+    @Authenticated
+    @PostMapping("/trivia/question/challenges/{challengeId}")
+    public TriviaQuestion createTriviaQuestionForChallenge(
+            @PathVariable Long challengeId,
+            @RequestBody TriviaQuestion question) {
+
+        return triviaQuestionService.createQuestion(
+                challengeId,
+                question
+        );
+    }
+
+    @Authenticated
+    @PutMapping("/trivia/question/{id}")
+    public TriviaQuestion updateTriviaQuestion(
+            @PathVariable Long id,
+            @RequestBody TriviaQuestion question) {
+
+        return triviaQuestionService.updateQuestion(id, question);
+    }
+
+    @Authenticated
+    @DeleteMapping("/trivia/question/{id}")
+    public ResponseEntity<Void> deleteTriviaQuestion(
+            @PathVariable Long id) {
+
+        triviaQuestionService.deleteQuestion(id);
         return ResponseEntity.noContent().build();
     }
 }

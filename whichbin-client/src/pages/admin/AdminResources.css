@@ -979,3 +979,86 @@
 		width: 100%;
 	}
 }
+/* Trivia Challenge Status */
+
+.admin-resource-trivia-title-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-bottom: 0.35rem;
+}
+
+.admin-resource-trivia-title-meta .admin-resource-form-eyebrow {
+  margin: 0;
+}
+
+.admin-resource-trivia-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.admin-resource-trivia-status-active {
+  border-color: var(--color-brand);
+  background: var(--color-surface-green-soft);
+  color: var(--color-brand);
+}
+
+.admin-resource-trivia-status-inactive {
+  background: var(--color-page);
+  color: var(--color-text-muted);
+}
+
+/* Active Toggle in Edit Challenge Form */
+
+.admin-resource-active-setting {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 0.6rem;
+  background: var(--color-surface);
+}
+
+.admin-resource-form .admin-resource-active-toggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.85rem;
+  margin: 0;
+  cursor: pointer;
+}
+
+.admin-resource-form .admin-resource-active-toggle input[type='checkbox'] {
+  flex: 0 0 auto;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--color-brand);
+  cursor: pointer;
+}
+
+.admin-resource-form .admin-resource-active-toggle input[type='checkbox']:disabled {
+  cursor: not-allowed;
+}
+
+.admin-resource-active-toggle > span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.admin-resource-active-toggle strong {
+  color: var(--color-heading-deep);
+}
+
+.admin-resource-active-toggle small {
+  font-weight: 400;
+  line-height: 1.5;
+}
