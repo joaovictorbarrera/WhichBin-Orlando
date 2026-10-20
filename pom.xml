@@ -22,7 +22,7 @@
     <description>WhichBin application parent project</description>
 
     <modules>
-        <module>server</module>
+        <module>whichbin-api</module>
     </modules>
 
     <properties>
