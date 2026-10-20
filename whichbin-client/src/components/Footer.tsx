@@ -3,10 +3,6 @@ import { FaRecycle } from 'react-icons/fa';
 import { FiExternalLink } from 'react-icons/fi';
 import './Footer.css';
 
-/**
- * Global Footer Component (Ticket #003)
- * Provides internal routing and verified active City of Orlando municipal links.
- */
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -14,12 +10,13 @@ export function Footer() {
     <footer role="contentinfo" className="site-footer bg-slate-900 text-slate-100">
       <div className="site-footer-inner max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="site-footer-grid">
-          
+
           {/* Brand Identity Section */}
           <div className="site-footer-brand">
             <Link to="/" className="site-footer-logo" aria-label="WhichBin Orlando Home">
               <FaRecycle aria-hidden="true" />
               <span>WhichBin Orlando</span>
+              <span className="site-footer-version">v{__APP_VERSION__}</span>
             </Link>
             <p className="site-footer-desc">
               Your official community recycling companion. Put every item in its
