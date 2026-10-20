@@ -29,7 +29,7 @@ import {
 	createTriviaQuestionForChallenge,
 	deleteTriviaChallenge,
 	deleteTriviaQuestion,
-	getTriviaChallenges,
+	getAllTriviaChallenges,
 	updateTriviaChallenge,
 	updateTriviaQuestion,
 	type CreateTriviaChallengeRequest,
@@ -166,6 +166,7 @@ export default function AdminResources() {
 	const [challengeDescription, setChallengeDescription] = useState(
 		emptyTriviaChallenge.description
 	)
+	const [challengeActive, setChallengeActive] = useState(false)
 
 	const [expandedTriviaChallengeId, setExpandedTriviaChallengeId] = useState<
 		number | null
@@ -222,7 +223,7 @@ export default function AdminResources() {
 		setTriviaLoading(true)
 		setTriviaError(false)
 
-		const result = await getTriviaChallenges()
+		const result = await getAllTriviaChallenges()
 
 		if (result === null) {
 			setTriviaError(true)
@@ -540,6 +541,7 @@ export default function AdminResources() {
 	function resetChallengeForm() {
 		setChallengeTitle('')
 		setChallengeDescription('')
+		setChallengeActive(false)
 		setChallengeFormError(false)
 		setEditingTriviaChallenge(null)
 	}
@@ -570,6 +572,7 @@ export default function AdminResources() {
 		setEditingTriviaChallenge(challenge)
 		setChallengeTitle(challenge.title)
 		setChallengeDescription(challenge.description)
+		setChallengeActive(challenge.active)
 		setChallengeFormError(false)
 		setShowChallengeForm(true)
 	}
@@ -598,7 +601,10 @@ export default function AdminResources() {
 		if (editingTriviaChallenge) {
 			const updatedChallenge = await updateTriviaChallenge(
 				editingTriviaChallenge.id,
-				challengeData
+				{
+					...challengeData,
+					active: challengeActive,
+				}
 			)
 
 			if (!updatedChallenge) {
@@ -1260,6 +1266,37 @@ export default function AdminResources() {
 					/>
 				</label>
 
+				{isEditing && (
+					<div className="admin-resource-active-setting">
+						<label className="admin-resource-active-toggle">
+							<input
+								type="checkbox"
+								checked={challengeActive}
+								onChange={(event) =>
+									setChallengeActive(
+										event.target.checked
+									)
+								}
+								disabled={savingChallenge}
+							/>
+
+							<span>
+								<strong>
+									{challengeActive
+										? 'Active'
+										: 'Inactive'}
+								</strong>
+
+								<small>
+									{challengeActive
+										? 'This challenge is visible on the public Resources page.'
+										: 'This challenge is hidden from the public while you work on it.'}
+								</small>
+							</span>
+						</label>
+					</div>
+				)}
+
 				{challengeFormError && (
 					<p className="admin-resource-form-error">
 						Please enter a title and description for the
@@ -1720,9 +1757,23 @@ export default function AdminResources() {
 														}
 													>
 														<div className="admin-resource-trivia-trigger-content">
-															<p className="admin-resource-form-eyebrow">
-																Trivia Challenge
-															</p>
+															<div className="admin-resource-trivia-title-meta">
+																<p className="admin-resource-form-eyebrow">
+																	Trivia Challenge
+																</p>
+
+																<span
+																	className={`admin-resource-trivia-status ${
+																		challenge.active
+																			? 'admin-resource-trivia-status-active'
+																			: 'admin-resource-trivia-status-inactive'
+																	}`}
+																>
+																	{challenge.active
+																		? 'Active'
+																		: 'Inactive'}
+																</span>
+															</div>
 
 															<h2>
 																{

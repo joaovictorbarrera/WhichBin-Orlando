@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-
 @Service
 public class TriviaQuestionService {
 
@@ -24,24 +22,16 @@ public class TriviaQuestionService {
         this.triviaChallengeRepository = triviaChallengeRepository;
     }
 
-    public List<TriviaQuestion> getAllQuestions() {
-        return triviaQuestionRepository.findAll();
-    }
-
-    public TriviaQuestion createQuestion(TriviaQuestion question) {
-        validateCorrectAnswer(question);
-        return triviaQuestionRepository.save(question);
-    }
-
     public TriviaQuestion createQuestion(
             Long challengeId,
             TriviaQuestion question) {
 
-        TriviaChallenge challenge = triviaChallengeRepository.findById(challengeId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Challenge does not exist"
-                ));
+        TriviaChallenge challenge =
+                triviaChallengeRepository.findById(challengeId)
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Challenge does not exist"
+                        ));
 
         validateCorrectAnswer(question);
 
@@ -54,11 +44,12 @@ public class TriviaQuestionService {
             Long id,
             TriviaQuestion question) {
 
-        TriviaQuestion existingQuestion = triviaQuestionRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Question does not exist"
-                ));
+        TriviaQuestion existingQuestion =
+                triviaQuestionRepository.findById(id)
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Question does not exist"
+                        ));
 
         validateCorrectAnswer(question);
 
@@ -75,7 +66,7 @@ public class TriviaQuestionService {
     public void deleteQuestion(Long id) {
         if (!triviaQuestionRepository.existsById(id)) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
+                    HttpStatus.NOT_FOUND,
                     "Question does not exist"
             );
         }
@@ -86,10 +77,11 @@ public class TriviaQuestionService {
     private void validateCorrectAnswer(TriviaQuestion question) {
         String correctAnswer = question.getCorrectAnswer();
 
-        if (!correctAnswer.equals(question.getAnswerA())
+        if (correctAnswer == null
+                || (!correctAnswer.equals(question.getAnswerA())
                 && !correctAnswer.equals(question.getAnswerB())
                 && !correctAnswer.equals(question.getAnswerC())
-                && !correctAnswer.equals(question.getAnswerD())) {
+                && !correctAnswer.equals(question.getAnswerD()))) {
 
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,

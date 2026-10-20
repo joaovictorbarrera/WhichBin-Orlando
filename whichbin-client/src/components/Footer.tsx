@@ -1,20 +1,22 @@
-import { Link } from 'react-router-dom'
-import { FaRecycle } from 'react-icons/fa'
-import { FiExternalLink } from 'react-icons/fi'
-import './Footer.css'
+import { Link } from 'react-router-dom';
+import { FaRecycle } from 'react-icons/fa';
+import { FiExternalLink } from 'react-icons/fi';
+import './Footer.css';
 
 export function Footer() {
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
 
   return (
     <footer role="contentinfo" className="site-footer bg-slate-900 text-slate-100">
       <div className="site-footer-inner max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="site-footer-grid">
+
           {/* Brand Identity Section */}
           <div className="site-footer-brand">
             <Link to="/" className="site-footer-logo" aria-label="WhichBin Orlando Home">
               <FaRecycle aria-hidden="true" />
               <span>WhichBin Orlando</span>
+              <span className="site-footer-version">v{__APP_VERSION__}</span>
             </Link>
             <p className="site-footer-desc">
               Your official community recycling companion. Put every item in its
@@ -24,7 +26,7 @@ export function Footer() {
 
           {/* Internal App Navigation */}
           <div className="site-footer-column">
-            <h3>Quick Links</h3>
+            <h3 className="site-footer-heading">Quick Links</h3>
             <nav aria-label="Footer navigation">
               <ul className="site-footer-links">
                 <li>
@@ -45,17 +47,17 @@ export function Footer() {
 
           {/* Official City of Orlando Links */}
           <div className="site-footer-column">
-            <h3>City of Orlando Resources</h3>
+            <h3 className="site-footer-heading">City of Orlando Resources</h3>
             <ul className="site-footer-links">
               <li>
                 <a
-                  href="https://www.orlando.gov/Initiatives/Recycle-Right"
+                  href="https://www.orlando.gov/Trash-Recycling/What-Goes-Where"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <span>Orlando Recycle Right Guide</span>
+                  <span>What Goes Where Guide</span>
                   <FiExternalLink className="site-footer-ext-icon" aria-hidden="true" />
-                  <span className="sr-only"> (opens in a new tab)</span>
+                  <span className="sr-only">(opens in a new tab)</span>
                 </a>
               </li>
               <li>
@@ -66,22 +68,23 @@ export function Footer() {
                 >
                   <span>Solid Waste Division</span>
                   <FiExternalLink className="site-footer-ext-icon" aria-hidden="true" />
-                  <span className="sr-only"> (opens in a new tab)</span>
+                  <span className="sr-only">(opens in a new tab)</span>
                 </a>
               </li>
               <li>
                 <a
-                  href="https://www.orlando.gov/Trash-Recycling/Get-a-Roll-Cart"
+                  href="https://www.orlando.gov/Trash-Recycling/Request-a-Trash-or-Recycling-Cart"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <span>Request Recycling Carts</span>
                   <FiExternalLink className="site-footer-ext-icon" aria-hidden="true" />
-                  <span className="sr-only"> (opens in a new tab)</span>
+                  <span className="sr-only">(opens in a new tab)</span>
                 </a>
               </li>
             </ul>
           </div>
+
         </div>
 
         {/* Footer Bottom / Copyright */}
@@ -95,7 +98,7 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }
 
-export default Footer
+export default Footer;

@@ -121,15 +121,6 @@
   box-shadow: var(--shadow-brand);
 }
 
-.illustration-label {
-  position: absolute;
-  color: var(--color-text-subtle);
-  font-size: 0.815rem;
-  font-weight: 700;
-  letter-spacing: 0.065rem;
-  text-transform: uppercase;
-}
-
 .home-toolkit {
   max-width: 61.25rem;
   margin: 3.375rem auto 0;
@@ -253,4 +244,3 @@
     border-top: 0.065rem solid var(--color-border-highlight);
   }
 }
-

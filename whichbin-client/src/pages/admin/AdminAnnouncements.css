@@ -112,6 +112,43 @@
 	font-weight: 700;
 }
 
+.admin-announcements-list-tools {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.6rem;
+	flex-wrap: wrap;
+}
+
+.admin-announcements-list-tools label {
+	color: var(--color-heading-deep);
+	font-size: 0.875rem;
+	font-weight: 700;
+}
+
+.admin-announcements-list-tools select {
+	min-width: 10rem;
+	padding: 0.55rem 2rem 0.55rem 0.7rem;
+	border: 0.065rem solid var(--color-border-soft);
+	border-radius: 0.5rem;
+	background: var(--color-surface);
+	color: var(--color-heading-deep);
+	font: inherit;
+}
+
+.admin-announcements-list-tools select:focus-visible {
+	outline: 0.125rem solid var(--color-brand);
+	outline-offset: 0.1rem;
+}
+
+.admin-announcements-list-tools > span {
+	flex: 0 0 auto;
+	margin-left: 0.4rem;
+	color: var(--color-text-subtle);
+	font-size: 0.875rem;
+	font-weight: 700;
+}
+
 .admin-announcement-close {
 	display: grid;
 	place-items: center;
@@ -407,6 +444,16 @@
 
 	.admin-announcements-list-heading {
 		flex-direction: column;
+	}
+
+	.admin-announcements-list-tools {
+		justify-content: flex-start;
+		width: 100%;
+	}
+
+	.admin-announcements-list-tools select {
+		flex: 1;
+		min-width: 0;
 	}
 
 	.admin-announcement-form-actions {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   FiArrowLeft,
   FiInfo,
@@ -14,6 +14,7 @@ import './ResourceDetails.css'
 
 function TriviaChallengeDetails() {
   const { challengeId } = useParams()
+  const navigate = useNavigate()
 
   const [challenge, setChallenge] = useState<TriviaChallenge | null>(null)
   const [loading, setLoading] = useState(true)
@@ -188,6 +189,10 @@ function TriviaChallengeDetails() {
   }
 
   if (quizComplete) {
+    const totalQuestions = challenge.questions.length
+    const perfectScore = score === totalQuestions
+    const scoreAboveHalf = score > totalQuestions / 2
+
     return (
       <PageLayout className="resource-details-page" width="wide">
         <Link to="/resources" className="resource-back-link">
@@ -205,19 +210,51 @@ function TriviaChallengeDetails() {
               Challenge Complete
             </p>
 
-            <h1>Great Job!</h1>
+            <h1>
+              {perfectScore
+                ? 'Perfect Score!'
+                : scoreAboveHalf
+                  ? 'Great Job!'
+                  : 'Not quite...'}
+            </h1>
 
             <p>
-              You scored {score} out of {challenge.questions.length}.
+              You scored {score} out of {totalQuestions}.
             </p>
 
-            <button
-              type="button"
-              className="trivia-button"
-              onClick={restartQuiz}
-            >
-              Try Again
-            </button>
+            {perfectScore ? (
+              <>
+                <p>
+                  You answered every question correctly! Keep up
+                  the great work and put your recycling knowledge
+                  to use.
+                </p>
+
+                <button
+                  type="button"
+                  className="trivia-button"
+                  onClick={() => navigate('/resources')}
+                >
+                  Return to Resources
+                </button>
+              </>
+            ) : (
+              <>
+                <p>
+                  {scoreAboveHalf
+                    ? 'Nice work! You are learning how to recycle correctly. Try again to see if you can get a perfect score.'
+                    : 'Not quite there yet. Review the educational resources and try the challenge again to improve your score.'}
+                </p>
+
+                <button
+                  type="button"
+                  className="trivia-button"
+                  onClick={restartQuiz}
+                >
+                  Try Again
+                </button>
+              </>
+            )}
           </div>
         </div>
       </PageLayout>

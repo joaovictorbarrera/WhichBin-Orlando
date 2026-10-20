@@ -1,6 +1,7 @@
 package com.whichbin.whichbin_api.service;
 
 import com.whichbin.whichbin_api.model.Announcement;
+import com.whichbin.whichbin_api.model.AnnouncementType;
 import com.whichbin.whichbin_api.repository.AnnouncementRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +22,25 @@ public class AnnouncementService {
         return announcementRepository.findCurrentAnnouncements(LocalDateTime.now());
     }
 
+    public List<Announcement> getCurrentAnnouncements(AnnouncementType type) {
+        if (type == null) {
+            return getCurrentAnnouncements();
+        }
+
+        return announcementRepository.findCurrentAnnouncementsByType(
+                LocalDateTime.now(),
+                type
+        );
+    }
+
     public List<Announcement> getAllAnnouncements() {
         return announcementRepository.findAll();
+    }
+
+    public List<Announcement> getAllAnnouncements(AnnouncementType type) {
+        return type == null
+                ? getAllAnnouncements()
+                : announcementRepository.findByTypeOrderByStartDateDesc(type);
     }
 
     public Optional<Announcement> getAnnouncementById(Long id) {
