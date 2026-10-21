@@ -2,6 +2,12 @@
 
 WhichBin Orlando is a recycling information application that helps Orlando residents determine how to properly dispose of common household items.
 
+## Features
+
+- Search for items and view disposal guidance.
+- Browse educational resources, trivia challenges, and announcements.
+- Manage items, resources, announcements, and users through the admin area.
+
 ## Tech stack
 
 ### Frontend
@@ -81,6 +87,30 @@ The backend will run at <http://localhost:5000/>.
    ```
 
 The frontend will run at <http://localhost:7000/>.
+
+To check the frontend for lint issues or create a production build, run these commands from `whichbin-client`:
+
+```bash
+npm run lint
+npm run build
+```
+
+## API and configuration
+
+Configure the following environment variables when running the application. Defaults are suitable for local development; set the deployment-specific values in the environment where the backend or frontend runs.
+
+| Variable | Default value | Description |
+| --- | --- | --- |
+| `CLIENT_URL` | `http://localhost:7000` | Backend: allowed frontend origin for CORS. Set this to the deployed frontend's origin so browsers can make API requests. Use only the origin (scheme, hostname, and optional port), with no path or trailing slash. |
+| `PORT` | `5000` | Backend: port used by the API server. |
+| `DB_URL` | `jdbc:mysql://localhost:3306/` | Backend: JDBC URL for the application database. |
+| `DB_USERNAME` | `root` | Backend: MySQL username. |
+| `DB_PASSWORD` | `password` | Backend: MySQL password. Override with a secure value in the backend environment or local development properties file; do not use the repository's configured value in deployments. |
+| `AUTH_TOKEN_TTL` | `PT24H` | Backend: authorization token lifetime, expressed as a Java duration. |
+| `AUTH_TOKEN_CLEANUP_CRON` | `0 0 3 * * *` | Backend: schedule for cleaning up expired tokens (daily at 3:00 a.m. server time). |
+| `VITE_API_URL` | `http://localhost:5000/api/` | Frontend: base URL of the backend API. |
+
+The API documentation is available at `/api/swagger-ui/index.html` while the backend is running. The API includes endpoints for items, resources and trivia, announcements, and authentication and user management. The root API endpoint at `/api/` returns the running API version.
 
 ## Project structure
 
