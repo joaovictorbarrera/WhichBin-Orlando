@@ -1,120 +1,118 @@
 # WhichBin Orlando
 
-WhichBin Orlando is a recycling information application designed to help Orlando residents quickly determine how to properly dispose of common household items.
+WhichBin Orlando is a recycling information application that helps Orlando residents determine how to properly dispose of common household items.
 
-## Tech Stack
+## Features
 
-**Frontend**
+- Search for items and view disposal guidance.
+- Browse educational resources, trivia challenges, and announcements.
+- Manage items, resources, announcements, and users through the admin area.
 
-* React
-* TypeScript
-* Vite
-* Node.js
+## Tech stack
 
-**Backend**
+### Frontend
 
-* Java 21
-* Spring Boot
-* Maven
+- React
+- TypeScript
+- Vite
+- Node.js
 
-**Database**
+### Backend
 
-* MySQL
+- Java 21
+- Spring Boot
+- Maven
 
-**Development Tools**
+### Database
 
-* Visual Studio Code
-* IntelliJ IDEA
-* MySQL Workbench
-* Git and GitHub
+- MySQL
 
-## Running the Project Locally
+### Development tools
+
+- Visual Studio Code
+- IntelliJ IDEA
+- MySQL Workbench
+- Git and GitHub
+
+## Running the project locally
 
 ### Prerequisites
 
 Install the following before running the application:
 
-* [Node.js](https://nodejs.org/)
-* Visual Studio Code
-* Java 21 SDK
-* IntelliJ IDEA
-* MySQL Server
-* MySQL Workbench
+- [Node.js](https://nodejs.org/)
+- Visual Studio Code
+- Java 21 SDK
+- IntelliJ IDEA
+- MySQL Server
+- MySQL Workbench
 
-### 1. Set Up the Database
+### Set up the database
 
-1. Open MySQL Workbench.
-2. Connect to your local MySQL server.
-3. Create a new schema named:
+1. Open MySQL Workbench and connect to your local MySQL server.
+2. Create a database named `whichbin_db`.
 
-```text
-whichbin_db
-```
-
-### 2. Run the Backend
+### Run the backend
 
 1. Open the `whichbin-api` folder in IntelliJ IDEA.
-2. Navigate to:
+2. In `src/main/resources/`, create a file named `application-dev.properties`.
+3. Add your local MySQL credentials:
 
-```text
-src/main/resources/
-```
+   ```properties
+   spring.datasource.username=root
+   spring.datasource.password=YOUR_PASSWORD
+   ```
 
-3. Create a file named:
+   Replace `YOUR_PASSWORD` with your local MySQL password.
 
-```text
-application-dev.properties
-```
+4. Select `WhichbinApiApplication` in IntelliJ IDEA.
+5. Open **Run → Edit Configurations** and set **Active Profiles** to `dev`.
+6. Save the configuration and start the application using the **Run** button.
 
-4. Add your local MySQL credentials:
+The backend will run at <http://localhost:5000/>.
 
-```properties
-spring.datasource.username=root
-spring.datasource.password=YOUR_PASSWORD
-```
-
-Replace `YOUR_PASSWORD` with your local MySQL password.
-
-5. In IntelliJ, select `WhichbinApiApplication`.
-6. Open **Run → Edit Configurations**.
-7. Set the **Active Profiles** field to:
-
-```text
-dev
-```
-
-8. Save the configuration.
-9. Start the application using the green **Run** button.
-
-The backend will run at:
-
-```text
-http://localhost:5000/
-```
-
-### 3. Run the Frontend
+### Run the frontend
 
 1. Open the `whichbin-client` folder in Visual Studio Code.
-2. Open the terminal.
-3. Install the project dependencies:
+2. Open a terminal and install the project dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+The frontend will run at <http://localhost:7000/>.
+
+To check the frontend for lint issues or create a production build, run these commands from `whichbin-client`:
 
 ```bash
-npm install
+npm run lint
+npm run build
 ```
 
-4. Start the development server:
+## API and configuration
 
-```bash
-npm run dev
-```
+Configure the following environment variables when running the application. Defaults are suitable for local development; set the deployment-specific values in the environment where the backend or frontend runs.
 
-The frontend will run at:
+| Variable | Default value | Description |
+| --- | --- | --- |
+| `CLIENT_URL` | `http://localhost:7000` | Backend: allowed frontend origin for CORS. Set this to the deployed frontend's origin so browsers can make API requests. Use only the origin (scheme, hostname, and optional port), with no path or trailing slash. |
+| `PORT` | `5000` | Backend: port used by the API server. |
+| `DB_URL` | `jdbc:mysql://localhost:3306/` | Backend: JDBC URL for the application database. |
+| `DB_USERNAME` | `root` | Backend: MySQL username. |
+| `DB_PASSWORD` | `password` | Backend: MySQL password. Override with a secure value in the backend environment or local development properties file; do not use the repository's configured value in deployments. |
+| `AUTH_TOKEN_TTL` | `PT24H` | Backend: authorization token lifetime, expressed as a Java duration. |
+| `AUTH_TOKEN_CLEANUP_CRON` | `0 0 3 * * *` | Backend: schedule for cleaning up expired tokens (daily at 3:00 a.m. server time). |
+| `VITE_API_URL` | `http://localhost:5000/api/` | Frontend: base URL of the backend API. |
 
-```text
-http://localhost:7000/
-```
+The API documentation is available at `/api/swagger-ui/index.html` while the backend is running. The API includes endpoints for items, resources and trivia, announcements, and authentication and user management. The root API endpoint at `/api/` returns the running API version.
 
-## Project Structure
+## Project structure
 
 ```text
 WhichBin-Orlando/
@@ -122,6 +120,31 @@ WhichBin-Orlando/
 └── whichbin-api/       # Spring Boot backend
 ```
 
-## Development Workflow
+## Development workflow
 
-The project uses Git and GitHub for version control. Developers should work on their assigned features using branches and merge completed work into the appropriate development branch after review and testing.
+Use Git and GitHub for version control. Work on assigned features in branches, then merge completed work into the appropriate development branch after review and testing.
+
+## Running backend unit tests locally
+
+1. In MySQL Workbench, create a separate database for tests:
+
+   ```sql
+   CREATE DATABASE whichbin_test;
+   ```
+
+2. In `whichbin-api/src/main/resources/`, create a file named `application-test-local.properties` with your local MySQL credentials:
+
+   ```properties
+   spring.datasource.username=root
+   spring.datasource.password=YOUR_PASSWORD
+   ```
+
+   Replace `YOUR_PASSWORD` with your local MySQL password.
+
+3. From the `whichbin-api` directory, run the tests:
+
+   ```powershell
+   .\mvnw.cmd test
+   ```
+
+The tests use the `whichbin_test` database. Its tables are created and dropped automatically, so do not configure the test profile to use a database containing data you need to keep.
