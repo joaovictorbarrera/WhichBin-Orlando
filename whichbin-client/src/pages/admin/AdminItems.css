@@ -4,34 +4,15 @@
 }
 
 .admin-items-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-  margin-bottom: 2rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.admin-items-heading {
-  display: flex;
-  align-items: flex-start;
-  gap: 1.25rem;
-}
-
-.admin-items-heading .admin-section-icon {
-  flex: 0 0 auto;
-  margin-bottom: 0;
-}
-
-.admin-items-heading h1 {
-  margin: 0;
-  color: var(--color-heading-deep);
-  font-size: clamp(2rem, 4vw, 2.75rem);
-}
-
-.admin-items-heading > div > p:last-child {
-  margin: 0.75rem 0 0;
-  color: var(--color-text-muted);
-  line-height: 1.6;
+.admin-items-header + .admin-items-form-panel,
+.admin-items-header + .admin-items-list-section {
+  border-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
 .admin-items-add,
@@ -610,7 +591,7 @@
   }
 
   .admin-items-add {
-    align-self: flex-start;
+    width: 100%;
   }
 
   .admin-items-classification {
@@ -626,10 +607,6 @@
   .admin-items-form-panel,
   .admin-items-list-section {
     padding: 1.25rem;
-  }
-
-  .admin-items-heading {
-    gap: 0.875rem;
   }
 
   .admin-items-empty {

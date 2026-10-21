@@ -229,8 +229,8 @@ async function handleConfirmDelete() {
         Back to dashboard
       </Link>
 
-      <section className="admin-announcements-header">
-        <div className="admin-announcements-heading">
+      <section className="admin-management-header admin-announcements-header">
+        <div className="admin-management-heading admin-announcements-heading">
           <span className="admin-section-icon">
             <FiBell />
           </span>

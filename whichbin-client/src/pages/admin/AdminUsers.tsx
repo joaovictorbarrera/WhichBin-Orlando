@@ -12,7 +12,6 @@ import {
 import { Link } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
 import DeleteConfirmModal from '../../components/DeleteConfirmModal'
-import { useAuth } from '../../context/useAuth'
 import {
   createPasswordResetLink,
   createUser,
@@ -43,7 +42,6 @@ function createRegistrationLink(invitationToken: string, email: string) {
 }
 
 function AdminUsers() {
-  const { user } = useAuth()
   const [users, setUsers] = useState<ManagedUser[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -211,8 +209,6 @@ function AdminUsers() {
     }
   }
 
-  const signedInName = user?.firstName ?? 'Admin'
-
   return (
     <PageLayout className="admin-section-page admin-users-page" width="wide">
       <Link to="/admin" className="admin-section-back">
@@ -238,8 +234,6 @@ function AdminUsers() {
             Create User
           </button>
         </header>
-
-        <p className="admin-users-signed-in">Signed in as {signedInName}.</p>
 
         {pageError && <p className="admin-users-error" role="alert">{pageError}</p>}
         {loadError && (

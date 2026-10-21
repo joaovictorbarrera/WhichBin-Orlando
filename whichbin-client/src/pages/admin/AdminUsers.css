@@ -82,12 +82,6 @@
   opacity: 0.6;
 }
 
-.admin-users-signed-in {
-  margin: 1rem 0 0;
-  color: var(--color-text-subtle);
-  font-size: 0.875rem;
-}
-
 .admin-users-error,
 .admin-users-load-error {
   margin: 1rem 0 0;
