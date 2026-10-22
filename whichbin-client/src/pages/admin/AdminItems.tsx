@@ -220,8 +220,8 @@ function AdminItems() {
         Back to dashboard
       </Link>
 
-      <section className="admin-items-header">
-        <div className="admin-items-heading">
+      <section className="admin-management-header admin-items-header">
+        <div className="admin-management-heading admin-items-heading">
           <span className="admin-section-icon">
             <FiBox aria-hidden="true" />
           </span>

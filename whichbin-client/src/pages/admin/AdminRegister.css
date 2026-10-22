@@ -1,0 +1,174 @@
+.admin-register-page {
+  display: grid;
+  place-items: center;
+  min-height: calc(100dvh - var(--top-navigation-height));
+  padding-top: 3rem;
+  padding-bottom: calc(var(--bottom-navigation-height) + 3rem);
+  background: var(--color-page);
+}
+
+.admin-register-shell {
+  position: relative;
+  width: 100%;
+  max-width: 32rem;
+  padding: 2.5rem;
+  border: 0.065rem solid var(--color-border-green);
+  border-radius: 1rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-api);
+}
+
+.admin-register-shell::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 0.25rem;
+  border-radius: 1rem 1rem 0 0;
+  background: linear-gradient(90deg, var(--color-brand), var(--color-accent));
+  content: '';
+}
+
+.admin-register-mark {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  margin-bottom: 1.25rem;
+  border-radius: 50%;
+  background: var(--color-surface-green-soft);
+  color: var(--color-brand);
+  font-size: 1.4rem;
+}
+
+.admin-register-eyebrow {
+  margin: 0 0 0.5rem;
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+}
+
+.admin-register-shell h1 {
+  margin: 0;
+  color: var(--color-heading-deep);
+  font-size: clamp(2rem, 5vw, 2.5rem);
+  line-height: 1.1;
+}
+
+.admin-register-description {
+  margin: 0.875rem 0 1.5rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.admin-register-form {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.admin-register-form label {
+  margin-top: 0.5rem;
+  color: var(--color-heading-soft);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.admin-register-input {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 3rem;
+  padding: 0 0.875rem;
+  border: 0.065rem solid var(--color-border-soft);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-text-subtle);
+}
+
+.admin-register-input:focus-within {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 0.19rem color-mix(in srgb, var(--color-brand) 14%, transparent);
+}
+
+.admin-register-input svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
+.admin-register-input input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text);
+}
+
+.admin-register-input input:disabled {
+  color: var(--color-text-muted);
+  opacity: 1;
+}
+
+.admin-register-form > button {
+  min-height: 3rem;
+  margin-top: 0.75rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: var(--color-brand);
+  color: var(--color-surface);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.admin-register-form > button:hover:not(:disabled) {
+  background: var(--color-brand-dark);
+}
+
+.admin-register-form > button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.admin-register-error {
+  margin: 0.5rem 0 0;
+  color: var(--color-danger);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.admin-register-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  color: var(--color-brand);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-register-back:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+
+@media (max-width: 600px) {
+  .admin-register-page {
+    padding-top: 2rem;
+    padding-bottom: calc(var(--bottom-navigation-height) + 2rem);
+  }
+
+  .admin-register-shell {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .admin-register-shell::before {
+    display: none;
+  }
+}
