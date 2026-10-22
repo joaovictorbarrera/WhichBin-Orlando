@@ -126,6 +126,8 @@ Use Git and GitHub for version control. Work on assigned features in branches, t
 
 ## Running backend unit tests locally
 
+Pull requests automatically run the backend Maven tests in GitHub Actions against a temporary MySQL database.
+
 1. In MySQL Workbench, create a separate database for tests:
 
    ```sql
