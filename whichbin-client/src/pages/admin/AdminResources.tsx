@@ -1512,8 +1512,8 @@ export default function AdminResources() {
 					Back to dashboard
 				</Link>
 
-				<section className="admin-resources-header">
-					<div className="admin-resources-heading">
+				<section className="admin-management-header admin-resources-header">
+					<div className="admin-management-heading admin-resources-heading">
 						<span className="admin-section-icon">
 							<FiFileText />
 						</span>
