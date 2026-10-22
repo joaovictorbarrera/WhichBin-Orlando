@@ -38,4 +38,6 @@ public interface AnnouncementRepository extends JpaRepository<Announcement, Long
     );
 
     List<Announcement> findByTypeOrderByStartDateDesc(AnnouncementType type);
+    
+    boolean existsByTitle(String title);
 }
