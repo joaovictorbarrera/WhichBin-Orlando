@@ -1,4 +1,3 @@
-
 package com.whichbin.whichbin_api.testutil;
 
 import com.whichbin.whichbin_api.dto.user.CreateUserRequest;
