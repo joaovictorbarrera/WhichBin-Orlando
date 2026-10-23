@@ -5,6 +5,9 @@
 }
 
 :root {
+	--z-bottom-navigation: 1000;
+	--z-navigation: 2000;
+	--z-modal: 3000;
 	--font-body: 'DM Sans', 'Segoe UI', sans-serif;
 	--color-brand: var(--color-navigation);
 	--color-brand-dark: #15592f;

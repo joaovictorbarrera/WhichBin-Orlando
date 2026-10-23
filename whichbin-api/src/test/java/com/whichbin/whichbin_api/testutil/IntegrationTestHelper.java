@@ -1,8 +1,7 @@
-
 package com.whichbin.whichbin_api.testutil;
 
 import com.whichbin.whichbin_api.dto.user.CreateUserRequest;
-import com.whichbin.whichbin_api.dto.user.UserResponse;
+import com.whichbin.whichbin_api.dto.user.CreateUserResponse;
 import com.whichbin.whichbin_api.model.User;
 import com.whichbin.whichbin_api.repository.UserRepository;
 import com.whichbin.whichbin_api.service.AuthorizationTokenService;
@@ -44,12 +43,11 @@ public class IntegrationTestHelper {
         );
 
         token = transactionTemplate.execute(status -> {
-            UserResponse userResponse = userService.createUser(
+            CreateUserResponse userResponse = userService.createUser(
                     new CreateUserRequest(
                             "Integration",
                             "Test",
-                            "integration-test@example.com",
-                            "IntegrationTestPassword123!"
+                            "integration-test@example.com"
                     )
             );
 

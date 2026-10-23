@@ -1,4 +1,4 @@
-package com.whichbin.whichbin_api.service;
+package com.whichbin.whichbin_api.data_initializer;
 
 import com.whichbin.whichbin_api.model.TriviaChallenge;
 import com.whichbin.whichbin_api.model.TriviaQuestion;
