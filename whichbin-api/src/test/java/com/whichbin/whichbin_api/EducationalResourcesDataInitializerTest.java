@@ -1,14 +1,14 @@
 
 package com.whichbin.whichbin_api;
 
+import com.whichbin.whichbin_api.data_initializer.ResourceDataInitializer;
+import com.whichbin.whichbin_api.data_initializer.TriviaQuestionDataInitializer;
 import com.whichbin.whichbin_api.model.Resource;
 import com.whichbin.whichbin_api.model.TriviaChallenge;
 import com.whichbin.whichbin_api.model.TriviaQuestion;
 import com.whichbin.whichbin_api.repository.ResourceRepository;
 import com.whichbin.whichbin_api.repository.TriviaChallengeRepository;
 import com.whichbin.whichbin_api.repository.TriviaQuestionRepository;
-import com.whichbin.whichbin_api.service.ResourceDataInitializer;
-import com.whichbin.whichbin_api.service.TriviaQuestionDataInitializer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -81,7 +81,7 @@ class EducationalResourcesDataInitializerTest {
 
         assertEquals(
                 "What Can Be Recycled?",
-                resource.getSections().get(0).getHeading()
+                resource.getSections().getFirst().getHeading()
         );
     }
 
