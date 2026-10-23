@@ -9,6 +9,7 @@ import Help from './pages/Help'
 import AdminLogin from './pages/admin/AdminLogin'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminUsers from './pages/admin/AdminUsers'
+import AdminRegister from './pages/admin/AdminRegister'
 import AdminItems from './pages/admin/AdminItems'
 import AdminResources from './pages/admin/AdminResources'
 import AdminAnnouncements from './pages/admin/AdminAnnouncements'
@@ -54,6 +55,7 @@ function App() {
         />
 
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/register" element={<AdminRegister />} />
 
         <Route
           path="/admin"

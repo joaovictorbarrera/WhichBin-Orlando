@@ -6,8 +6,12 @@ import com.whichbin.whichbin_api.auth.CurrentUser;
 import com.whichbin.whichbin_api.dto.auth.LoginRequest;
 import com.whichbin.whichbin_api.dto.auth.LoginResponse;
 import com.whichbin.whichbin_api.dto.auth.MeResponse;
+import com.whichbin.whichbin_api.dto.auth.InvitationTokenResponse;
+import com.whichbin.whichbin_api.dto.auth.RegisterRequest;
+import com.whichbin.whichbin_api.dto.auth.ResetPasswordRequest;
 import com.whichbin.whichbin_api.model.User;
 import com.whichbin.whichbin_api.repository.UserRepository;
+import com.whichbin.whichbin_api.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,15 +27,18 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     public AuthController(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            AuthorizationTokenService authorizationTokenService
+            AuthorizationTokenService authorizationTokenService,
+            UserService userService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorizationTokenService = authorizationTokenService;
+        this.userService = userService;
     }
 
     @PostMapping("/login")
@@ -42,7 +49,9 @@ public class AuthController {
                         "Invalid email or password"
                 ));
 
-        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+        if (user.getPasswordHash() == null
+                || user.getPasswordHash().isBlank()
+                || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED,
                     "Invalid email or password"
@@ -69,6 +78,18 @@ public class AuthController {
                 user.getLastName(),
                 user.getEmail()
         );
+    }
+
+    @PostMapping("/register")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void register(@Valid @RequestBody RegisterRequest request) {
+        userService.register(request);
+    }
+
+    @Authenticated
+    @PostMapping("/reset-password")
+    public InvitationTokenResponse resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        return new InvitationTokenResponse(userService.createPasswordResetInvitation(request.userId()));
     }
 
     @PostMapping("/logout")
