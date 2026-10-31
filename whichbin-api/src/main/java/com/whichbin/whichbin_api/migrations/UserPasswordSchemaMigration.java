@@ -1,4 +1,4 @@
-package com.whichbin.whichbin_api.config;
+package com.whichbin.whichbin_api.migrations;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
