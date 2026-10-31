@@ -70,7 +70,7 @@ Install the following before running the application:
 6. Save the configuration and start the application using the **Run** button.
 
 The backend will run at <http://localhost:5000/>.
-Demo educational resources and trivia are populated only when the `dev` profile is active. Tests use empty application-data tables and create any records they need.
+Dummy data is populated only when the `dev` profile is active. Tests use empty application-data tables and create any records they need.
 
 ### Run the frontend
 
@@ -151,3 +151,4 @@ Pull requests automatically run the backend Maven tests in GitHub Actions agains
    ```
 
 The tests use the `whichbin_test` database. Its tables are created and dropped automatically, so do not configure the test profile to use a database containing data you need to keep.
+Each unit test is Transactional and rolls back any data created/modified after the test case is done running.
