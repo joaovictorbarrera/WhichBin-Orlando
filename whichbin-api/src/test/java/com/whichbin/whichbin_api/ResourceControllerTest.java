@@ -104,7 +104,7 @@ class ResourceControllerTest {
         mockMvc.perform(put("/resources/{id}", resource.getId())
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(resourceJson(                        "Updated Recycling Basics")))
+                        .content(resourceJson("Updated Recycling Basics")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(resource.getId()))
                 .andExpect(jsonPath("$.title").value("Updated Recycling Basics"));
