@@ -70,6 +70,7 @@ Install the following before running the application:
 6. Save the configuration and start the application using the **Run** button.
 
 The backend will run at <http://localhost:5000/>.
+Demo educational resources and trivia are populated only when the `dev` profile is active. Tests use empty application-data tables and create any records they need.
 
 ### Run the frontend
 
