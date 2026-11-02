@@ -35,6 +35,32 @@
   box-shadow: var(--shadow-card);
 }
 
+.pagination-demo-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--color-border-soft);
+  color: var(--color-ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.pagination-demo-filter select {
+  min-height: 2.4rem;
+  padding: 0.35rem 2rem 0.35rem 0.65rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  background-color: #fff;
+  color: var(--color-ink);
+}
+
+.pagination-demo-filter select:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
 .pagination-demo-card-heading {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--color-border-soft);
@@ -132,6 +158,10 @@
 }
 
 @media (max-width: 600px) {
+  .pagination-demo-filter {
+    padding: 1rem;
+  }
+
   .pagination-demo-card-heading {
     padding: 1rem;
   }
