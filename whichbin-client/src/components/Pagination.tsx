@@ -165,7 +165,10 @@ export function Pagination({
             id="pagination-page-size-select"
             className="pagination-page-size"
             value={pageSize}
-            onChange={(e) => onPageSizeChange(Number(e.target.value))}
+            onChange={(e) => {
+              onPageSizeChange(Number(e.target.value))
+              onPageChange(1)
+            }}
             aria-label="Select page size"
           >
             {resolvedPageSizeOptions.map((opt) => (

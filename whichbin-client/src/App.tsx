@@ -20,7 +20,7 @@ import Announcements from './pages/Announcements/Announcements'
 import AnnouncementDetails from './pages/Announcements/AnnouncementDetails'
 import ItemSearch from './pages/Item/ItemSearch'
 import ItemDetail from './pages/Item/ItemDetail'
-import PaginationDemo from './pages/PaginationDemo'
+import PaginationDemo from './pages/PaginationDemo/PaginationDemo'
 
 function App() {
   return (
@@ -35,7 +35,11 @@ function App() {
         <Route path="/item-search/:itemId" element={<ItemDetail />} />
 
         <Route path="/apistatus" element={<ApiStatus />} />
-        <Route path="/pagination-demo" element={<PaginationDemo />} />
+        <Route path="/pagination-demo" element={
+          <ProtectedRoute>
+            <PaginationDemo />
+          </ProtectedRoute>}
+        />
 
         <Route path="/resources" element={<EducationalResources />} />
         <Route

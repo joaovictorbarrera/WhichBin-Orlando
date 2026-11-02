@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import PageLayout from '../components/PageLayout'
-import Pagination from '../components/Pagination'
+import PageLayout from '../../components/PageLayout'
+import Pagination from '../../components/Pagination'
 import './PaginationDemo.css'
 
 type DemoItem = {
@@ -99,8 +99,6 @@ function PaginationDemo() {
     setLoading(true)
     setPageSize(nextPageSize)
 
-    // TODO: This neeeds to be fixed in the component itself, and not be done by the caller.
-    // setCurrentPage(1)
   }
 
   function handlePageChange(nextPage: number) {
@@ -111,9 +109,7 @@ function PaginationDemo() {
   function handleBinFilterChange(nextBinFilter: BinFilter) {
     setLoading(true)
     setBinFilter(nextBinFilter)
-
-    // TODO: This neeeds to be fixed in the component itself, and not be done by the caller.
-    // setCurrentPage(1)
+    setCurrentPage(1)
   }
 
   return (
