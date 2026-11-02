@@ -1,12 +1,13 @@
+import { useId, useEffect, useMemo } from 'react'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import './Pagination.css'
 
 export interface PaginationProps {
   currentPage: number
-  totalPages: number
-  totalItems?: number
+  totalItems?: number | null
   pageSize?: number
   pageSizeOptions?: number[]
+  displayName?: string // Optional: e.g. "articles", "announcements", "items". Default: "items"
   onPageChange: (page: number) => void
   onPageSizeChange?: (pageSize: number) => void
   siblingCount?: number
@@ -54,43 +55,55 @@ function generatePaginationRange(
 
 export function Pagination({
   currentPage,
-  totalPages,
   totalItems,
-  pageSize,
+  pageSize = 10,
   pageSizeOptions = [10, 20, 50],
+  displayName = 'items',
   onPageChange,
   onPageSizeChange,
   siblingCount = 1,
   className = '',
 }: PaginationProps) {
-  const displayTotalPages = Math.max(1, totalPages)
-  const displayCurrentPage = Math.min(Math.max(1, currentPage), displayTotalPages)
-  const paginationRange = generatePaginationRange(displayCurrentPage, displayTotalPages, siblingCount)
+  const pageSizeSelectId = useId()
+
+  const effectivePageSize = pageSize && pageSize > 0 ? pageSize : 10
+  const isDataLoaded = totalItems != null
+  const totalPages = isDataLoaded ? Math.max(1, Math.ceil(totalItems / effectivePageSize)) : 1
+  const displayCurrentPage = Math.max(1, Math.min(currentPage, totalPages))
+
+  // Out-of-bounds page clamping: sync parent state if currentPage exceeds totalPages
+  useEffect(() => {
+    if (isDataLoaded && currentPage > totalPages) {
+      onPageChange(displayCurrentPage)
+    }
+  }, [isDataLoaded, currentPage, totalPages, displayCurrentPage, onPageChange])
+
+  const paginationRange = useMemo(
+    () => generatePaginationRange(displayCurrentPage, totalPages, siblingCount),
+    [displayCurrentPage, totalPages, siblingCount]
+  )
 
   let statusText: string
-  if (totalItems !== undefined) {
-    if (pageSize !== undefined && pageSize > 0) {
-      if (totalItems === 0) {
-        statusText = 'Showing 0 of 0 items'
-      } else {
-        const startItem = (displayCurrentPage - 1) * pageSize + 1
-        const endItem = Math.min(displayCurrentPage * pageSize, totalItems)
-        statusText = `Showing ${startItem}–${endItem} of ${totalItems} items`
-      }
-    } else {
-      statusText = `Page ${displayCurrentPage} of ${displayTotalPages} (${totalItems} items)`
-    }
+  if (!isDataLoaded || totalItems === 0) {
+    statusText = `Showing 0 of 0 ${displayName}`
   } else {
-    statusText = `Page ${displayCurrentPage} of ${displayTotalPages}`
+    const startItem = (displayCurrentPage - 1) * effectivePageSize + 1
+    const endItem = Math.min(displayCurrentPage * effectivePageSize, totalItems)
+    statusText = `Showing ${startItem}–${endItem} of ${totalItems} ${displayName}`
   }
 
-  const isPrevDisabled = currentPage <= 1 || totalPages <= 1
-  const isNextDisabled = currentPage >= totalPages || totalPages <= 1
+  // Interactive controls disabled state
+  const isPrevDisabled = !isDataLoaded || displayCurrentPage <= 1 || totalPages <= 1
+  const isNextDisabled = !isDataLoaded || displayCurrentPage >= totalPages || totalPages <= 1
+  const arePageButtonsDisabled = !isDataLoaded || totalItems === 0
 
-  const resolvedPageSizeOptions =
-    pageSize !== undefined && !pageSizeOptions.includes(pageSize)
-      ? [...pageSizeOptions, pageSize].sort((a, b) => a - b)
-      : pageSizeOptions
+  const resolvedPageSizeOptions = useMemo(() => {
+    const currentSize = pageSize ?? effectivePageSize
+    if (!pageSizeOptions.includes(currentSize)) {
+      return [...pageSizeOptions, currentSize].sort((a, b) => a - b)
+    }
+    return pageSizeOptions
+  }, [pageSize, effectivePageSize, pageSizeOptions])
 
   const containerClasses = ['pagination-container', className].filter(Boolean).join(' ')
 
@@ -105,7 +118,7 @@ export function Pagination({
           <button
             type="button"
             className="pagination-button pagination-prev"
-            onClick={() => onPageChange(currentPage - 1)}
+            onClick={() => onPageChange(displayCurrentPage - 1)}
             disabled={isPrevDisabled}
             aria-label="Go to previous page"
           >
@@ -125,7 +138,7 @@ export function Pagination({
             )
           }
 
-          const isCurrent = pageItem === currentPage
+          const isCurrent = pageItem === displayCurrentPage
 
           return (
             <li key={`page-${pageItem}`} className="pagination-item">
@@ -133,6 +146,7 @@ export function Pagination({
                 type="button"
                 className={`pagination-button ${isCurrent ? 'active' : ''}`}
                 onClick={() => onPageChange(pageItem)}
+                disabled={arePageButtonsDisabled}
                 aria-current={isCurrent ? 'page' : undefined}
                 aria-label={`Go to page ${pageItem}`}
               >
@@ -146,7 +160,7 @@ export function Pagination({
           <button
             type="button"
             className="pagination-button pagination-next"
-            onClick={() => onPageChange(currentPage + 1)}
+            onClick={() => onPageChange(displayCurrentPage + 1)}
             disabled={isNextDisabled}
             aria-label="Go to next page"
           >
@@ -158,13 +172,14 @@ export function Pagination({
 
       {pageSize !== undefined && onPageSizeChange !== undefined && (
         <div className="pagination-size-wrapper">
-          <label htmlFor="pagination-page-size-select" className="pagination-size-label">
+          <label htmlFor={pageSizeSelectId} className="pagination-size-label">
             Rows per page:
           </label>
           <select
-            id="pagination-page-size-select"
-            className="pagination-page-size"
-            value={pageSize}
+            id={pageSizeSelectId}
+            className="pagination-page-size pagination-select"
+            disabled={!isDataLoaded}
+            value={pageSize ?? effectivePageSize}
             onChange={(e) => onPageSizeChange(Number(e.target.value))}
             aria-label="Select page size"
           >

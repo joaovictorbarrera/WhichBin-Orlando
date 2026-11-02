@@ -108,7 +108,8 @@
   user-select: none;
 }
 
-.pagination-page-size {
+.pagination-page-size,
+.pagination-select {
   display: inline-flex;
   align-items: center;
   height: 2.25rem;
@@ -124,14 +125,23 @@
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.pagination-page-size:hover {
+.pagination-page-size:hover:not(:disabled),
+.pagination-select:hover:not(:disabled) {
   border-color: #94a3b8;
 }
 
-.pagination-page-size:focus-visible {
+.pagination-page-size:focus-visible,
+.pagination-select:focus-visible {
   outline: 2px solid #16a34a;
   outline-offset: 2px;
   border-color: #16a34a;
+}
+
+.pagination-select:disabled,
+.pagination-page-size:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--wb-slate-50, #f8fafc);
 }
 
 /* Responsive adjustments for mobile viewports (<= 640px) */
