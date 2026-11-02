@@ -2,6 +2,7 @@
 package com.whichbin.whichbin_api;
 
 import com.whichbin.whichbin_api.testutil.IntegrationTestHelper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,6 +10,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
@@ -27,13 +29,19 @@ public class AnnouncementTest {
     @Autowired
     private IntegrationTestHelper testHelper;
 
+    private RequestPostProcessor bearerAuth;
+
+    @BeforeEach
+    void setUpBearerAuth() {
+        bearerAuth = testHelper.bearerAuth();
+    }
+
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
     void shouldCreateAnnouncement() throws Exception {
 
-        String token = testHelper.getAuthToken();
 
         String announcementJson = """
             {
@@ -47,7 +55,7 @@ public class AnnouncementTest {
             """;
 
         mockMvc.perform(post("/announcements")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(announcementJson))
                 .andExpect(status().isCreated())
@@ -60,7 +68,6 @@ public class AnnouncementTest {
     @Test
     void shouldCreateAndRetrieveAnnouncementById() throws Exception {
 
-        String token = testHelper.getAuthToken();
 
         String announcementJson = """
         {
@@ -75,7 +82,7 @@ public class AnnouncementTest {
 
         // Step 1: Create an announcement
         String response = mockMvc.perform(post("/announcements")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(announcementJson))
                 .andExpect(status().isCreated())
@@ -103,7 +110,6 @@ public class AnnouncementTest {
     @Test
     void shouldNotShowFutureAnnouncement() throws Exception {
 
-        String token = testHelper.getAuthToken();
 
         String futureDate = java.time.LocalDateTime.now()
                 .plusDays(7).toString();
@@ -124,7 +130,7 @@ public class AnnouncementTest {
 
         // Create a future announcement
         String response = mockMvc.perform(post("/announcements")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(announcementJson))
                 .andExpect(status().isCreated())
@@ -146,7 +152,6 @@ public class AnnouncementTest {
     @Test
     void shouldNotShowInactiveAnnouncement() throws Exception {
 
-        String token = testHelper.getAuthToken();
 
         String startDate = java.time.LocalDateTime.now()
                 .minusDays(1).toString();
@@ -167,7 +172,7 @@ public class AnnouncementTest {
 
         // Create an inactive announcement
         String response = mockMvc.perform(post("/announcements")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(announcementJson))
                 .andExpect(status().isCreated())
@@ -189,7 +194,6 @@ public class AnnouncementTest {
     @Test
     void shouldNotShowExpiredAnnouncement() throws Exception {
 
-        String token = testHelper.getAuthToken();
 
         String startDate = java.time.LocalDateTime.now()
                 .minusDays(14).toString();
@@ -210,7 +214,7 @@ public class AnnouncementTest {
 
         // Create an expired announcement
         String response = mockMvc.perform(post("/announcements")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(announcementJson))
                 .andExpect(status().isCreated())
@@ -232,7 +236,6 @@ public class AnnouncementTest {
     @Test
     void shouldShowCurrentAnnouncement() throws Exception {
 
-        String token = testHelper.getAuthToken();
 
         String startDate = java.time.LocalDateTime.now()
                 .minusDays(1).toString();
@@ -253,7 +256,7 @@ public class AnnouncementTest {
 
         // Create an announcement that is currently active
         String response = mockMvc.perform(post("/announcements")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(announcementJson))
                 .andExpect(status().isCreated())
@@ -277,7 +280,6 @@ public class AnnouncementTest {
     @Test
     void shouldFilterAnnouncementsByType() throws Exception {
 
-        String token = testHelper.getAuthToken();
 
         String startDate = java.time.LocalDateTime.now()
                 .minusDays(1).toString();
@@ -298,7 +300,7 @@ public class AnnouncementTest {
         """.formatted(startDate, endDate);
 
         String generalResponse = mockMvc.perform(post("/announcements")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(generalJson))
                 .andExpect(status().isCreated())
@@ -323,7 +325,7 @@ public class AnnouncementTest {
         """.formatted(startDate, endDate);
 
         String serviceResponse = mockMvc.perform(post("/announcements")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(serviceJson))
                 .andExpect(status().isCreated())
@@ -349,7 +351,6 @@ public class AnnouncementTest {
     @Test
     void shouldUpdateAnnouncement() throws Exception {
 
-        String token = testHelper.getAuthToken();
 
         String startDate = java.time.LocalDateTime.now()
                 .minusDays(1).toString();
@@ -370,7 +371,7 @@ public class AnnouncementTest {
         """.formatted(startDate, endDate);
 
         String response = mockMvc.perform(post("/announcements")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(originalJson))
                 .andExpect(status().isCreated())
@@ -395,7 +396,7 @@ public class AnnouncementTest {
         """.formatted(startDate, endDate);
 
         mockMvc.perform(put("/announcements/{id}", announcementId)
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedJson))
                 .andExpect(status().isOk())
@@ -415,7 +416,6 @@ public class AnnouncementTest {
     @Test
     void shouldDeleteAnnouncement() throws Exception {
 
-        String token = testHelper.getAuthToken();
 
         String startDate = java.time.LocalDateTime.now()
                 .minusDays(1).toString();
@@ -436,7 +436,7 @@ public class AnnouncementTest {
         """.formatted(startDate, endDate);
 
         String response = mockMvc.perform(post("/announcements")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(announcementJson))
                 .andExpect(status().isCreated())
@@ -450,7 +450,7 @@ public class AnnouncementTest {
 
         // Delete the announcement
         mockMvc.perform(delete("/announcements/{id}", announcementId)
-                        .header("Authorization", "Bearer " + token))
+                        .with(bearerAuth))
                 .andExpect(status().isNoContent());
 
         // Verify it no longer exists
@@ -487,5 +487,3 @@ public class AnnouncementTest {
                 .andExpect(status().isUnauthorized());
     }
 }
-
-

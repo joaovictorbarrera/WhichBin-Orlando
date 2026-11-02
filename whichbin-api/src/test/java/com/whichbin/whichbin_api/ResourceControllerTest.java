@@ -5,6 +5,7 @@ import com.whichbin.whichbin_api.model.Resource;
 import com.whichbin.whichbin_api.model.ResourceSection;
 import com.whichbin.whichbin_api.repository.ResourceRepository;
 import com.whichbin.whichbin_api.testutil.IntegrationTestHelper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +13,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -41,6 +43,13 @@ class ResourceControllerTest {
 
     @Autowired
     private IntegrationTestHelper testHelper;
+
+    private RequestPostProcessor bearerAuth;
+
+    @BeforeEach
+    void setUpBearerAuth() {
+        bearerAuth = testHelper.bearerAuth();
+    }
 
     @Test
     void shouldReturnEducationalResources() throws Exception {
@@ -83,10 +92,9 @@ class ResourceControllerTest {
 
     @Test
     void shouldCreateResourceWithValidToken() throws Exception {
-        String token = testHelper.getAuthToken();
 
         mockMvc.perform(post("/resources")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(resourceJson("New Resource")))
                 .andExpect(status().isOk())
@@ -98,11 +106,10 @@ class ResourceControllerTest {
 
     @Test
     void shouldUpdateExistingResource() throws Exception {
-        String token = testHelper.getAuthToken();
         Resource resource = saveResource("Resource To Update");
 
         mockMvc.perform(put("/resources/{id}", resource.getId())
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(resourceJson("Updated Recycling Basics")))
                 .andExpect(status().isOk())
@@ -122,7 +129,6 @@ class ResourceControllerTest {
 
     @Test
     void shouldDeleteResourceWithValidToken() throws Exception {
-        String token = testHelper.getAuthToken();
 
         Resource resource = resourceRepository.saveAndFlush(
                 new Resource(
@@ -136,7 +142,7 @@ class ResourceControllerTest {
         );
 
         mockMvc.perform(delete("/resources/{id}", resource.getId())
-                        .header("Authorization", "Bearer " + token))
+                        .with(bearerAuth))
                 .andExpect(status().isNoContent());
 
         assertFalse(resourceRepository.existsById(resource.getId()));

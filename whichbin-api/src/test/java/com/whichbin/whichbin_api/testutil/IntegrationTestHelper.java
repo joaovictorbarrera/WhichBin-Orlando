@@ -6,9 +6,9 @@ import com.whichbin.whichbin_api.model.User;
 import com.whichbin.whichbin_api.repository.UserRepository;
 import com.whichbin.whichbin_api.service.AuthorizationTokenService;
 import com.whichbin.whichbin_api.service.UserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -31,7 +31,7 @@ public class IntegrationTestHelper {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
-    public String getAuthToken() {
+    private String getAuthToken() {
         TransactionTemplate transactionTemplate =
                 new TransactionTemplate(transactionManager);
 
@@ -53,6 +53,14 @@ public class IntegrationTestHelper {
         }
 
         return token;
+    }
+
+    public RequestPostProcessor bearerAuth() {
+        String authorizationHeader = "Bearer " + getAuthToken();
+        return request -> {
+            request.addHeader("Authorization", authorizationHeader);
+            return request;
+        };
     }
 
     private User createTestUser() {
