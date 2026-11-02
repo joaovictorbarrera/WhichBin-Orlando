@@ -486,6 +486,58 @@ public class AnnouncementTest {
                         .content(announcementJson))
                 .andExpect(status().isUnauthorized());
     }
+    
+    @Test
+    void shouldTestAnnouncementWithLongMessage() throws Exception {
+
+        String token = testHelper.getAuthToken();
+
+        // Create a message containing more than 2000 characters
+        String longMessage = "A".repeat(2001);
+
+        String announcementJson = """
+        {
+            "title": "Long Message Test",
+            "message": "%s",
+            "type": "GENERAL",
+            "startDate": "2026-10-20T08:00:00",
+            "endDate": "2026-12-20T08:00:00",
+            "active": true
+        }
+        """.formatted(longMessage);
+
+        mockMvc.perform(post("/announcements")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(announcementJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldAcceptAnnouncementWith2000CharacterMessage() throws Exception {
+
+        String token = testHelper.getAuthToken();
+
+        String longMessage = "A".repeat(2000);
+
+        String announcementJson = """
+        {
+            "title": "Long Message Test",
+            "message": "%s",
+            "type": "GENERAL",
+            "startDate": "2026-10-20T08:00:00",
+            "endDate": "2026-12-20T08:00:00",
+            "active": true
+        }
+        """.formatted(longMessage);
+
+        mockMvc.perform(post("/announcements")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(announcementJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.message").value(longMessage));
+    }
 }
 
 
