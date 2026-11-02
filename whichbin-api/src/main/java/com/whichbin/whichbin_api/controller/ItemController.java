@@ -8,10 +8,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 @RestController
 @RequestMapping("/items")
 public class ItemController {
+
+    public record ItemPage(List<Item> content, int number, int size,
+                           long totalElements, int totalPages) {
+        static ItemPage from(Page<Item> page) {
+            return new ItemPage(page.getContent(), page.getNumber(), page.getSize(),
+                    page.getTotalElements(), page.getTotalPages());
+        }
+    }
 
     private final ItemService itemService;
 
@@ -20,17 +29,20 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<Item> getItems(
+    public ItemPage getItems(
             @RequestParam(
                     name = "searchText",
                     defaultValue = ""
             ) String searchText,
             @RequestParam(
                     name = "recyclable",
+                    defaultValue = "",
                     required = false
-            ) Boolean recyclable
+            ) Boolean recyclable,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        return itemService.searchItems(searchText, recyclable);
+        return ItemPage.from(itemService.searchItems(searchText, recyclable, page, size));
     }
 
     @GetMapping("/{id}")

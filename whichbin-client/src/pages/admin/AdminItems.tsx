@@ -12,6 +12,7 @@ import {
 import { FaRecycle } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
+import Pagination from '../../components/Pagination'
 import DeleteConfirmModal from '../../components/DeleteConfirmModal'
 import {
   createItem,
@@ -28,6 +29,11 @@ type FilterOption = 'all' | 'recyclable' | 'non-recyclable'
 
 function AdminItems() {
   const [items, setItems] = useState<Item[]>([])
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalItems, setTotalItems] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+
   const [searchText, setSearchText] = useState('')
   const [debouncedSearchText, setDebouncedSearchText] = useState('')
   const [filter, setFilter] = useState<FilterOption>('all')
@@ -47,9 +53,20 @@ function AdminItems() {
   const [deleteTarget, setDeleteTarget] = useState<Item | null>(null)
   const [deleting, setDeleting] = useState(false)
 
+  function changeFilter(value: FilterOption) {
+    setFilter(value)
+    setPage(1)
+  }
+
+  function changePageSize(value: number) {
+    setPageSize(value)
+    setPage(1)
+  }
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchText(searchText)
+      setPage(1)
     }, 250)
 
     return () => clearTimeout(timer)
@@ -70,7 +87,10 @@ function AdminItems() {
             : undefined
       const result = await fetchItems(
         debouncedSearchText.trim(),
-        recyclableParam
+        recyclableParam,
+        undefined,
+        page,
+        pageSize
       )
       if (!isMounted) return
 
@@ -78,7 +98,13 @@ function AdminItems() {
         setItems([])
         setLoadError(true)
       } else {
-        setItems(result)
+        if (page > Math.max(1, result.totalPages)) {
+          setPage(Math.max(1, result.totalPages))
+          return
+        }
+        setItems(result.content)
+        setTotalItems(result.totalElements)
+        setTotalPages(result.totalPages)
       }
 
       setLoading(false)
@@ -88,7 +114,7 @@ function AdminItems() {
     return () => {
       isMounted = false
     }
-  }, [debouncedSearchText, filter, refreshKey])
+  }, [debouncedSearchText, filter, refreshKey, page, pageSize])
 
   function resetForm() {
     setName('')
@@ -205,7 +231,7 @@ function AdminItems() {
       return
     }
 
-    setItems((current) => current.filter((item) => item.id !== deleteTarget.id))
+    setRefreshKey((current) => current + 1)
     setDeleting(false)
     setDeleteTarget(null)
   }
@@ -439,7 +465,7 @@ function AdminItems() {
             <button
               type="button"
               className={`admin-items-filter ${filter === 'all' ? 'active' : ''}`}
-              onClick={() => setFilter('all')}
+              onClick={() => changeFilter('all')}
               aria-pressed={filter === 'all'}
             >
               All Items
@@ -447,7 +473,7 @@ function AdminItems() {
             <button
               type="button"
               className={`admin-items-filter ${filter === 'recyclable' ? 'active' : ''}`}
-              onClick={() => setFilter('recyclable')}
+              onClick={() => changeFilter('recyclable')}
               aria-pressed={filter === 'recyclable'}
             >
               <FaRecycle aria-hidden="true" />
@@ -456,7 +482,7 @@ function AdminItems() {
             <button
               type="button"
               className={`admin-items-filter ${filter === 'non-recyclable' ? 'active' : ''}`}
-              onClick={() => setFilter('non-recyclable')}
+              onClick={() => changeFilter('non-recyclable')}
               aria-pressed={filter === 'non-recyclable'}
             >
               <FiTrash2 aria-hidden="true" />
@@ -471,7 +497,7 @@ function AdminItems() {
             <p>Items shown in public search and detail pages.</p>
           </div>
           {!loading && !loadError && (
-            <span>{items.length} {items.length === 1 ? 'item' : 'items'}</span>
+            <span>{totalItems} {totalItems === 1 ? 'item' : 'items'}</span>
           )}
         </div>
 
@@ -501,7 +527,7 @@ function AdminItems() {
                 type="button"
                 onClick={() => {
                   setSearchText('')
-                  setFilter('all')
+                  changeFilter('all')
                 }}
               >
                 Clear search &amp; filters
@@ -512,7 +538,7 @@ function AdminItems() {
 
         {!loading && !loadError && items.length > 0 && (
           <div className="admin-items-list">
-            {[...items].sort((a, b) => a.name.localeCompare(b.name)).map((item) => (
+            {items.map((item) => (
               <article className="admin-item-card" key={item.id}>
                 <div className="admin-item-card-content">
                   <div className="admin-item-card-labels">
@@ -570,6 +596,16 @@ function AdminItems() {
           loading={deleting}
           onCancel={handleCloseDeleteModal}
           onConfirm={handleConfirmDelete}
+        />
+      )}
+      {!loading && !loadError && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={changePageSize}
         />
       )}
     </PageLayout>

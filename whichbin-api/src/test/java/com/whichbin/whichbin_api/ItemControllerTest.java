@@ -61,7 +61,8 @@ public class ItemControllerTest {
         mockMvc.perform(get("/items"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json("[]"));
+                .andExpect(jsonPath("$.content").isEmpty())
+                .andExpect(jsonPath("$.totalElements").value(0));
     }
 
     @Test
@@ -124,7 +125,8 @@ public class ItemControllerTest {
         mockMvc.perform(get("/items")
                         .param("searchText", "nonexistent-item-xyz"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("[]"));
+                .andExpect(jsonPath("$.content").isEmpty())
+                .andExpect(jsonPath("$.totalElements").value(0));
     }
 
     @Test
@@ -136,8 +138,8 @@ public class ItemControllerTest {
         mockMvc.perform(get("/items")
                         .param("searchText", "Plastic"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].name").value("Plastic Bottle"));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].name").value("Plastic Bottle"));
     }
 
     @Test
@@ -149,9 +151,9 @@ public class ItemControllerTest {
         mockMvc.perform(get("/items")
                         .param("recyclable", "false"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].name").value("Broken Ceramic"))
-                .andExpect(jsonPath("$[0].recyclable").value(false));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].name").value("Broken Ceramic"))
+                .andExpect(jsonPath("$.content[0].recyclable").value(false));
     }
 
     @Test
@@ -211,5 +213,128 @@ public class ItemControllerTest {
 
         mockMvc.perform(get("/items/{id}", itemId))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldPaginateInStableNameOrderWithAccurateTotals() throws Exception {
+        String token = testHelper.getAuthToken();
+        createItem(token, "Zinc Can", true);
+        createItem(token, "Apple Box", true);
+        createItem(token, "Milk Jug", true);
+        mockMvc.perform(get("/items").param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.content[0].name").value("Apple Box"))
+                .andExpect(jsonPath("$.content[1].name").value("Milk Jug"))
+                .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.totalPages").value(2));
+        mockMvc.perform(get("/items").param("page", "1").param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.number").value(1))
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].name").value("Zinc Can"));
+        mockMvc.perform(get("/items").param("page", "2").param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isEmpty())
+                .andExpect(jsonPath("$.totalElements").value(3));
+    }
+
+    @Test
+    void shouldPrioritizeCommonItemsBeforePaginationInEveryFilter() throws Exception {
+        String token = testHelper.getAuthToken();
+        createItem(token, "AAA uncommon recyclable", true);
+        createItem(token, "AAA uncommon garbage", false);
+        createItem(token, "Plastic Water Bottle", true);
+        createItem(token, "Glass Bottle", true);
+        createItem(token, "Plastic Bag", false);
+        createItem(token, "Food Scraps", false);
+        mockMvc.perform(get("/items").param("recyclable", "true").param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("Plastic Water Bottle"))
+                .andExpect(jsonPath("$.totalElements").value(3));
+        mockMvc.perform(get("/items").param("recyclable", "false").param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("Plastic Bag"))
+                .andExpect(jsonPath("$.totalElements").value(3));
+        mockMvc.perform(get("/items").param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("Plastic Water Bottle"))
+                .andExpect(jsonPath("$.content[1].name").value("Plastic Bag"))
+                .andExpect(jsonPath("$.totalElements").value(6));
+        mockMvc.perform(get("/items").param("recyclable", "true").param("size", "1").param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("Glass Bottle"));
+        mockMvc.perform(get("/items").param("searchText", "AAA").param("recyclable", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("AAA uncommon recyclable"));
+    }
+
+    @Test
+    void shouldCombineKeywordSearchAndFilterWithoutDuplicateResults() throws Exception {
+        String token = testHelper.getAuthToken();
+        createItem(token, "Test Bottle", true);
+        createItem(token, "Test Jar", true);
+        createItem(token, "Test Ceramic", false);
+        mockMvc.perform(get("/items").param("searchText", "  TEST  ")
+                        .param("recyclable", "true").param("size", "1").param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("Test Jar"))
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.totalPages").value(2));
+        mockMvc.perform(get("/items").param("searchText", "test").param("recyclable", "false"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("Test Ceramic"))
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void shouldSearchByKeywordOnly() throws Exception {
+        String token = testHelper.getAuthToken();
+        createItem(token, "Glass Jar", true);
+        mockMvc.perform(get("/items").param("searchText", "TEST"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("Glass Jar"));
+    }
+
+    @Test
+    void shouldRejectInvalidPaginationAndSearch() throws Exception {
+        for (String page : new String[]{"-1", "invalid"}) {
+            mockMvc.perform(get("/items").param("page", page)).andExpect(status().isBadRequest());
+        }
+        for (String size : new String[]{"0", "-1", "101", "invalid"}) {
+            mockMvc.perform(get("/items").param("size", size)).andExpect(status().isBadRequest());
+        }
+        mockMvc.perform(get("/items").param("searchText", "x".repeat(151)))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/items").param("recyclable", "invalid"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/items/0")).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldRejectInvalidBodiesAndMissingItems() throws Exception {
+        String token = testHelper.getAuthToken();
+        mockMvc.perform(post("/items").header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/items").header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{bad json"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(put("/items/{id}", Long.MAX_VALUE)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(delete("/items/{id}", Long.MAX_VALUE)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldRejectUnauthorizedUpdatesAndDeletes() throws Exception {
+        Long id = createItem(testHelper.getAuthToken(), "Protected Item", true);
+        mockMvc.perform(put("/items/{id}", id).contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(delete("/items/{id}", id)).andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/items/{id}", id)).andExpect(status().isOk());
     }
 }

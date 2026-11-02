@@ -11,6 +11,7 @@ import {
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
 import PageLayout from '../../components/PageLayout'
+import Pagination from '../../components/Pagination'
 import { fetchItems, type Item } from '../../services/itemService'
 import { isAbortError } from '../../helpers/ErrorHelper'
 import './ItemSearch.css'
@@ -20,15 +21,31 @@ type FilterOption = 'all' | 'recyclable' | 'non-recyclable'
 function ItemSearch() {
   const [searchText, setSearchText] = useState('')
   const [debouncedSearchText, setDebouncedSearchText] = useState('')
-  const [filter, setFilter] = useState<FilterOption>('all')
+  const [filter, setFilter] = useState<FilterOption>('recyclable')
   const [items, setItems] = useState<Item[]>([])
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalItems, setTotalItems] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
+  function changeFilter(value: FilterOption) {
+    setFilter(value)
+    setPage(1)
+  }
+
+  function changePageSize(value: number) {
+    setPageSize(value)
+    setPage(1)
+  }
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchText(searchText)
+      setPage(1)
     }, 250)
 
     return () => clearTimeout(timer)
@@ -49,11 +66,17 @@ function ItemSearch() {
             ? false
             : undefined
 
-      fetchItems(debouncedSearchText.trim(), recyclableParam, controller.signal)
+      fetchItems(debouncedSearchText.trim(), recyclableParam, controller.signal, page, pageSize)
         .then((data) => {
           if (!isMounted) return
           if (data) {
-            setItems(data)
+            if (page > Math.max(1, data.totalPages)) {
+              setPage(Math.max(1, data.totalPages))
+              return
+            }
+            setItems(data.content)
+            setTotalItems(data.totalElements)
+            setTotalPages(data.totalPages)
             setError(null)
           } else {
             setItems([])
@@ -74,7 +97,7 @@ function ItemSearch() {
       controller.abort()
       clearTimeout(timer)
     }
-  }, [debouncedSearchText, filter, refreshKey])
+  }, [debouncedSearchText, filter, refreshKey, page, pageSize])
 
   function forceRefresh() {
     setRefreshKey((prev) => prev + 1)
@@ -126,18 +149,11 @@ function ItemSearch() {
           role="group"
           aria-label="Filter items by recyclability"
         >
-          <button
-            type="button"
-            className={`item-filter-btn ${filter === 'all' ? 'active' : ''}`}
-            onClick={() => setFilter('all')}
-            aria-pressed={filter === 'all'}
-          >
-            All Items
-          </button>
+
           <button
             type="button"
             className={`item-filter-btn ${filter === 'recyclable' ? 'active' : ''}`}
-            onClick={() => setFilter('recyclable')}
+            onClick={() => changeFilter('recyclable')}
             aria-pressed={filter === 'recyclable'}
           >
             <FaRecycle aria-hidden="true" />
@@ -146,11 +162,19 @@ function ItemSearch() {
           <button
             type="button"
             className={`item-filter-btn ${filter === 'non-recyclable' ? 'active' : ''}`}
-            onClick={() => setFilter('non-recyclable')}
+            onClick={() => changeFilter('non-recyclable')}
             aria-pressed={filter === 'non-recyclable'}
           >
             <FiTrash2 aria-hidden="true" />
             Non-Recyclable
+          </button>
+          <button
+            type="button"
+            className={`item-filter-btn ${filter === 'all' ? 'active' : ''}`}
+            onClick={() => changeFilter('all')}
+            aria-pressed={filter === 'all'}
+          >
+            All Items
           </button>
         </div>
       </section>
@@ -191,7 +215,7 @@ function ItemSearch() {
               className="item-search-reset-btn"
               onClick={() => {
                 setSearchText('')
-                setFilter('all')
+                changeFilter('all')
               }}
             >
               Clear search & filters
@@ -245,6 +269,16 @@ function ItemSearch() {
             </Link>
           ))}
         </div>
+      )}
+      {!loading && !error && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={changePageSize}
+        />
       )}
     </PageLayout>
   )

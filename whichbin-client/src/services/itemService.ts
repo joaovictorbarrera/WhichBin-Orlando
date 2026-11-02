@@ -4,6 +4,7 @@ import { isAbortError } from '../helpers/ErrorHelper'
 export interface Item {
   id: number
   name: string
+  disposalMethod?: string | null
   recyclable: boolean
   largeItem: boolean
   information: string
@@ -13,19 +14,30 @@ export interface Item {
 
 export interface ItemInput {
   name: string
+  disposalMethod?: string | null
   recyclable: boolean
   largeItem?: boolean
   information: string
   keywords?: string[]
 }
 
+export interface ItemPage {
+  content: Item[]
+  number: number
+  size: number
+  totalElements: number
+  totalPages: number
+}
+
 export async function fetchItems(
   searchText = '',
   recyclable?: boolean,
-  signal?: AbortSignal
-): Promise<Item[] | null> {
+  signal?: AbortSignal,
+  page = 1,
+  pageSize = 10
+): Promise<ItemPage | null> {
   try {
-    const params = new URLSearchParams()
+    const params = new URLSearchParams({ page: String(page - 1), size: String(pageSize) })
     if (searchText.trim()) {
       params.append('searchText', searchText.trim())
     }
@@ -39,7 +51,7 @@ export async function fetchItems(
       return null
     }
 
-    return (await response.json()) as Item[]
+    return (await response.json()) as ItemPage
   } catch (error) {
     if (isAbortError(error)) {
       throw error
