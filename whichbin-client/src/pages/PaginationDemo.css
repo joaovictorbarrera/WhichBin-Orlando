@@ -1,0 +1,147 @@
+.pagination-demo-page {
+  max-width: 62rem;
+}
+
+.pagination-demo-header {
+  margin-bottom: 1.75rem;
+}
+
+.pagination-demo-eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--color-brand);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pagination-demo-header h1 {
+  margin: 0;
+  color: var(--color-heading);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+}
+
+.pagination-demo-header > p:last-child {
+  max-width: 42rem;
+  margin: 0.65rem 0 0;
+  color: var(--color-text-muted);
+}
+
+.pagination-demo-card {
+  overflow: hidden;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 0.75rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.pagination-demo-card-heading {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.pagination-demo-card-heading h2 {
+  margin: 0;
+  color: var(--color-heading);
+  font-size: 1.125rem;
+}
+
+.pagination-demo-card-heading p {
+  margin: 0.25rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.pagination-demo-table-wrapper {
+  overflow-x: auto;
+}
+
+.pagination-demo-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.pagination-demo-table th,
+.pagination-demo-table td {
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid #edf1ee;
+  white-space: nowrap;
+}
+
+.pagination-demo-table th {
+  color: var(--color-text-muted);
+  background: #f7faf8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pagination-demo-table td {
+  color: var(--color-ink);
+  font-size: 0.9rem;
+}
+
+.pagination-demo-loading {
+  height: 7rem;
+  color: var(--color-text-muted) !important;
+  text-align: center;
+}
+
+.pagination-demo-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.55rem;
+  border: 2px solid #d5e5da;
+  border-top-color: var(--color-brand);
+  border-radius: 50%;
+  vertical-align: -0.15rem;
+  animation: pagination-demo-spin 0.7s linear infinite;
+}
+
+@keyframes pagination-demo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pagination-demo-bin {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.pagination-demo-bin-recycling {
+  color: #15592f;
+  background: #e4f3e9;
+}
+
+.pagination-demo-bin-trash {
+  color: #76521b;
+  background: #fff3d8;
+}
+
+.pagination-demo-card .pagination-container {
+  margin: 0;
+  padding: 1rem 1.5rem 1.25rem;
+}
+
+@media (max-width: 600px) {
+  .pagination-demo-card-heading {
+    padding: 1rem;
+  }
+
+  .pagination-demo-table th,
+  .pagination-demo-table td {
+    padding: 0.75rem 1rem;
+  }
+
+  .pagination-demo-card .pagination-container {
+    padding: 1rem;
+  }
+}
