@@ -490,8 +490,6 @@ public class AnnouncementTest {
     @Test
     void shouldTestAnnouncementWithLongMessage() throws Exception {
 
-        String token = testHelper.getAuthToken();
-
         // Create a message containing more than 2000 characters
         String longMessage = "A".repeat(2001);
 
@@ -507,7 +505,7 @@ public class AnnouncementTest {
         """.formatted(longMessage);
 
         mockMvc.perform(post("/announcements")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(announcementJson))
                 .andExpect(status().isBadRequest());
@@ -515,8 +513,6 @@ public class AnnouncementTest {
 
     @Test
     void shouldAcceptAnnouncementWith2000CharacterMessage() throws Exception {
-
-        String token = testHelper.getAuthToken();
 
         String longMessage = "A".repeat(2000);
 
@@ -532,7 +528,7 @@ public class AnnouncementTest {
         """.formatted(longMessage);
 
         mockMvc.perform(post("/announcements")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(announcementJson))
                 .andExpect(status().isCreated())
