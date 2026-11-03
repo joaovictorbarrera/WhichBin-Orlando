@@ -35,7 +35,7 @@ function App() {
         <Route path="/item-search/:itemId" element={<ItemDetail />} />
 
         <Route path="/apistatus" element={<ApiStatus />} />
-        <Route path="/pagination-demo" element={
+        <Route path="/demo/pagination" element={
           <ProtectedRoute>
             <PaginationDemo />
           </ProtectedRoute>}

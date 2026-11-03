@@ -1,65 +1,12 @@
 import { useEffect, useState } from 'react'
 import PageLayout from '../../components/PageLayout'
 import Pagination from '../../components/Pagination/Pagination'
+import {
+  fetchDemoItems,
+  type BinFilter,
+  type DemoItem,
+} from '../../services/paginationDemoService'
 import './PaginationDemo.css'
-
-type DemoItem = {
-  id: number
-  name: string
-  category: string
-  bin: 'Recycling' | 'Trash'
-}
-
-type BinFilter = 'All' | DemoItem['bin']
-
-// The mock API uses this predictable local list as its backing data store.
-const DEMO_ITEMS: DemoItem[] = Array.from({ length: 47 }, (_, index) => {
-  const examples: Omit<DemoItem, 'id'>[] = [
-    { name: 'Glass beverage bottle', category: 'Glass', bin: 'Recycling' },
-    { name: 'Cardboard shipping box', category: 'Paper', bin: 'Recycling' },
-    { name: 'Plastic water bottle', category: 'Plastic', bin: 'Recycling' },
-    { name: 'Used paper towel', category: 'Paper', bin: 'Trash' },
-    { name: 'Aluminum drink can', category: 'Metal', bin: 'Recycling' },
-    { name: 'Food-soiled pizza box', category: 'Paper', bin: 'Trash' },
-    { name: 'Empty cleaning bottle', category: 'Plastic', bin: 'Recycling' },
-  ]
-
-  // Repeat a few realistic examples while giving every row its own stable ID.
-  return {
-    id: index + 1,
-    ...examples[index % examples.length],
-  }
-})
-
-const SIMULATED_API_DELAY_MS = 1000
-
-type DemoApiResponse = {
-  items: DemoItem[]
-  totalItems: number
-}
-
-// Model a paginated API response: both the requested page and the total count
-// arrive together after the simulated network delay.
-function fetchDemoItems(
-  page: number,
-  pageSize: number,
-  binFilter: BinFilter
-): Promise<DemoApiResponse> {
-  return new Promise((resolve) => {
-    window.setTimeout(() => {
-      const filteredItems =
-        binFilter === 'All'
-          ? DEMO_ITEMS
-          : DEMO_ITEMS.filter((item) => item.bin === binFilter)
-      const firstItemIndex = (page - 1) * pageSize
-
-      resolve({
-        items: filteredItems.slice(firstItemIndex, firstItemIndex + pageSize),
-        totalItems: filteredItems.length,
-      })
-    }, SIMULATED_API_DELAY_MS)
-  })
-}
 
 function PaginationDemo() {
   // The component starts without data or a total count, just as it would while
@@ -69,41 +16,64 @@ function PaginationDemo() {
   const [items, setItems] = useState<DemoItem[]>([])
   const [totalItems, setTotalItems] = useState<number>()
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string>()
   const [binFilter, setBinFilter] = useState<BinFilter>('All')
 
-  // Every page or page-size change starts another simulated request. Ignore
-  // responses from older requests if the user changes controls before one ends.
+  // Ignore responses from earlier requests if the selected controls change.
   useEffect(() => {
     let isLatestRequest = true
+    const abortController = new AbortController()
 
-    fetchDemoItems(currentPage, pageSize, binFilter).then((response) => {
-      if (!isLatestRequest) {
-        return
-      }
+    fetchDemoItems(currentPage, pageSize, binFilter, abortController.signal)
+      .then((response) => {
+        if (!isLatestRequest) {
+          return
+        }
 
-      setItems(response.items)
-      setTotalItems(response.totalItems)
-      setLoading(false)
-    })
+        setItems(response.items)
+        setCurrentPage(response.currentPage)
+        setPageSize(response.pageSize)
+        setTotalItems(response.totalItems)
+      })
+      .catch((requestError: unknown) => {
+        if (!isLatestRequest || abortController.signal.aborted) {
+          return
+        }
+
+        setItems([])
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : 'Could not load demo items.'
+        )
+      })
+      .finally(() => {
+        if (isLatestRequest) {
+          setLoading(false)
+        }
+      })
 
     return () => {
       isLatestRequest = false
+      abortController.abort()
     }
   }, [currentPage, pageSize, binFilter])
 
   function handlePageSizeChange(nextPageSize: number) {
     setLoading(true)
+    setError(undefined)
     setPageSize(nextPageSize)
-
   }
 
   function handlePageChange(nextPage: number) {
     setLoading(true)
+    setError(undefined)
     setCurrentPage(nextPage)
   }
 
   function handleBinFilterChange(nextBinFilter: BinFilter) {
     setLoading(true)
+    setError(undefined)
     setBinFilter(nextBinFilter)
     setCurrentPage(1)
   }
@@ -155,7 +125,14 @@ function PaginationDemo() {
           </div>
         </div>
 
-        <div className="pagination-demo-table-wrapper">
+        <div
+          className={`pagination-demo-table-wrapper${loading ? ' is-loading' : ''}`}
+        >
+          {loading && (
+            <span className="pagination-demo-visually-hidden" role="status">
+              Loading items...
+            </span>
+          )}
           <table className="pagination-demo-table" aria-busy={loading}>
             <thead>
               <tr>
@@ -166,13 +143,36 @@ function PaginationDemo() {
               </tr>
             </thead>
             <tbody>
-              {loading ? (
+              {error ? (
                 <tr>
-                  <td className="pagination-demo-loading" colSpan={4} role="status">
-                    <span className="pagination-demo-spinner" aria-hidden="true" />
-                    Loading items...
+                  <td className="pagination-demo-error" colSpan={4} role="alert">
+                    {error}
                   </td>
                 </tr>
+              ) : loading && items.length === 0 ? (
+                Array.from({ length: pageSize }, (_, index) => (
+                  <tr key={`loading-${index}`} aria-hidden="true">
+                    <td>&nbsp;</td>
+                    <td />
+                    <td />
+                    <td />
+                  </tr>
+                ))
+              ) : items.length === 0 ? (
+                Array.from({ length: pageSize }, (_, index) => (
+                  <tr key={`empty-${index}`} aria-hidden={index > 0}>
+                    {index === 0 ? (
+                      <td colSpan={4}>No items found for this page.</td>
+                    ) : (
+                      <>
+                        <td />
+                        <td />
+                        <td />
+                        <td />
+                      </>
+                    )}
+                  </tr>
+                ))
               ) : (
                 items.map((item) => (
                   <tr key={item.id}>
