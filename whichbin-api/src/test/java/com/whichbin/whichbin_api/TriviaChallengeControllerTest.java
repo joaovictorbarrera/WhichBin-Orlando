@@ -4,6 +4,7 @@ package com.whichbin.whichbin_api;
 import com.whichbin.whichbin_api.model.TriviaChallenge;
 import com.whichbin.whichbin_api.repository.TriviaChallengeRepository;
 import com.whichbin.whichbin_api.testutil.IntegrationTestHelper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.hasItem;
@@ -37,6 +39,13 @@ class TriviaChallengeControllerTest {
 
     @Autowired
     private IntegrationTestHelper testHelper;
+
+    private RequestPostProcessor bearerAuth;
+
+    @BeforeEach
+    void setUpBearerAuth() {
+        bearerAuth = testHelper.bearerAuth();
+    }
 
     @Test
     void shouldReturnOnlyActiveChallengesPublicly() throws Exception {
@@ -93,12 +102,11 @@ class TriviaChallengeControllerTest {
 
     @Test
     void shouldReturnAllChallengesWithValidToken() throws Exception {
-        String token = testHelper.getAuthToken();
         TriviaChallenge challenge =
                 saveChallenge("Admin Visible Challenge", false);
 
         mockMvc.perform(get("/resources/trivia/challenges/all")
-                        .header("Authorization", "Bearer " + token))
+                        .with(bearerAuth))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].id",
                         hasItem(challenge.getId().intValue())));
@@ -106,10 +114,9 @@ class TriviaChallengeControllerTest {
 
     @Test
     void shouldCreateChallengeAsInactive() throws Exception {
-        String token = testHelper.getAuthToken();
 
         mockMvc.perform(post("/resources/trivia/challenges")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -127,14 +134,13 @@ class TriviaChallengeControllerTest {
 
     @Test
     void shouldUpdateChallengeAndItsActiveStatus() throws Exception {
-        String token = testHelper.getAuthToken();
         TriviaChallenge challenge =
                 saveChallenge("Challenge Before Update", false);
 
         mockMvc.perform(put(
                         "/resources/trivia/challenges/{id}",
                         challenge.getId())
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -153,14 +159,13 @@ class TriviaChallengeControllerTest {
 
     @Test
     void shouldDeleteChallengeWithValidToken() throws Exception {
-        String token = testHelper.getAuthToken();
         TriviaChallenge challenge =
                 saveChallenge("Challenge To Delete", false);
 
         mockMvc.perform(delete(
                         "/resources/trivia/challenges/{id}",
                         challenge.getId())
-                        .header("Authorization", "Bearer " + token))
+                        .with(bearerAuth))
                 .andExpect(status().isNoContent());
 
         assertFalse(challengeRepository.existsById(challenge.getId()));
