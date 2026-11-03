@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import PageLayout from '../../components/PageLayout'
-import Pagination from '../../components/Pagination'
+import Pagination from '../../components/Pagination/Pagination'
 import './PaginationDemo.css'
 
 type DemoItem = {
@@ -90,10 +90,6 @@ function PaginationDemo() {
       isLatestRequest = false
     }
   }, [currentPage, pageSize, binFilter])
-
-  // The total page count is unknown until the first response supplies totalItems.
-  const totalPages =
-    totalItems === undefined ? 1 : Math.ceil(totalItems / pageSize)
 
   function handlePageSizeChange(nextPageSize: number) {
     setLoading(true)
@@ -203,7 +199,6 @@ function PaginationDemo() {
 
         <Pagination
           currentPage={currentPage}
-          totalPages={totalPages}
           totalItems={totalItems}
           pageSize={pageSize}
           pageSizeOptions={[5, 10, 20]}
