@@ -33,88 +33,58 @@ The `Pagination` component is an accessible, WCAG 2.1 AA compliant, responsive p
 
 ---
 
-## Developer Integration Example
+## Paginated API Response Example
 
-Here is a full integration example for feature developers implementing pagination in Items, Announcements, or Educational Resources:
+The reusable `PaginatedResponse<T>` type is defined in
+`src/types/PaginatedResponse.ts`. It contains the current page of items and the
+metadata for the full filtered result set:
 
-```tsx
-import { useState, useMemo, useEffect } from 'react'
-import Pagination from '../components/Pagination'
-import { fetchItems, type Item } from '../services/itemService'
+```ts
+import type { PaginatedResponse } from '../../types/PaginatedResponse'
 
-export function ItemList() {
-  const [items, setItems] = useState<Item[] | null>(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
-  const [searchTerm, setSearchTerm] = useState('')
+// For example: PaginatedResponse<Item>
+```
 
-  // Load items from service
-  useEffect(() => {
-    let isMounted = true
-    fetchItems(searchTerm)
-      .then((data) => {
-        if (isMounted) setItems(data)
-      })
-      .catch(() => {
-        if (isMounted) setItems([])
-      })
+For example, an endpoint returning items might respond with:
 
-    return () => {
-      isMounted = false
-    }
-  }, [searchTerm])
-
-  // Filter items
-  const filteredItems = useMemo(() => {
-    if (!items) return null
-    return items.filter((item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  }, [items, searchTerm])
-
-  // Paginate local subset (or let backend slice)
-  const paginatedItems = useMemo(() => {
-    if (!filteredItems) return []
-    const start = (currentPage - 1) * pageSize
-    return filteredItems.slice(start, start + pageSize)
-  }, [filteredItems, currentPage, pageSize])
-
-  return (
-    <div className="item-list-container">
-      <input
-        type="search"
-        placeholder="Filter items..."
-        value={searchTerm}
-        onChange={(e) => {
-          setSearchTerm(e.target.value)
-          setCurrentPage(1) // Reset to first page on search
-        }}
-      />
-
-      {/* Render current page data */}
-      <ul>
-        {paginatedItems.map((item) => (
-          <li key={item.id}>{item.name}</li>
-        ))}
-      </ul>
-
-      {/* Reusable Pagination Component */}
-      <Pagination
-        currentPage={currentPage}
-        totalItems={filteredItems?.length ?? null}
-        pageSize={pageSize}
-        pageSizeOptions={[10, 20, 50]}
-        displayName="items"
-        onPageChange={setCurrentPage}
-        onPageSizeChange={(newSize) => {
-          setPageSize(newSize)
-          setCurrentPage(1)
-        }}
-      />
-    </div>
-  )
+```json
+{
+  "currentPage": 2,
+  "totalPages": 10,
+  "pageSize": 5,
+  "totalItems": 47,
+  "items": [
+    { "id": 6, "name": "Empty cleaning bottle" },
+    { "id": 7, "name": "Glass beverage bottle" }
+  ]
 }
 ```
+
+Render the `items` from that response and pass its pagination metadata to the
+component. The parent handles requesting another page when `onPageChange` or
+`onPageSizeChange` fires; the response from that request replaces
+`paginatedResponse`.
+
+```tsx
+<ul>
+  {paginatedResponse.items.map((item) => (
+    <li key={item.id}>{item.name}</li>
+  ))}
+</ul>
+
+<Pagination
+  currentPage={paginatedResponse.currentPage}
+  totalItems={paginatedResponse.totalItems}
+  pageSize={paginatedResponse.pageSize}
+  pageSizeOptions={[5, 10, 20]}
+  displayName="items"
+  onPageChange={handlePageChange}
+  onPageSizeChange={handlePageSizeChange}
+/>
+```
+
+`totalPages` is included for clients that need it for other purposes, but this
+component calculates its page range from `totalItems` and `pageSize`.
 
 ---
 
@@ -126,4 +96,3 @@ export function ItemList() {
    If a user is on page 4 and filters down to 10 items total, `Pagination` clamps display to page 1 and automatically calls `onPageChange(1)` so parent state stays aligned.
 3. **Responsive Mobile Viewports**:
    On mobile devices ($\le 640px$), Previous/Next button labels are hidden, preserving clear chevron icons and accessible touch targets.
-
