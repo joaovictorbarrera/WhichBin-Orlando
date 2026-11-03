@@ -1,18 +1,11 @@
 import { apiFetch } from './apiClient'
+import type { PaginatedResponse } from '../types/PaginatedResponse'
 
 export interface DemoItem {
   id: number
   name: string
   category: string
   bin: 'Recycling' | 'Trash'
-}
-
-export interface PaginatedResponse<T> {
-  currentPage: number
-  totalPages: number
-  pageSize: number
-  totalItems: number
-  items: T[]
 }
 
 export type BinFilter = 'All' | DemoItem['bin']
