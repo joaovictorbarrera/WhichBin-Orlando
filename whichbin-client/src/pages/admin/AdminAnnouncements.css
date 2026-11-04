@@ -319,6 +319,10 @@
 	margin: 0;
 	color: var(--color-heading-deep);
 	font-size: 1.1rem;
+
+	overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .admin-announcement-message {
@@ -327,8 +331,10 @@
 	margin: 0.55rem 0 0;
 	color: var(--color-text-muted);
 	line-height: 1.55;
+
+	overflow-wrap: anywhere;
 	-webkit-box-orient: vertical;
-	-webkit-line-clamp: 2;
+    -webkit-line-clamp: 2;
 }
 
 .admin-announcement-dates {
@@ -441,3 +447,62 @@
 		gap: 0.4rem;
 	}
 }
+
+/* Keep announcement containers within the available width */
+.admin-announcements-list-section,
+.admin-announcements-list,
+.admin-announcement-card,
+.admin-announcement-content {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Keep long announcement text inside its container */
+.admin-announcement-card h3 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.admin-announcement-message {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+/* Prevent long titles from expanding the edit form */
+.admin-announcement-form-header > div {
+    min-width: 0;
+    flex: 1;
+}
+
+.admin-announcement-form-header h2 {
+    overflow-wrap: anywhere;
+}
+
+/* Keep action buttons accessible */
+.admin-announcement-actions {
+    flex-shrink: 0;
+}
+
+/* Mobile-first adjustments */
+@media (max-width: 700px) {
+    .admin-announcement-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-announcement-content,
+    .admin-announcement-actions {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .admin-announcement-actions button {
+        flex: 1;
+        min-width: 0;
+    }
+}
+

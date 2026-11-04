@@ -305,3 +305,57 @@
     font-size: 1.25rem;
   }
 }
+
+/* Prevent long announcement text from breaking the layout */
+.announcements-list,
+.announcement-card,
+.announcement-card-content {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Keep long titles on one line with ellipses */
+.announcement-card h2 {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Keep message previews within two lines */
+.announcement-preview {
+  display: -webkit-box;
+  max-width: 100%;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* Keep announcement metadata inside the card */
+.announcement-card-top {
+  min-width: 0;
+}
+
+.announcement-type {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+/* Keep the arrow visible */
+.announcement-arrow {
+  flex-shrink: 0;
+}
+
+/* Character counters for announcement forms */
+.admin-announcement-character-count {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-align: right;
+}
