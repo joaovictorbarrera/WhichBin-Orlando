@@ -20,6 +20,8 @@ public class Announcement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(max = 255, message = "Announcement title cannot exceed 255 characters")
+    @Column(length = 255)
     private String title;
 
     @Size(max = 2000, message = "Announcement message cannot exceed 2000 characters")
