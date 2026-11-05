@@ -33,4 +33,4 @@ USER appuser
 
 EXPOSE 8080
 
-ENTRYPOINT ["sh", "-c", "exec java ${JAVA_OPTS:-} -Dserver.port=${PORT:-8080} -jar /app/app.jar"]
+ENTRYPOINT ["sh", "-c", "exec java ${JAVA_OPTS:--Xms64m -Xmx512m} -Dserver.port=${PORT:-8080} -jar /app/app.jar"]
