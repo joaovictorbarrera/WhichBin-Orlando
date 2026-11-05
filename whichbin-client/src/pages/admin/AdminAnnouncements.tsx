@@ -291,9 +291,13 @@ async function handleConfirmDelete() {
                 type="text"
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
+                maxLength={255}
                 disabled={saving}
                 required
               />
+              <small className="admin-announcement-character-count">
+                {title.length} / 255 characters
+              </small>
             </label>
 
             <label>
@@ -301,10 +305,14 @@ async function handleConfirmDelete() {
               <textarea
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
+                maxLength={2000}
                 rows={5}
                 disabled={saving}
                 required
               />
+              <small className="admin-announcement-character-count">
+                {message.length} / 2000 characters
+              </small>
             </label>
 
             <div className="admin-announcement-form-grid">

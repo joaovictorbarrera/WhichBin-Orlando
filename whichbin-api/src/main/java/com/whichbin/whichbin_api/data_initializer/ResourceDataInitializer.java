@@ -4,11 +4,13 @@ import com.whichbin.whichbin_api.model.Resource;
 import com.whichbin.whichbin_api.model.ResourceSection;
 import com.whichbin.whichbin_api.repository.ResourceRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@Profile("dev")
 public class ResourceDataInitializer implements CommandLineRunner {
 
     private final ResourceRepository resourceRepository;

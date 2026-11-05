@@ -106,5 +106,12 @@ public class AnnouncementService {
                     "End date and time cannot be before the start date and time."
             );
         }
+        
+        if (announcement.getEndDate() != null &&
+                !announcement.getEndDate().isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException(
+                    "End date and time must be in the future."
+            );
+        }
     }
 }

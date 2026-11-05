@@ -6,6 +6,7 @@ import com.whichbin.whichbin_api.model.TriviaQuestion;
 import com.whichbin.whichbin_api.repository.TriviaChallengeRepository;
 import com.whichbin.whichbin_api.repository.TriviaQuestionRepository;
 import com.whichbin.whichbin_api.testutil.IntegrationTestHelper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +14,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -40,13 +42,19 @@ class TriviaQuestionControllerTest {
     @Autowired
     private IntegrationTestHelper testHelper;
 
+    private RequestPostProcessor bearerAuth;
+
+    @BeforeEach
+    void setUpBearerAuth() {
+        bearerAuth = testHelper.bearerAuth();
+    }
+
     @Test
     void shouldCreateQuestionForExistingChallenge() throws Exception {
-        String token = testHelper.getAuthToken();
         TriviaChallenge challenge = saveChallenge();
 
         mockMvc.perform(post("/resources/trivia/question")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(questionRequest(
                                 challenge.getId(),
@@ -77,11 +85,10 @@ class TriviaQuestionControllerTest {
     @Test
     void shouldRejectQuestionWhenCorrectAnswerDoesNotMatchChoices()
             throws Exception {
-        String token = testHelper.getAuthToken();
         TriviaChallenge challenge = saveChallenge();
 
         mockMvc.perform(post("/resources/trivia/question")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -102,10 +109,9 @@ class TriviaQuestionControllerTest {
     @Test
     void shouldReturnNotFoundWhenChallengeDoesNotExist()
             throws Exception {
-        String token = testHelper.getAuthToken();
 
         mockMvc.perform(post("/resources/trivia/question")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(questionRequest(
                                 999999999L,
@@ -116,14 +122,13 @@ class TriviaQuestionControllerTest {
 
     @Test
     void shouldUpdateQuestion() throws Exception {
-        String token = testHelper.getAuthToken();
         TriviaChallenge challenge = saveChallenge();
         TriviaQuestion question = saveQuestion(challenge);
 
         mockMvc.perform(put(
                         "/resources/trivia/question/{id}",
                         question.getId())
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -145,14 +150,13 @@ class TriviaQuestionControllerTest {
 
     @Test
     void shouldDeleteQuestion() throws Exception {
-        String token = testHelper.getAuthToken();
         TriviaChallenge challenge = saveChallenge();
         TriviaQuestion question = saveQuestion(challenge);
 
         mockMvc.perform(delete(
                         "/resources/trivia/question/{id}",
                         question.getId())
-                        .header("Authorization", "Bearer " + token))
+                        .with(bearerAuth))
                 .andExpect(status().isNoContent());
 
         assertFalse(questionRepository.existsById(question.getId()));
@@ -161,12 +165,11 @@ class TriviaQuestionControllerTest {
     @Test
     void shouldReturnNotFoundWhenDeletingMissingQuestion()
             throws Exception {
-        String token = testHelper.getAuthToken();
 
         mockMvc.perform(delete(
                         "/resources/trivia/question/{id}",
                         999999999L)
-                        .header("Authorization", "Bearer " + token))
+                        .with(bearerAuth))
                 .andExpect(status().isNotFound());
     }
 

@@ -6,9 +6,9 @@ import com.whichbin.whichbin_api.model.User;
 import com.whichbin.whichbin_api.repository.UserRepository;
 import com.whichbin.whichbin_api.service.AuthorizationTokenService;
 import com.whichbin.whichbin_api.service.UserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -16,7 +16,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Component
 public class IntegrationTestHelper {
 
-    private String token;
+    private static final String TEST_USER_EMAIL =
+            "integration-test@example.com";
 
     @Autowired
     private UserService userService;
@@ -30,11 +31,7 @@ public class IntegrationTestHelper {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
-    public synchronized String getAuthToken() {
-        if (token != null) {
-            return token;
-        }
-
+    private String getAuthToken() {
         TransactionTemplate transactionTemplate =
                 new TransactionTemplate(transactionManager);
 
@@ -42,22 +39,10 @@ public class IntegrationTestHelper {
                 TransactionDefinition.PROPAGATION_REQUIRES_NEW
         );
 
-        token = transactionTemplate.execute(status -> {
-            CreateUserResponse userResponse = userService.createUser(
-                    new CreateUserRequest(
-                            "Integration",
-                            "Test",
-                            "integration-test@example.com"
-                    )
-            );
-
-            User user = userRepository.findById(userResponse.id())
-                    .orElseThrow(() ->
-                            new IllegalStateException(
-                                    "Integration test user was not found"
-                            )
-                    );
-
+        String token = transactionTemplate.execute(status -> {
+            User user = userRepository
+                    .findByEmailIgnoreCase(TEST_USER_EMAIL)
+                    .orElseGet(this::createTestUser);
             return authorizationTokenService.createAuthorizationToken(user);
         });
 
@@ -68,5 +53,30 @@ public class IntegrationTestHelper {
         }
 
         return token;
+    }
+
+    public RequestPostProcessor bearerAuth() {
+        String authorizationHeader = "Bearer " + getAuthToken();
+        return request -> {
+            request.addHeader("Authorization", authorizationHeader);
+            return request;
+        };
+    }
+
+    private User createTestUser() {
+        CreateUserResponse userResponse = userService.createUser(
+                new CreateUserRequest(
+                        "Integration",
+                        "Test",
+                        TEST_USER_EMAIL
+                )
+        );
+
+        return userRepository.findById(userResponse.id())
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Integration test user was not found"
+                        )
+                );
     }
 }

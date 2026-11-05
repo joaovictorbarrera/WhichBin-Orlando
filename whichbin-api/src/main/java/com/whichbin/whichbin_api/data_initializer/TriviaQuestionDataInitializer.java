@@ -5,9 +5,11 @@ import com.whichbin.whichbin_api.model.TriviaQuestion;
 import com.whichbin.whichbin_api.repository.TriviaChallengeRepository;
 import com.whichbin.whichbin_api.repository.TriviaQuestionRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("dev")
 public class TriviaQuestionDataInitializer implements CommandLineRunner {
 
     private final TriviaQuestionRepository triviaQuestionRepository;
