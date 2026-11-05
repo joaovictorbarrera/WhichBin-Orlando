@@ -109,7 +109,14 @@ Configure the following environment variables when running the application. Defa
 | `DB_PASSWORD` | `password` | Backend: MySQL password. Override with a secure value in the backend environment or local development properties file; do not use the repository's configured value in deployments. |
 | `AUTH_TOKEN_TTL` | `PT24H` | Backend: authorization token lifetime, expressed as a Java duration. |
 | `AUTH_TOKEN_CLEANUP_CRON` | `0 0 3 * * *` | Backend: schedule for cleaning up expired tokens (daily at 3:00 a.m. server time). |
+| `DB_POOL_SIZE` | `5` | Backend: maximum number of concurrent MySQL connections in the API pool. |
+| `DB_POOL_MIN_IDLE` | `1` | Backend: minimum number of idle MySQL connections kept open. Keep this at or below `DB_POOL_SIZE`. |
+| `HTTP_MAX_THREADS` | `50` | Backend: maximum number of Tomcat request-processing threads. |
+| `HTTP_MIN_SPARE_THREADS` | `5` | Backend: minimum number of idle Tomcat request-processing threads. |
+| `HTTP_MAX_CONNECTIONS` | `200` | Backend: maximum number of simultaneous client connections accepted by Tomcat. |
 | `VITE_API_URL` | `http://localhost:5000/api/` | Frontend: base URL of the backend API. |
+
+The Docker image starts the API with a 512 MB maximum Java heap and a 64 MB initial heap by default. Set `JAVA_OPTS` in the deployment environment to override these JVM options. The heap limit is not a hard limit on total process memory: leave room for the JVM, threads, and native memory in the hosting service's memory limit. Tomcat concurrency and the MySQL connection pool are also kept small by default and can be adjusted with the variables above if traffic requires it.
 
 The API documentation is available at `/api/swagger-ui/index.html` while the backend is running. The API includes endpoints for items, resources and trivia, announcements, and authentication and user management. The root API endpoint at `/api/` returns the running API version.
 
