@@ -192,15 +192,14 @@ public class AnnouncementTest {
     }
 
     @Test
-    void shouldNotShowExpiredAnnouncement() throws Exception {
-
+    void shouldNotAllowCreatingExpiredAnnouncement() throws Exception {
 
         String startDate = java.time.LocalDateTime.now()
                 .minusDays(14).toString();
-
+        
         String endDate = java.time.LocalDateTime.now()
                 .minusDays(7).toString();
-
+        
         String announcementJson = """
         {
             "title": "Expired Recycling Announcement",
@@ -212,25 +211,15 @@ public class AnnouncementTest {
         }
         """.formatted(startDate, endDate);
 
-        // Create an expired announcement
-        String response = mockMvc.perform(post("/announcements")
+        // Verify that creating an expired announcement is rejected
+        mockMvc.perform(post("/announcements")
                         .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(announcementJson))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Long announcementId = objectMapper.readTree(response)
-                .get("id")
-                .asLong();
-
-        // Check that the expired announcement is not public
-        mockMvc.perform(get("/announcements"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.id == " + announcementId + ")]")
-                        .isEmpty());
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(
+                        "End date and time must be in the future."
+                ));
     }
 
     @Test
@@ -485,5 +474,53 @@ public class AnnouncementTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(announcementJson))
                 .andExpect(status().isUnauthorized());
+    }
+    
+    @Test
+    void shouldTestAnnouncementWithLongMessage() throws Exception {
+
+        // Create a message containing more than 2000 characters
+        String longMessage = "A".repeat(2001);
+
+        String announcementJson = """
+        {
+            "title": "Long Message Test",
+            "message": "%s",
+            "type": "GENERAL",
+            "startDate": "2026-10-20T08:00:00",
+            "endDate": "2026-12-20T08:00:00",
+            "active": true
+        }
+        """.formatted(longMessage);
+
+        mockMvc.perform(post("/announcements")
+                        .with(bearerAuth)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(announcementJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldAcceptAnnouncementWith2000CharacterMessage() throws Exception {
+
+        String longMessage = "A".repeat(2000);
+
+        String announcementJson = """
+        {
+            "title": "Long Message Test",
+            "message": "%s",
+            "type": "GENERAL",
+            "startDate": "2026-10-20T08:00:00",
+            "endDate": "2026-12-20T08:00:00",
+            "active": true
+        }
+        """.formatted(longMessage);
+
+        mockMvc.perform(post("/announcements")
+                        .with(bearerAuth)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(announcementJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.message").value(longMessage));
     }
 }
