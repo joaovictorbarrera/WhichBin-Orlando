@@ -134,6 +134,13 @@ function AdminAnnouncements() {
       return
     }
 
+    if (endDate && new Date(endDate).getTime() <= Date.now()) {
+      setFormError(
+        'The end date and time must be in the future. Please select a new expiration date.'
+      )
+      return
+    }
+    
     const announcementInput: AnnouncementInput = {
       title: title.trim(),
       message: message.trim(),
