@@ -1,4 +1,6 @@
+
 import { apiFetch } from './apiClient'
+import type { PaginatedResponse } from '../types/PaginatedResponse'
 
 export type TriviaQuestion = {
   id: number
@@ -129,17 +131,58 @@ export async function getTriviaChallenges(): Promise<TriviaChallenge[] | null> {
   }
 }
 
-// Admin list: returns active and inactive challenges.
-export async function getAllTriviaChallenges(): Promise<TriviaChallenge[] | null> {
+// Public list: returns active challenges with pagination.
+export async function getPaginatedTriviaChallenges(
+  page: number,
+  pageSize: number,
+  signal?: AbortSignal
+): Promise<PaginatedResponse<TriviaChallenge> | null> {
   try {
-    const response = await apiFetch('resources/trivia/challenges/all')
+    const response = await apiFetch(
+      `resources/trivia/challenges?page=${page}&pageSize=${pageSize}`,
+      {
+        signal,
+      }
+    )
 
     if (!response.ok) {
       return null
     }
 
-    return (await response.json()) as TriviaChallenge[]
-  } catch {
+    return (await response.json()) as PaginatedResponse<TriviaChallenge>
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error
+    }
+
+    return null
+  }
+}
+
+// Admin list: returns active and inactive challenges with pagination.
+export async function getAllTriviaChallenges(
+  page: number,
+  pageSize: number,
+  signal?: AbortSignal
+): Promise<PaginatedResponse<TriviaChallenge> | null> {
+  try {
+    const response = await apiFetch(
+      `resources/trivia/challenges/all?page=${page}&pageSize=${pageSize}`,
+      {
+        signal,
+      }
+    )
+
+    if (!response.ok) {
+      return null
+    }
+
+    return (await response.json()) as PaginatedResponse<TriviaChallenge>
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error
+    }
+
     return null
   }
 }

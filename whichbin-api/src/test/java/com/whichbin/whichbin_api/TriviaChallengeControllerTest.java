@@ -4,6 +4,7 @@ package com.whichbin.whichbin_api;
 import com.whichbin.whichbin_api.model.TriviaChallenge;
 import com.whichbin.whichbin_api.repository.TriviaChallengeRepository;
 import com.whichbin.whichbin_api.testutil.IntegrationTestHelper;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,19 +50,27 @@ class TriviaChallengeControllerTest {
 
     @Test
     void shouldReturnOnlyActiveChallengesPublicly() throws Exception {
-        TriviaChallenge active = saveChallenge("Active Test Challenge", true);
-        TriviaChallenge inactive = saveChallenge("Inactive Test Challenge", false);
+
+        TriviaChallenge active =
+                saveChallenge("Active Test Challenge", true);
+
+        TriviaChallenge inactive =
+                saveChallenge("Inactive Test Challenge", false);
 
         mockMvc.perform(get("/resources/trivia/challenges"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].id",
+                .andExpect(jsonPath("$.currentPage").value(1))
+                .andExpect(jsonPath("$.pageSize").value(5))
+                .andExpect(jsonPath("$.totalItems").value(1))
+                .andExpect(jsonPath("$.items[*].id",
                         hasItem(active.getId().intValue())))
-                .andExpect(jsonPath("$[*].id",
+                .andExpect(jsonPath("$.items[*].id",
                         not(hasItem(inactive.getId().intValue()))));
     }
 
     @Test
     void shouldReturnAnActiveChallengeById() throws Exception {
+
         TriviaChallenge challenge =
                 saveChallenge("Visible Challenge", true);
 
@@ -76,6 +85,7 @@ class TriviaChallengeControllerTest {
 
     @Test
     void shouldRejectOpeningAnInactiveChallenge() throws Exception {
+
         TriviaChallenge challenge =
                 saveChallenge("Hidden Challenge", false);
 
@@ -87,6 +97,7 @@ class TriviaChallengeControllerTest {
 
     @Test
     void shouldReturnNotFoundForMissingChallenge() throws Exception {
+
         mockMvc.perform(get(
                         "/resources/trivia/challenges/{id}",
                         999999999L))
@@ -96,20 +107,27 @@ class TriviaChallengeControllerTest {
     @Test
     void shouldRequireAuthenticationToListAllChallenges()
             throws Exception {
+
         mockMvc.perform(get("/resources/trivia/challenges/all"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     void shouldReturnAllChallengesWithValidToken() throws Exception {
+
         TriviaChallenge challenge =
                 saveChallenge("Admin Visible Challenge", false);
 
         mockMvc.perform(get("/resources/trivia/challenges/all")
                         .with(bearerAuth))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].id",
-                        hasItem(challenge.getId().intValue())));
+                .andExpect(jsonPath("$.currentPage").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.pageSize").value(10))
+                .andExpect(jsonPath("$.totalItems").value(1))
+                .andExpect(jsonPath("$.items[*].id").value(
+                        hasItem(challenge.getId().intValue())
+                ));
     }
 
     @Test
@@ -134,6 +152,7 @@ class TriviaChallengeControllerTest {
 
     @Test
     void shouldUpdateChallengeAndItsActiveStatus() throws Exception {
+
         TriviaChallenge challenge =
                 saveChallenge("Challenge Before Update", false);
 
@@ -159,6 +178,7 @@ class TriviaChallengeControllerTest {
 
     @Test
     void shouldDeleteChallengeWithValidToken() throws Exception {
+
         TriviaChallenge challenge =
                 saveChallenge("Challenge To Delete", false);
 
@@ -174,6 +194,7 @@ class TriviaChallengeControllerTest {
     @Test
     void shouldRejectChallengeCreationWithoutAuthentication()
             throws Exception {
+
         mockMvc.perform(post("/resources/trivia/challenges")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -184,6 +205,19 @@ class TriviaChallengeControllerTest {
                                 }
                                 """))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldRejectInvalidPublicPaginationParameters()
+            throws Exception {
+
+        mockMvc.perform(get("/resources/trivia/challenges")
+                        .param("page", "0"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(get("/resources/trivia/challenges")
+                        .param("pageSize", "0"))
+                .andExpect(status().isBadRequest());
     }
 
     private TriviaChallenge saveChallenge(

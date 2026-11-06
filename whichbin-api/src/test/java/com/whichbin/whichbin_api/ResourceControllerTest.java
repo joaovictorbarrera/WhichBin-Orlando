@@ -58,11 +58,46 @@ class ResourceControllerTest {
 
         mockMvc.perform(get("/resources"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].title",
+                .andExpect(jsonPath("$.currentPage").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.pageSize").value(10))
+                .andExpect(jsonPath("$.totalItems").value(2))
+                .andExpect(jsonPath("$.items[*].title",
                         hasItems(
                                 "Test Resource One",
                                 "Test Resource Two"
                         )));
+    }
+
+    @Test
+    void shouldReturnSecondPageOfEducationalResources() throws Exception {
+        saveResource("Page One Resource");
+        saveResource("Page One Resource Two");
+        saveResource("Page Two Resource");
+
+        mockMvc.perform(get("/resources")
+                        .param("page", "2")
+                        .param("pageSize", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.currentPage").value(2))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.pageSize").value(2))
+                .andExpect(jsonPath("$.totalItems").value(3))
+                .andExpect(jsonPath("$.items.length()").value(1))
+                .andExpect(jsonPath("$.items[0].title")
+                        .value("Page Two Resource"));
+    }
+
+    @Test
+    void shouldRejectInvalidPaginationParameters() throws Exception {
+
+        mockMvc.perform(get("/resources")
+                        .param("page", "0"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(get("/resources")
+                        .param("pageSize", "0"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
