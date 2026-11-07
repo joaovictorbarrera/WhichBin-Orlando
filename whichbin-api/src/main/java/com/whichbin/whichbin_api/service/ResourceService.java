@@ -1,10 +1,12 @@
+
 package com.whichbin.whichbin_api.service;
 
 import com.whichbin.whichbin_api.model.Resource;
 import com.whichbin.whichbin_api.repository.ResourceRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,8 +18,8 @@ public class ResourceService {
         this.resourceRepository = resourceRepository;
     }
 
-    public List<Resource> getAllResources() {
-        return resourceRepository.findAll();
+    public Page<Resource> getAllResources(Pageable pageable) {
+        return resourceRepository.findAll(pageable);
     }
 
     public Optional<Resource> getResourceById(Long id) {
