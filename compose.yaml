@@ -36,7 +36,7 @@ services:
       DB_USERNAME: ${DB_USERNAME:?Set DB_USERNAME in .env}
       DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
       TLS_KEYSTORE_PASSWORD: ${TLS_KEYSTORE_PASSWORD:?Set TLS_KEYSTORE_PASSWORD in .env}
-      CLIENT_URL: ${CLIENT_URL:-https://which-bin-orlando.vercel.app}
+      CLIENT_URL: ${CLIENT_URL:-https://www.whichbin-orlando.org}
     volumes:
       - ./secrets/whichbin-orlando.org-fullchain.pfx:/run/secrets/whichbin-orlando.org-fullchain.pfx:ro
 
