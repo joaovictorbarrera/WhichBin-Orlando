@@ -102,9 +102,9 @@ Configure the following environment variables when running the application. Defa
 
 | Variable | Default value | Description |
 | --- | --- | --- |
-| `CLIENT_URL` | `http://localhost:7000` | Backend: allowed frontend origin for CORS. Set this to the deployed frontend's origin so browsers can make API requests. Use only the origin (scheme, hostname, and optional port), with no path or trailing slash. |
-| `PORT` | `5000` | Backend: port used by the API server. |
-| `DB_URL` | `jdbc:mysql://localhost:3306/` | Backend: JDBC URL for the application database. |
+| `CLIENT_URL` | `http://localhost:7000` | Backend: allowed frontend origin for CORS. For production, set this to `https://which-bin-orlando.vercel.app` (origin only, with no path or trailing slash). |
+| `PORT` | `443` | Backend: server port. The `dev` profile defaults to `5000`. |
+| `DB_URL` | `jdbc:mysql://localhost:3306/whichbin_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC` | Backend: JDBC URL for the application database. |
 | `DB_USERNAME` | `root` | Backend: MySQL username. |
 | `DB_PASSWORD` | `password` | Backend: MySQL password. Override with a secure value in the backend environment or local development properties file; do not use the repository's configured value in deployments. |
 | `AUTH_TOKEN_TTL` | `PT24H` | Backend: authorization token lifetime, expressed as a Java duration. |
@@ -112,6 +112,28 @@ Configure the following environment variables when running the application. Defa
 | `VITE_API_URL` | `http://localhost:5000/api/` | Frontend: base URL of the backend API. |
 
 The API documentation is available at `/api/swagger-ui/index.html` while the backend is running. The API includes endpoints for items, resources and trivia, announcements, and authentication and user management. The root API endpoint at `/api/` returns the running API version.
+
+### Deploy the API and MySQL
+
+The root `compose.yaml` builds and runs the API with MySQL 8.4. The API listens on HTTPS port `443` and connects to the private MySQL service; database data persists in a Docker volume. Only the API port is published. The frontend remains hosted at <https://which-bin-orlando.vercel.app/>.
+
+On the server, from the repository root:
+
+1. Keep the full-chain PFX at `secrets/whichbin-orlando.org-fullchain.pfx`. It is mounted read-only into the API container and excluded from Git and the Docker build context.
+2. Create `.env` from `.env.example` only if it does not already exist. Set `TLS_KEYSTORE_PASSWORD` to the PFX password. Keep `.env` private; it is excluded from Git. The database passwords are stored there as well.
+3. Start or update the services:
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+4. Check the API logs if needed:
+
+   ```bash
+   docker compose logs -f whichbin-api
+   ```
+
+Allow inbound TCP port `443` in the server firewall and point `whichbin-orlando.org` DNS to the server. In Vercel, set `VITE_API_URL` to `https://whichbin-orlando.org/api/`. Compose allows the Vercel frontend origin for API requests. Do not remove the `mysql_data` volume unless you intend to delete the database.
 
 ## Project structure
 
