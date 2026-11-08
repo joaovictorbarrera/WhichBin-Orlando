@@ -37,6 +37,7 @@ function AdminItems() {
   const [debouncedSearchText, setDebouncedSearchText] = useState('')
   const [filter, setFilter] = useState<FilterOption>('all')
   const [loading, setLoading] = useState(true)
+  const [hasLoaded, setHasLoaded] = useState(false)
   const [loadError, setLoadError] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const [showForm, setShowForm] = useState(false)
@@ -72,45 +73,58 @@ function AdminItems() {
   }, [searchText])
 
   useEffect(() => {
+    const controller = new AbortController()
     let isMounted = true
 
-    async function loadItems() {
+    const timer = setTimeout(() => {
       setLoading(true)
       setLoadError(false)
 
-      const recyclableParam =
-        filter === 'recyclable'
-          ? true
-          : filter === 'non-recyclable'
-            ? false
-            : undefined
-      const result = await fetchItems(
-        debouncedSearchText.trim(),
-        recyclableParam,
-        undefined,
-        page,
-        pageSize
-      )
-      if (!isMounted) return
+      async function loadItems() {
+        try {
+          const recyclableParam =
+            filter === 'recyclable'
+              ? true
+              : filter === 'non-recyclable'
+                ? false
+                : undefined
+          const result = await fetchItems(
+            debouncedSearchText.trim(),
+            recyclableParam,
+            controller.signal,
+            page,
+            pageSize
+          )
+          if (!isMounted) return
 
-      if (result === null) {
-        setItems([])
-        setLoadError(true)
-      } else {
-        if (page > Math.max(1, result.totalPages)) {
-          setPage(Math.max(1, result.totalPages))
-          return
+          if (result === null) {
+            setLoadError(true)
+            return
+          }
+
+          if (page > Math.max(1, result.totalPages)) {
+            setPage(Math.max(1, result.totalPages))
+            return
+          }
+
+          setItems(result.items)
+          setTotalItems(result.totalItems)
+          setHasLoaded(true)
+        } catch {
+          if (!isMounted || controller.signal.aborted) return
+          setLoadError(true)
+        } finally {
+          if (isMounted) setLoading(false)
         }
-        setItems(result.items)
-        setTotalItems(result.totalItems)
       }
 
-      setLoading(false)
-    }
+      void loadItems()
+    }, 0)
 
-    void loadItems()
     return () => {
       isMounted = false
+      controller.abort()
+      clearTimeout(timer)
     }
   }, [debouncedSearchText, filter, refreshKey, page, pageSize])
 
@@ -494,14 +508,12 @@ function AdminItems() {
             <h2 id="items-list-heading">Items</h2>
             <p>Items shown in public search and detail pages.</p>
           </div>
-          {!loading && !loadError && (
+          {!loading && !loadError && hasLoaded ? (
             <span>{totalItems} {totalItems === 1 ? 'item' : 'items'}</span>
-          )}
+          ) : null}
         </div>
 
-        {loading && <p className="admin-items-status" role="status">Loading items...</p>}
-
-        {!loading && loadError && (
+        {!loading && loadError && items.length === 0 && (
           <div className="admin-items-empty admin-items-error" role="alert">
             <p>Items could not be loaded. Check your connection and try again.</p>
             <button type="button" onClick={() => setRefreshKey((current) => current + 1)}>
@@ -511,7 +523,17 @@ function AdminItems() {
           </div>
         )}
 
-        {!loading && !loadError && items.length === 0 && (
+        {!loading && loadError && items.length > 0 && (
+          <div className="admin-items-load-error" role="alert">
+            <p>Items could not be updated. Showing the previous results.</p>
+            <button type="button" onClick={() => setRefreshKey((current) => current + 1)}>
+              <FiRefreshCw aria-hidden="true" />
+              Try again
+            </button>
+          </div>
+        )}
+
+        {!loading && !loadError && hasLoaded && items.length === 0 && (
           <div className="admin-items-empty">
             <p>
               {debouncedSearchText.trim()
@@ -534,8 +556,8 @@ function AdminItems() {
           </div>
         )}
 
-        {!loading && !loadError && items.length > 0 && (
-          <div className="admin-items-list">
+        {items.length > 0 && (
+          <div className="admin-items-list" aria-busy={loading}>
             {items.map((item) => (
               <article className="admin-item-card" key={item.id}>
                 <div className="admin-item-card-content">
@@ -596,7 +618,19 @@ function AdminItems() {
           onConfirm={handleConfirmDelete}
         />
       )}
-      {!loading && !loadError && (
+      <div
+        className={`admin-items-loading${loading ? '' : ' is-hidden'}`}
+        role={loading ? 'status' : undefined}
+        aria-hidden={!loading}
+      >
+        {loading && (
+          <>
+            <span className="admin-items-loading-spinner" aria-hidden="true" />
+            {hasLoaded ? 'Updating items...' : 'Loading items...'}
+          </>
+        )}
+      </div>
+      {hasLoaded && (
         <Pagination
           currentPage={page}
           totalItems={totalItems}

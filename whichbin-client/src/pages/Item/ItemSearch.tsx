@@ -28,6 +28,7 @@ function ItemSearch() {
   const [totalItems, setTotalItems] = useState(0)
 
   const [loading, setLoading] = useState(true)
+  const [hasLoaded, setHasLoaded] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
@@ -58,36 +59,45 @@ function ItemSearch() {
       setLoading(true)
       setError(null)
 
-      const recyclableParam =
-        filter === 'recyclable'
-          ? true
-          : filter === 'non-recyclable'
-            ? false
-            : undefined
-
-      fetchItems(debouncedSearchText.trim(), recyclableParam, controller.signal, page, pageSize)
-        .then((data) => {
+      async function loadItems() {
+        try {
+          const recyclableParam =
+            filter === 'recyclable'
+              ? true
+              : filter === 'non-recyclable'
+                ? false
+                : undefined
+          const data = await fetchItems(
+            debouncedSearchText.trim(),
+            recyclableParam,
+            controller.signal,
+            page,
+            pageSize
+          )
           if (!isMounted) return
-          if (data) {
-            if (page > Math.max(1, data.totalPages)) {
-              setPage(Math.max(1, data.totalPages))
-              return
-            }
-            setItems(data.items)
-            setTotalItems(data.totalItems)
-            setError(null)
-          } else {
-            setItems([])
+
+          if (data === null) {
             setError('Unable to load items. Please try again later.')
+            return
           }
-          setLoading(false)
-        })
-        .catch((err) => {
-          if (!isMounted || isAbortError(err)) return
+
+          if (page > Math.max(1, data.totalPages)) {
+            setPage(Math.max(1, data.totalPages))
+            return
+          }
+
+          setItems(data.items)
+          setTotalItems(data.totalItems)
+          setHasLoaded(true)
+        } catch (requestError) {
+          if (!isMounted || isAbortError(requestError)) return
           setError('Unable to load items. Please try again later.')
-          setItems([])
-          setLoading(false)
-        })
+        } finally {
+          if (isMounted) setLoading(false)
+        }
+      }
+
+      void loadItems()
     }, 0)
 
     return () => {
@@ -177,14 +187,7 @@ function ItemSearch() {
         </div>
       </section>
 
-      {loading && (
-        <div className="item-search-status item-search-loading" role="status">
-          <div className="loading-spinner" aria-hidden="true" />
-          <p>Loading items...</p>
-        </div>
-      )}
-
-      {!loading && error && (
+      {!loading && error && items.length === 0 && (
         <div className="item-search-status item-search-error" role="alert">
           <FiAlertCircle className="status-icon" aria-hidden="true" />
           <h2>Unable to load items</h2>
@@ -200,7 +203,16 @@ function ItemSearch() {
         </div>
       )}
 
-      {!loading && !error && items.length === 0 && (
+      {!loading && error && items.length > 0 && (
+        <div className="item-search-inline-error" role="alert">
+          <span>{error}</span>
+          <button type="button" onClick={forceRefresh}>
+            Try again
+          </button>
+        </div>
+      )}
+
+      {!loading && !error && hasLoaded && items.length === 0 && (
         <div className="item-search-status item-search-empty">
           <p>
             {searchText.trim()
@@ -222,8 +234,8 @@ function ItemSearch() {
         </div>
       )}
 
-      {!loading && !error && items.length > 0 && (
-        <div className="item-search-list">
+      {items.length > 0 && (
+        <div className="item-search-list" aria-busy={loading}>
           {items.map((item) => (
             <Link
               to={`/item-search/${item.id}`}
@@ -268,7 +280,19 @@ function ItemSearch() {
           ))}
         </div>
       )}
-      {!loading && !error && (
+      <div
+        className={`item-search-loading-indicator${loading ? '' : ' is-hidden'}`}
+        role={loading ? 'status' : undefined}
+        aria-hidden={!loading}
+      >
+        {loading && (
+          <>
+            <div className="loading-spinner" aria-hidden="true" />
+            <span>{hasLoaded ? 'Updating items...' : 'Loading items...'}</span>
+          </>
+        )}
+      </div>
+      {hasLoaded && (
         <Pagination
           currentPage={page}
           totalItems={totalItems}
