@@ -3,6 +3,7 @@ package com.whichbin.whichbin_api;
 import com.whichbin.whichbin_api.model.Item;
 import com.whichbin.whichbin_api.testutil.IntegrationTestHelper;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,6 +11,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
@@ -30,10 +32,14 @@ public class ItemControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Long createItem(
-            String token,
-            String name,
-            boolean recyclable) throws Exception {
+    private RequestPostProcessor bearerAuth;
+
+    @BeforeEach
+    void setUpBearerAuth() {
+        bearerAuth = testHelper.bearerAuth();
+    }
+
+    private Long createItem(String name, boolean recyclable) throws Exception {
 
         Item item = new Item();
         item.setName(name);
@@ -43,7 +49,7 @@ public class ItemControllerTest {
         item.setKeywords(Set.of("test", name.toLowerCase()));
 
         String response = mockMvc.perform(post("/items")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(item)))
                 .andExpect(status().isCreated())
@@ -67,7 +73,6 @@ public class ItemControllerTest {
 
     @Test
     void shouldCreateItemAndRetrieveItById() throws Exception {
-        String token = testHelper.getAuthToken();
 
         String itemJson = """
             {
@@ -82,7 +87,7 @@ public class ItemControllerTest {
         // Create the item
         String response = mockMvc.perform(post("/items")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .content(itemJson))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(
@@ -131,9 +136,8 @@ public class ItemControllerTest {
 
     @Test
     void shouldSearchItemsByName() throws Exception {
-        String token = testHelper.getAuthToken();
-        createItem(token, "Plastic Bottle", true);
-        createItem(token, "Glass Jar", true);
+        createItem("Plastic Bottle", true);
+        createItem("Glass Jar", true);
 
         mockMvc.perform(get("/items")
                         .param("searchText", "Plastic"))
@@ -144,9 +148,8 @@ public class ItemControllerTest {
 
     @Test
     void shouldFilterItemsByRecyclableStatus() throws Exception {
-        String token = testHelper.getAuthToken();
-        createItem(token, "Plastic Bottle", true);
-        createItem(token, "Broken Ceramic", false);
+        createItem("Plastic Bottle", true);
+        createItem("Broken Ceramic", false);
 
         mockMvc.perform(get("/items")
                         .param("recyclable", "false"))
@@ -176,8 +179,7 @@ public class ItemControllerTest {
 
     @Test
     void shouldUpdateExistingItem() throws Exception {
-        String token = testHelper.getAuthToken();
-        Long itemId = createItem(token, "Plastic Bottle", true);
+        Long itemId = createItem("Plastic Bottle", true);
 
         String updatedJson = """
             {
@@ -190,7 +192,7 @@ public class ItemControllerTest {
             """;
 
         mockMvc.perform(put("/items/{id}", itemId)
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedJson))
                 .andExpect(status().isOk())
@@ -204,11 +206,10 @@ public class ItemControllerTest {
 
     @Test
     void shouldDeleteItemAndReturnNotFoundWhenRetrieved() throws Exception {
-        String token = testHelper.getAuthToken();
-        Long itemId = createItem(token, "Plastic Bottle", true);
+        Long itemId = createItem("Plastic Bottle", true);
 
         mockMvc.perform(delete("/items/{id}", itemId)
-                        .header("Authorization", "Bearer " + token))
+                        .with(bearerAuth))
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/items/{id}", itemId))
@@ -217,10 +218,9 @@ public class ItemControllerTest {
 
     @Test
     void shouldPaginateInStableNameOrderWithAccurateTotals() throws Exception {
-        String token = testHelper.getAuthToken();
-        createItem(token, "Zinc Can", true);
-        createItem(token, "Apple Box", true);
-        createItem(token, "Milk Jug", true);
+        createItem("Zinc Can", true);
+        createItem("Apple Box", true);
+        createItem("Milk Jug", true);
         mockMvc.perform(get("/items").param("size", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(2))
@@ -241,13 +241,12 @@ public class ItemControllerTest {
 
     @Test
     void shouldPrioritizeCommonItemsBeforePaginationInEveryFilter() throws Exception {
-        String token = testHelper.getAuthToken();
-        createItem(token, "AAA uncommon recyclable", true);
-        createItem(token, "AAA uncommon garbage", false);
-        createItem(token, "Plastic Water Bottle", true);
-        createItem(token, "Glass Bottle", true);
-        createItem(token, "Plastic Bag", false);
-        createItem(token, "Food Scraps", false);
+        createItem("AAA uncommon recyclable", true);
+        createItem("AAA uncommon garbage", false);
+        createItem("Plastic Water Bottle", true);
+        createItem("Glass Bottle", true);
+        createItem("Plastic Bag", false);
+        createItem("Food Scraps", false);
         mockMvc.perform(get("/items").param("recyclable", "true").param("size", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].name").value("Plastic Water Bottle"))
@@ -271,10 +270,9 @@ public class ItemControllerTest {
 
     @Test
     void shouldCombineKeywordSearchAndFilterWithoutDuplicateResults() throws Exception {
-        String token = testHelper.getAuthToken();
-        createItem(token, "Test Bottle", true);
-        createItem(token, "Test Jar", true);
-        createItem(token, "Test Ceramic", false);
+        createItem("Test Bottle", true);
+        createItem("Test Jar", true);
+        createItem("Test Ceramic", false);
         mockMvc.perform(get("/items").param("searchText", "  TEST  ")
                         .param("recyclable", "true").param("size", "1").param("page", "1"))
                 .andExpect(status().isOk())
@@ -289,8 +287,7 @@ public class ItemControllerTest {
 
     @Test
     void shouldSearchByKeywordOnly() throws Exception {
-        String token = testHelper.getAuthToken();
-        createItem(token, "Glass Jar", true);
+        createItem("Glass Jar", true);
         mockMvc.perform(get("/items").param("searchText", "TEST"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].name").value("Glass Jar"));
@@ -313,25 +310,24 @@ public class ItemControllerTest {
 
     @Test
     void shouldRejectInvalidBodiesAndMissingItems() throws Exception {
-        String token = testHelper.getAuthToken();
-        mockMvc.perform(post("/items").header("Authorization", "Bearer " + token)
+        mockMvc.perform(post("/items").with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(post("/items").header("Authorization", "Bearer " + token)
+        mockMvc.perform(post("/items").with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON).content("{bad json"))
                 .andExpect(status().isBadRequest());
         mockMvc.perform(put("/items/{id}", Long.MAX_VALUE)
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isNotFound());
         mockMvc.perform(delete("/items/{id}", Long.MAX_VALUE)
-                        .header("Authorization", "Bearer " + token))
+                        .with(bearerAuth))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void shouldRejectUnauthorizedUpdatesAndDeletes() throws Exception {
-        Long id = createItem(testHelper.getAuthToken(), "Protected Item", true);
+        Long id = createItem("Protected Item", true);
         mockMvc.perform(put("/items/{id}", id).contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isUnauthorized());
         mockMvc.perform(delete("/items/{id}", id)).andExpect(status().isUnauthorized());

@@ -5,6 +5,7 @@ import com.whichbin.whichbin_api.model.Resource;
 import com.whichbin.whichbin_api.model.ResourceSection;
 import com.whichbin.whichbin_api.repository.ResourceRepository;
 import com.whichbin.whichbin_api.testutil.IntegrationTestHelper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +13,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -42,6 +44,13 @@ class ResourceControllerTest {
     @Autowired
     private IntegrationTestHelper testHelper;
 
+    private RequestPostProcessor bearerAuth;
+
+    @BeforeEach
+    void setUpBearerAuth() {
+        bearerAuth = testHelper.bearerAuth();
+    }
+
     @Test
     void shouldReturnEducationalResources() throws Exception {
         saveResource("Test Resource One");
@@ -49,11 +58,46 @@ class ResourceControllerTest {
 
         mockMvc.perform(get("/resources"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].title",
+                .andExpect(jsonPath("$.currentPage").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.pageSize").value(10))
+                .andExpect(jsonPath("$.totalItems").value(2))
+                .andExpect(jsonPath("$.items[*].title",
                         hasItems(
                                 "Test Resource One",
                                 "Test Resource Two"
                         )));
+    }
+
+    @Test
+    void shouldReturnSecondPageOfEducationalResources() throws Exception {
+        saveResource("Page One Resource");
+        saveResource("Page One Resource Two");
+        saveResource("Page Two Resource");
+
+        mockMvc.perform(get("/resources")
+                        .param("page", "2")
+                        .param("pageSize", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.currentPage").value(2))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.pageSize").value(2))
+                .andExpect(jsonPath("$.totalItems").value(3))
+                .andExpect(jsonPath("$.items.length()").value(1))
+                .andExpect(jsonPath("$.items[0].title")
+                        .value("Page Two Resource"));
+    }
+
+    @Test
+    void shouldRejectInvalidPaginationParameters() throws Exception {
+
+        mockMvc.perform(get("/resources")
+                        .param("page", "0"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(get("/resources")
+                        .param("pageSize", "0"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -83,10 +127,9 @@ class ResourceControllerTest {
 
     @Test
     void shouldCreateResourceWithValidToken() throws Exception {
-        String token = testHelper.getAuthToken();
 
         mockMvc.perform(post("/resources")
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(resourceJson("New Resource")))
                 .andExpect(status().isOk())
@@ -98,11 +141,10 @@ class ResourceControllerTest {
 
     @Test
     void shouldUpdateExistingResource() throws Exception {
-        String token = testHelper.getAuthToken();
         Resource resource = saveResource("Resource To Update");
 
         mockMvc.perform(put("/resources/{id}", resource.getId())
-                        .header("Authorization", "Bearer " + token)
+                        .with(bearerAuth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(resourceJson("Updated Recycling Basics")))
                 .andExpect(status().isOk())
@@ -122,7 +164,6 @@ class ResourceControllerTest {
 
     @Test
     void shouldDeleteResourceWithValidToken() throws Exception {
-        String token = testHelper.getAuthToken();
 
         Resource resource = resourceRepository.saveAndFlush(
                 new Resource(
@@ -136,7 +177,7 @@ class ResourceControllerTest {
         );
 
         mockMvc.perform(delete("/resources/{id}", resource.getId())
-                        .header("Authorization", "Bearer " + token))
+                        .with(bearerAuth))
                 .andExpect(status().isNoContent());
 
         assertFalse(resourceRepository.existsById(resource.getId()));

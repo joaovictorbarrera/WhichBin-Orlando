@@ -7,6 +7,7 @@ import com.whichbin.whichbin_api.service.AnnouncementService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class AnnouncementController {
     @Authenticated
     @PostMapping
     public ResponseEntity<Announcement> createAnnouncement(
-            @RequestBody Announcement announcement) {
+            @Valid @RequestBody Announcement announcement) {
 
         Announcement createdAnnouncement =
                 announcementService.createAnnouncement(announcement);
@@ -61,7 +62,7 @@ public class AnnouncementController {
     @PutMapping("/{id}")
     public ResponseEntity<Announcement> updateAnnouncement(
             @PathVariable Long id,
-            @RequestBody Announcement announcement) {
+            @Valid @RequestBody Announcement announcement) {
 
         Announcement updatedAnnouncement =
                 announcementService.updateAnnouncement(id, announcement);

@@ -1,4 +1,5 @@
 import { apiFetch } from './apiClient'
+import type { PaginatedResponse } from '../types/PaginatedResponse'
 
 export type ResourceSection = {
   heading: string
@@ -25,15 +26,26 @@ export type CreateResourceRequest = {
   sections?: ResourceSection[]
 }
 
-export async function getResources(): Promise<Resource[] | null> {
+export async function getResources(
+  page: number,
+  pageSize: number,
+  signal?: AbortSignal
+): Promise<PaginatedResponse<Resource> | null> {
   try {
-    const response = await apiFetch('resources')
+    const params = new URLSearchParams({
+      page: String(page),
+      pageSize: String(pageSize),
+    })
+
+    const response = await apiFetch(`resources?${params.toString()}`, {
+      signal,
+    })
 
     if (!response.ok) {
       return null
     }
 
-    return (await response.json()) as Resource[]
+    return (await response.json()) as PaginatedResponse<Resource>
   } catch {
     return null
   }

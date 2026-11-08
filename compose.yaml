@@ -1,0 +1,44 @@
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3307:3306"
+    environment:
+      MYSQL_DATABASE: whichbin_db
+      MYSQL_USER: ${DB_USERNAME:?Set DB_USERNAME in .env}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Set DB_ROOT_PASSWORD in .env}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  whichbin-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "443:443"
+    cap_add:
+      - NET_BIND_SERVICE
+    environment:
+      PORT: "443"
+      DB_URL: jdbc:mysql://mysql:3306/whichbin_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      DB_USERNAME: ${DB_USERNAME:?Set DB_USERNAME in .env}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      TLS_KEYSTORE_PASSWORD: ${TLS_KEYSTORE_PASSWORD:?Set TLS_KEYSTORE_PASSWORD in .env}
+      CLIENT_URL: ${CLIENT_URL:-https://www.whichbin-orlando.org}
+    volumes:
+      - ./secrets/whichbin-orlando.org-fullchain.pfx:/run/secrets/whichbin-orlando.org-fullchain.pfx:ro
+
+volumes:
+  mysql_data:
