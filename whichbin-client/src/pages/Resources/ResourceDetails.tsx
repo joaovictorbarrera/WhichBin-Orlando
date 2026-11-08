@@ -1,255 +1,273 @@
+
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
-	FiArrowLeft,
-	FiCheckCircle,
-	FiInfo,
-	FiAlertTriangle,
-	FiXCircle,
-	FiList,
+        FiArrowLeft,
+        FiCheckCircle,
+        FiInfo,
+        FiAlertTriangle,
+        FiXCircle,
+        FiList,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa6'
 import {
-	getResourceById,
-	type Resource,
+        getResourceById,
+        type Resource,
 } from '../../services/resourceService'
 import PageLayout from '../../components/PageLayout'
 import './ResourceDetails.css'
 import '../Announcements/Announcements.css'
 
 function ResourceDetails() {
-	const { resourceId } = useParams()
+        const { resourceId } = useParams()
 
-	const [resource, setResource] = useState<Resource | null>(null)
-	const [loading, setLoading] = useState(true)
+        const [resource, setResource] = useState<Resource | null>(null)
+        const [loading, setLoading] = useState(true)
 
-	useEffect(() => {
-		if (!resourceId) {
-			setLoading(false)
-			return
-		}
+        useEffect(() => {
+                if (!resourceId) {
+                        setLoading(false)
+                        return
+                }
 
-		let isMounted = true
+                let isMounted = true
 
-		getResourceById(resourceId)
-			.then((data) => {
-				if (isMounted) {
-					setResource(data)
-					setLoading(false)
-				}
-			})
-			.catch(() => {
-				if (isMounted) {
-					setResource(null)
-					setLoading(false)
-				}
-			})
+                getResourceById(resourceId)
+                        .then((data) => {
+                                if (isMounted) {
+                                        setResource(data)
+                                        setLoading(false)
+                                }
+                        })
+                        .catch(() => {
+                                if (isMounted) {
+                                        setResource(null)
+                                        setLoading(false)
+                                }
+                        })
 
-		return () => {
-			isMounted = false
-		}
-	}, [resourceId])
+                return () => {
+                        isMounted = false
+                }
+        }, [resourceId])
 
-	function getSectionIcon(styleType: string) {
-		if (styleType.includes('blue')) {
-			return <FiInfo aria-hidden="true" />
-		}
+        function getSectionIcon(styleType: string) {
+                if (styleType.includes('blue')) {
+                        return <FiInfo aria-hidden="true" />
+                }
 
-		if (styleType.includes('orange')) {
-			return <FiAlertTriangle aria-hidden="true" />
-		}
+                if (styleType.includes('orange')) {
+                        return <FiAlertTriangle aria-hidden="true" />
+                }
 
-		if (styleType.includes('red')) {
-			return <FiXCircle aria-hidden="true" />
-		}
+                if (styleType.includes('red')) {
+                        return <FiXCircle aria-hidden="true" />
+                }
 
-		return <FiCheckCircle aria-hidden="true" />
-	}
+                return <FiCheckCircle aria-hidden="true" />
+        }
 
-	function getSectionClass(styleType: string) {
-		if (styleType.includes('blue')) {
-			return 'resource-section resource-section-blue'
-		}
+        function getSectionClass(styleType: string) {
+                if (styleType.includes('blue')) {
+                        return 'resource-section resource-section-blue'
+                }
 
-		if (styleType.includes('orange')) {
-			return 'resource-section resource-section-orange'
-		}
+                if (styleType.includes('orange')) {
+                        return 'resource-section resource-section-orange'
+                }
 
-		if (styleType.includes('red')) {
-			return 'resource-section resource-section-red'
-		}
+                if (styleType.includes('red')) {
+                        return 'resource-section resource-section-red'
+                }
 
-		return 'resource-section resource-section-green'
-	}
+                return 'resource-section resource-section-green'
+        }
 
-	if (loading) {
-		return (
-			<PageLayout
-				className="resource-details-page"
-				width="wide"
-			>
-				<Link
-					to="/resources"
-					className="resource-back-link"
-				>
-					<FiArrowLeft aria-hidden="true" />
-					Back to Educational Resources
-				</Link>
+        if (loading) {
+                return (
+                        <PageLayout
+                                className="resource-details-page"
+                                width="wide"
+                        >
+                                <Link
+                                        to="/resources"
+                                        className="resource-back-link"
+                                >
+                                        <FiArrowLeft aria-hidden="true" />
+                                        Back to Educational Resources
+                                </Link>
 
-				<div className="announcements-status">
-					<p>Loading resource...</p>
-				</div>
-			</PageLayout>
-		)
-	}
+                                <div className="announcements-status">
+                                        <p>Loading resource...</p>
+                                </div>
+                        </PageLayout>
+                )
+        }
 
-	if (!resource || !resourceId) {
-		return (
-			<PageLayout
-				className="resource-details-page"
-				width="wide"
-			>
-				<Link
-					to="/resources"
-					className="resource-back-link"
-				>
-					<FiArrowLeft aria-hidden="true" />
-					Back to Educational Resources
-				</Link>
+        if (!resource || !resourceId) {
+                return (
+                        <PageLayout
+                                className="resource-details-page"
+                                width="wide"
+                        >
+                                <Link
+                                        to="/resources"
+                                        className="resource-back-link"
+                                >
+                                        <FiArrowLeft aria-hidden="true" />
+                                        Back to Educational Resources
+                                </Link>
 
-				<div className="resource-details-card">
-					<div className="resource-empty-icon">
-						<FiInfo aria-hidden="true" />
-					</div>
+                                <div className="resource-details-card">
+                                        <div className="resource-empty-icon">
+                                                <FiInfo aria-hidden="true" />
+                                        </div>
 
-					<h1>Resource Not Found</h1>
+                                        <h1>Resource Not Found</h1>
 
-					<p>Resource not found.</p>
-				</div>
-			</PageLayout>
-		)
-	}
+                                        <p>Resource not found.</p>
+                                </div>
+                        </PageLayout>
+                )
+        }
 
-	return (
-		<PageLayout
-			className="resource-details-page"
-			width="wide"
-		>
-			<Link
-				to="/resources"
-				className="resource-back-link"
-			>
-				<FiArrowLeft aria-hidden="true" />
-				Back to Educational Resources
-			</Link>
+        const articleContent = resource.content?.trim() ?? ''
+        const resourceSections = resource.sections ?? []
 
-			<div className="resource-details-card">
-				<div className="resource-hero resource-hero-green">
-					<div className="resource-hero-icon">
-						<FaRecycle aria-hidden="true" />
-					</div>
+        return (
+                <PageLayout
+                        className="resource-details-page"
+                        width="wide"
+                >
+                        <Link
+                                to="/resources"
+                                className="resource-back-link"
+                        >
+                                <FiArrowLeft aria-hidden="true" />
+                                Back to Educational Resources
+                        </Link>
 
-					<div>
-						<p className="resource-hero-label">
-							Educational Resource
-						</p>
+                        <div className="resource-details-card">
+                                <div className="resource-hero resource-hero-green">
+                                        <div className="resource-hero-icon">
+                                                <FaRecycle aria-hidden="true" />
+                                        </div>
 
-						<h1>{resource.title}</h1>
+                                        <div>
+                                                <p className="resource-hero-label">
+                                                        Educational Resource
+                                                </p>
 
-						<p>{resource.description}</p>
-					</div>
-				</div>
+                                                <h1>{resource.title}</h1>
 
-				<div className="resource-section-list">
-					{(resource.sections ?? []).map(
-						(section, sectionIndex) => (
-							<section
-								className={getSectionClass(
-									section.styleType
-								)}
-								key={`${section.heading}-${sectionIndex}`}
-							>
-								<div className="resource-section-heading">
-									<div className="resource-section-icon">
-										{getSectionIcon(
-											section.styleType
-										)}
-									</div>
+                                                <p>{resource.description}</p>
+                                        </div>
+                                </div>
 
-									<div>
-										<h2>{section.heading}</h2>
-									</div>
-								</div>
+                                {articleContent !== '' && (
+                                        <section
+                                                className="resource-article-content"
+                                                aria-label="Article content"
+                                        >
+                                                <h2>Article Content</h2>
 
-								<ul>
-									{section.items
-										.split('|')
-										.map(
-											(
-												item,
-												itemIndex
-											) => (
-												<li
-													key={
-														itemIndex
-													}
-												>
-													{item}
-												</li>
-											)
-										)}
-								</ul>
-							</section>
-						)
-					)}
-				</div>
+                                                <div className="resource-article-text">
+                                                        {articleContent}
+                                                </div>
+                                        </section>
+                                )}
 
-				{(resource.sections ?? []).length === 0 && (
-					<div className="resource-empty-message">
-						<FiList aria-hidden="true" />
+                                <div className="resource-section-list">
+                                        {resourceSections.map(
+                                                (section, sectionIndex) => (
+                                                        <section
+                                                                className={getSectionClass(
+                                                                        section.styleType
+                                                                )}
+                                                                key={`${section.heading}-${sectionIndex}`}
+                                                        >
+                                                                <div className="resource-section-heading">
+                                                                        <div className="resource-section-icon">
+                                                                                {getSectionIcon(
+                                                                                        section.styleType
+                                                                                )}
+                                                                        </div>
 
-						<p>
-							No information has been added
-							to this resource yet.
-						</p>
-					</div>
-				)}
+                                                                        <div>
+                                                                                <h2>{section.heading}</h2>
+                                                                        </div>
+                                                                </div>
 
-				{resource.pdfUrl &&
-					resource.pdfUrl.trim() !== '' && (
-						<section className="resource-pdf">
-							<div className="resource-pdf-header">
-								<div>
-									<span className="resource-pdf-label">
-										PDF GUIDE
-									</span>
+                                                                <ul>
+                                                                        {section.items
+                                                                                .split('|')
+                                                                                .map(
+                                                                                        (
+                                                                                                item,
+                                                                                                itemIndex
+                                                                                        ) => (
+                                                                                                <li
+                                                                                                        key={
+                                                                                                                itemIndex
+                                                                                                        }
+                                                                                                >
+                                                                                                        {item}
+                                                                                                </li>
+                                                                                        )
+                                                                                )}
+                                                                </ul>
+                                                        </section>
+                                                )
+                                        )}
+                                </div>
 
-									<h2>
-										Additional
-										Information
-									</h2>
+                                {resourceSections.length === 0 &&
+                                        articleContent === '' && (
+                                                <div className="resource-empty-message">
+                                                        <FiList aria-hidden="true" />
 
-									<p>
-										View the complete
-										guide for this
-										resource.
-									</p>
-								</div>
+                                                        <p>
+                                                                No information has been added
+                                                                to this resource yet.
+                                                        </p>
+                                                </div>
+                                        )}
 
-								<a
-									href={resource.pdfUrl}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="resource-pdf-button"
-								>
-									Open PDF
-								</a>
-							</div>
-						</section>
-					)}
-			</div>
-		</PageLayout>
-	)
+                                {resource.pdfUrl &&
+                                        resource.pdfUrl.trim() !== '' && (
+                                                <section className="resource-pdf">
+                                                        <div className="resource-pdf-header">
+                                                                <div>
+                                                                        <span className="resource-pdf-label">
+                                                                                PDF GUIDE
+                                                                        </span>
+
+                                                                        <h2>
+                                                                                Additional
+                                                                                Information
+                                                                        </h2>
+
+                                                                        <p>
+                                                                                View the complete
+                                                                                guide for this
+                                                                                resource.
+                                                                        </p>
+                                                                </div>
+
+                                                                <a
+                                                                        href={resource.pdfUrl}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="resource-pdf-button"
+                                                                >
+                                                                        Open PDF
+                                                                </a>
+                                                        </div>
+                                                </section>
+                                        )}
+                        </div>
+                </PageLayout>
+        )
 }
 
 export default ResourceDetails
