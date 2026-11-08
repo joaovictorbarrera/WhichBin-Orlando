@@ -1,4 +1,5 @@
 import { apiFetch } from './apiClient'
+import type { PaginatedResponse } from '../types/PaginatedResponse'
 
 export const announcementTypes = [
   { value: 'GENERAL', label: 'General' },
@@ -37,6 +38,32 @@ export async function getAnnouncements(
   }
 }
 
+export async function getAnnouncementsPaged(
+  page: number,
+  pageSize: number,
+  type?: AnnouncementType,
+  signal?: AbortSignal
+): Promise<PaginatedResponse<Announcement>> {
+  const params = new URLSearchParams({
+    page: String(page),
+    pageSize: String(pageSize),
+  })
+
+  if (type) {
+    params.set('type', type)
+  }
+
+  const response = await apiFetch(`announcements?${params}`, {
+    signal,
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to load announcements (${response.status})`)
+  }
+
+  return (await response.json()) as PaginatedResponse<Announcement>
+}
+
 export async function getAllAnnouncements(
   type?: AnnouncementType
 ): Promise<Announcement[] | null> {
@@ -52,6 +79,32 @@ export async function getAllAnnouncements(
   } catch {
     return null
   }
+}
+
+export async function getAllAnnouncementsPaged(
+  page: number,
+  pageSize: number,
+  type?: AnnouncementType,
+  signal?: AbortSignal
+): Promise<PaginatedResponse<Announcement>> {
+  const params = new URLSearchParams({
+    page: String(page),
+    pageSize: String(pageSize),
+  })
+
+  if (type) {
+    params.set('type', type)
+  }
+
+  const response = await apiFetch(`announcements/all?${params}`, {
+    signal,
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to load admin announcements (${response.status})`)
+  }
+
+  return (await response.json()) as PaginatedResponse<Announcement>
 }
 
 export async function getAnnouncementById(

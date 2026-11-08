@@ -9,10 +9,11 @@ import {
 } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
+import Pagination from '../../components/Pagination/Pagination'
 import {
   createAnnouncement,
   deleteAnnouncement,
-  getAllAnnouncements,
+  getAllAnnouncementsPaged,
   updateAnnouncement,
   type Announcement,
   type AnnouncementInput,
@@ -35,6 +36,9 @@ function AdminAnnouncements() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const announcementLoadRequest = useRef(0)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(5)
+  const [totalItems, setTotalItems] = useState<number>()
 
   const [showForm, setShowForm] = useState(false)
   const [editingAnnouncement, setEditingAnnouncement] =
@@ -53,28 +57,71 @@ function AdminAnnouncements() {
   const [deleteTarget, setDeleteTarget] = useState<Announcement | null>(null)
 
   useEffect(() => {
-    void loadAnnouncements(announcementFilter || undefined)
-  }, [announcementFilter])
+    const controller = new AbortController()
 
-  async function loadAnnouncements(type?: AnnouncementType) {
+    void loadAnnouncements(
+      announcementFilter || undefined,
+      controller.signal
+    )
+
+    return () => {
+      controller.abort()
+      announcementLoadRequest.current += 1
+    }
+  }, [announcementFilter, currentPage, pageSize])
+
+  async function loadAnnouncements(
+    type?: AnnouncementType,
+    signal?: AbortSignal
+  ) {
     const requestId = ++announcementLoadRequest.current
+
     setLoading(true)
     setError(false)
 
-    const result = await getAllAnnouncements(type)
+    try {
+      const result = await getAllAnnouncementsPaged(
+        currentPage,
+        pageSize,
+        type,
+        signal
+    )
+
     if (requestId !== announcementLoadRequest.current) {
       return
     }
 
-    if (result === null) {
-      setError(true)
-      setAnnouncements([])
-    } else {
-      setAnnouncements(sortAnnouncements(result))
+    setAnnouncements(result.items)
+    setTotalItems(result.totalItems)
+  } catch {
+    if (requestId !== announcementLoadRequest.current) {
+      return
     }
 
-    setLoading(false)
+    setError(true)
+    setAnnouncements([])
+    setTotalItems(undefined)
+  } finally {
+    if (requestId === announcementLoadRequest.current) {
+      setLoading(false)
+    }
   }
+}
+
+
+function handlePageChange(nextPage: number) {
+  setCurrentPage(nextPage)
+}
+
+function handlePageSizeChange(nextPageSize: number) {
+  setPageSize(nextPageSize)
+  setCurrentPage(1)
+}
+
+function handleFilterChange(nextFilter: AnnouncementType | '') {
+  setAnnouncementFilter(nextFilter)
+  setCurrentPage(1)
+}
 
   function resetForm() {
     setTitle('')
@@ -167,29 +214,18 @@ function AdminAnnouncements() {
       return
     }
 
-    if (editingAnnouncement) {
-      setAnnouncements((current) =>
-        sortAnnouncements(
-          current.flatMap((announcement) => {
-            if (announcement.id !== result.id) return [announcement]
-            return !announcementFilter || result.type === announcementFilter
-              ? [result]
-              : []
-          })
-        )
-      )
-    } else if (!announcementFilter || result.type === announcementFilter) {
-      setAnnouncements((current) =>
-        sortAnnouncements([...current, result])
-      )
-    }
-
-    setSaving(false)
-    resetForm()
-    setShowForm(false)
+  if (currentPage !== 1) {
+      setCurrentPage(1)
+  } else {
+    void loadAnnouncements(announcementFilter || undefined)
   }
 
-function handleDeleteAnnouncement(announcement: Announcement) {
+  setSaving(false)
+  resetForm()
+  setShowForm(false)
+  }
+
+  function handleDeleteAnnouncement(announcement: Announcement) {
   setDeleteTarget(announcement)
 }
 
@@ -218,13 +254,18 @@ async function handleConfirmDelete() {
     return
   }
 
-  setAnnouncements((current) =>
-    current.filter((item) => item.id !== announcementId)
-  )
-
   setDeletingId(null)
   setDeleteTarget(null)
-}
+
+  const totalAfterDelete = Math.max(0, (totalItems ?? 0) - 1)
+  const lastPage = Math.max(1, Math.ceil(totalAfterDelete / pageSize))
+
+  if (currentPage > lastPage) {
+    setCurrentPage(lastPage)
+  } else {
+    void loadAnnouncements(announcementFilter || undefined)
+  }
+  }
 
   return (
     <PageLayout
@@ -426,7 +467,7 @@ async function handleConfirmDelete() {
               id="admin-announcements-type-filter"
               value={announcementFilter}
               onChange={(event) =>
-                setAnnouncementFilter(
+                handleFilterChange(
                   event.target.value as AnnouncementType | ''
                 )
               }
@@ -442,10 +483,10 @@ async function handleConfirmDelete() {
                 </option>
               ))}
             </select>
-            {!loading && !error && (
+            {!loading && !error && totalItems !== undefined && (
               <span>
-                {announcements.length}{' '}
-                {announcements.length === 1 ? 'announcement' : 'announcements'}
+                {totalItems}{' '}
+                {totalItems === 1 ? 'announcement' : 'announcements'}
               </span>
             )}
           </div>
@@ -557,6 +598,17 @@ async function handleConfirmDelete() {
             })}
           </div>
         )}
+        {!loading && !error && (
+          <Pagination
+            currentPage={currentPage}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            pageSizeOptions={[5, 10, 20]}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            siblingCount={1}
+          />
+        )}
       </section>
 
       {deleteTarget && (
@@ -596,16 +648,6 @@ function getAnnouncementStatus(
   }
 
   return 'Active'
-}
-
-function sortAnnouncements(
-  announcements: Announcement[]
-): Announcement[] {
-  return [...announcements].sort(
-    (first, second) =>
-      new Date(second.startDate).getTime() -
-      new Date(first.startDate).getTime()
-  )
 }
 
 function formatAnnouncementType(type: string) {

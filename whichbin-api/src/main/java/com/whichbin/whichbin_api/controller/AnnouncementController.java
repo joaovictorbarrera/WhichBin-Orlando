@@ -8,8 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
-
-import java.util.List;
+import com.whichbin.whichbin_api.dto.PaginatedResponse;
 
 @RestController
 @RequestMapping("/announcements")
@@ -21,21 +20,44 @@ public class AnnouncementController {
         this.announcementService = announcementService;
     }
 
-    // Public route - returns only currently visible announcements
     @GetMapping
-    public ResponseEntity<List<Announcement>> getCurrentAnnouncements(
-            @RequestParam(name = "type", required = false) AnnouncementType type
+    public ResponseEntity<PaginatedResponse<Announcement>> getCurrentAnnouncements(
+            @RequestParam(name = "type", required = false) AnnouncementType type,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "pageSize", defaultValue = "5") int pageSize
     ) {
-        return ResponseEntity.ok(announcementService.getCurrentAnnouncements(type));
+        if (page < 1 || pageSize < 1 || pageSize > 100) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(
+                announcementService.getCurrentAnnouncementsPaged(
+                        type,
+                        page,
+                        pageSize
+                )
+        );
     }
 
     // Admin route - returns all announcements
     @Authenticated
     @GetMapping("/all")
-    public ResponseEntity<List<Announcement>> getAllAnnouncements(
-            @RequestParam(name = "type", required = false) AnnouncementType type
+    public ResponseEntity<PaginatedResponse<Announcement>> getAllAnnouncements(
+            @RequestParam(name = "type", required = false) AnnouncementType type,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "pageSize", defaultValue = "5") int pageSize
     ) {
-        return ResponseEntity.ok(announcementService.getAllAnnouncements(type));
+        if (page < 1 || pageSize < 1 || pageSize > 100) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(
+                announcementService.getAllAnnouncementsPaged(
+                        type,
+                        page,
+                        pageSize
+                )
+        );
     }
 
     @GetMapping("/{id}")

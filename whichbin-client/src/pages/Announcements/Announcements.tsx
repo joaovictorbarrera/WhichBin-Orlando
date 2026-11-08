@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom'
 import { FiBell, FiChevronRight } from 'react-icons/fi'
 import {
   announcementTypes,
-  getAnnouncements,
+  getAnnouncementsPaged,
   type AnnouncementType,
   type Announcement,
 } from '../../services/announcementService'
 import PageLayout from '../../components/PageLayout'
+import Pagination from '../../components/Pagination/Pagination'
 import './Announcements.css'
 
 function formatType(type: string) {
@@ -29,28 +30,68 @@ function Announcements() {
   const [loading, setLoading] = useState(true)
   const [filterType, setFilterType] = useState<AnnouncementType | ''>('')
 
-  useEffect(() => {
-    let isMounted = true
-    setLoading(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(5)
+  const [totalItems, setTotalItems] = useState<number>()
+  const [error, setError] = useState<string>()
+useEffect(() => {
+  let isLatestRequest = true
+  const abortController = new AbortController()
 
-    getAnnouncements(filterType || undefined)
-      .then((data) => {
-        if (isMounted) {
-          setAnnouncements(data ?? [])
-          setLoading(false)
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setAnnouncements([])
-          setLoading(false)
-        }
-      })
+  setLoading(true)
+  setError(undefined)
 
-    return () => {
-      isMounted = false
-    }
-  }, [filterType])
+  getAnnouncementsPaged(
+    currentPage,
+    pageSize,
+    filterType || undefined,
+    abortController.signal
+  )
+    .then((response) => {
+      if (!isLatestRequest) {
+        return
+      }
+
+      setAnnouncements(response.items)
+      setTotalItems(response.totalItems)
+    })
+    .catch((requestError: unknown) => {
+      if (!isLatestRequest || abortController.signal.aborted) {
+        return
+      }
+
+      setAnnouncements([])
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : 'Could not load announcements.'
+      )
+    })
+    .finally(() => {
+      if (isLatestRequest) {
+        setLoading(false)
+      }
+    })
+
+  return () => {
+    isLatestRequest = false
+    abortController.abort()
+  }
+}, [currentPage, pageSize, filterType])
+
+function handlePageChange(nextPage: number) {
+  setCurrentPage(nextPage)
+}
+
+function handlePageSizeChange(nextPageSize: number) {
+  setPageSize(nextPageSize)
+  setCurrentPage(1)
+}
+
+function handleFilterChange(nextFilter: AnnouncementType | '') {
+  setFilterType(nextFilter)
+  setCurrentPage(1)
+}
 
   return (
     <PageLayout className="announcements-page" width="wide">
@@ -74,7 +115,7 @@ function Announcements() {
           id="announcements-type-filter"
           value={filterType}
           onChange={(event) =>
-            setFilterType(event.target.value as AnnouncementType | '')
+            handleFilterChange(event.target.value as AnnouncementType | '')
           }
         >
           <option value="">All types</option>
@@ -148,6 +189,18 @@ function Announcements() {
           ))}
         </div>
       )}
+      {!loading && !error && (
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          pageSizeOptions={[5, 10, 20]}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          siblingCount={1}
+        />
+      )}
+
     </PageLayout>
   )
 }
