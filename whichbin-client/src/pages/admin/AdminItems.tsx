@@ -30,7 +30,7 @@ type FilterOption = 'all' | 'recyclable' | 'non-recyclable'
 function AdminItems() {
   const [items, setItems] = useState<Item[]>([])
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(5)
   const [totalItems, setTotalItems] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
 
@@ -606,6 +606,7 @@ function AdminItems() {
           pageSize={pageSize}
           onPageChange={setPage}
           onPageSizeChange={changePageSize}
+          pageSizeOptions={[5, 10, 20, 50]}
         />
       )}
     </PageLayout>
