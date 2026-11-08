@@ -124,6 +124,8 @@ These variables configure the Spring Boot API. Local defaults are shown; Docker 
 
 The MySQL container also requires `DB_ROOT_PASSWORD` in the root `.env`. This is used by the MySQL image to initialize the database root account; it is not a Spring Boot API variable. Changing it in `.env` does not change the root password in an already-initialized `mysql_data` volume. The root `.env` should define `DB_USERNAME`, `DB_PASSWORD`, `DB_ROOT_PASSWORD`, and `TLS_KEYSTORE_PASSWORD`; `CLIENT_URL` can also be set there to override the Compose fallback. See `.env.example` for placeholder entries. Never commit real secrets.
 
+The Docker image starts the API with a 512 MB maximum Java heap and a 64 MB initial heap by default. Set `JAVA_OPTS` in the deployment environment to override these JVM options. The heap limit is not a hard limit on total process memory: leave room for the JVM, threads, and native memory in the hosting service's memory limit. Tomcat concurrency and the MySQL connection pool are also kept small by default and can be adjusted with the variables above if traffic requires it.
+
 The API documentation is available at `/api/swagger-ui/index.html` while the backend is running. The API includes endpoints for items, resources and trivia, announcements, and authentication and user management. The root API endpoint at `/api/` returns the running API version.
 
 ## Project structure
