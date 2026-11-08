@@ -1,6 +1,20 @@
-import type { Dispatch, FormEvent, ReactNode, SetStateAction } from 'react'
-import { FiPlus, FiTrash2, FiX, FiArrowUp, FiArrowDown } from 'react-icons/fi'
-import type { Resource, ResourceSection } from '../../services/resourceService'
+import type {
+        Dispatch,
+        FormEvent,
+        ReactNode,
+        SetStateAction,
+} from 'react'
+import {
+        FiPlus,
+        FiTrash2,
+        FiX,
+        FiArrowUp,
+        FiArrowDown,
+} from 'react-icons/fi'
+import type {
+        Resource,
+        ResourceSection,
+} from '../../services/resourceService'
 import type { TriviaChallenge } from '../../services/triviaService'
 
 type StyleOption = {
@@ -39,7 +53,11 @@ type ResourceFormProps = {
         sections: ResourceSection[]
         sectionStyleOptions: SectionStyleOption[]
         handleStyleSelect: (value: string) => void
-        handleSectionChange: (index: number, field: keyof ResourceSection, value: string) => void
+        handleSectionChange: (
+                index: number,
+                field: keyof ResourceSection,
+                value: string
+        ) => void
         handleAddSection: () => void
         handleRemoveSection: (index: number) => void
         handleMoveSectionUp: (index: number) => void
@@ -152,6 +170,7 @@ export function ResourceForm(props: ResourceFormProps) {
                                 <input
                                         type="text"
                                         value={title}
+                                        required
                                         onChange={(event) =>
                                                 setTitle(event.target.value)
                                         }
@@ -163,6 +182,7 @@ export function ResourceForm(props: ResourceFormProps) {
                                 <input
                                         type="text"
                                         value={description}
+                                        required
                                         onChange={(event) =>
                                                 setDescription(event.target.value)
                                         }
@@ -173,6 +193,7 @@ export function ResourceForm(props: ResourceFormProps) {
                                 Content *
                                 <textarea
                                         value={content}
+                                        required
                                         onChange={(event) =>
                                                 setContent(event.target.value)
                                         }
@@ -182,11 +203,9 @@ export function ResourceForm(props: ResourceFormProps) {
                         <label>
                                 PDF URL
                                 <input
-                                        type="url"
+                                        type="text"
                                         value={pdfUrl}
-                                        onChange={(event) =>
-                                                setPdfUrl(event.target.value)
-                                        }
+                                        onChange={(event) => setPdfUrl(event.target.value)}
                                         placeholder="Optional PDF link"
                                 />
                                 <small>
@@ -390,10 +409,11 @@ export function ResourceForm(props: ResourceFormProps) {
                                                         </div>
 
                                                         <label>
-                                                                Heading
+                                                                Section Heading *
                                                                 <input
                                                                         type="text"
                                                                         value={section.heading}
+                                                                        required
                                                                         onChange={(event) =>
                                                                                 handleSectionChange(
                                                                                         index,
@@ -444,9 +464,10 @@ export function ResourceForm(props: ResourceFormProps) {
                                                         </label>
 
                                                         <label>
-                                                                Items
+                                                                Items *
                                                                 <textarea
                                                                         value={section.items}
+                                                                        required
                                                                         onChange={(event) =>
                                                                                 handleSectionChange(
                                                                                         index,
@@ -479,8 +500,9 @@ export function ResourceForm(props: ResourceFormProps) {
 
                         {formError && (
                                 <p className="admin-resource-form-error">
-                                        Please complete all required fields and try
-                                        again.
+                                        Please complete all required fields, including
+                                        each resource section heading and at least one
+                                        item.
                                 </p>
                         )}
 
@@ -567,6 +589,7 @@ export function ChallengeForm(props: ChallengeFormProps) {
                                 <input
                                         type="text"
                                         value={challengeTitle}
+                                        required
                                         onChange={(event) =>
                                                 setChallengeTitle(event.target.value)
                                         }
@@ -578,6 +601,7 @@ export function ChallengeForm(props: ChallengeFormProps) {
                                 Description *
                                 <textarea
                                         value={challengeDescription}
+                                        required
                                         onChange={(event) =>
                                                 setChallengeDescription(
                                                         event.target.value
@@ -711,6 +735,7 @@ export function TriviaForm(props: TriviaFormProps) {
                                 Question *
                                 <textarea
                                         value={triviaQuestion}
+                                        required
                                         onChange={(event) =>
                                                 setTriviaQuestion(event.target.value)
                                         }
@@ -723,6 +748,7 @@ export function TriviaForm(props: TriviaFormProps) {
                                 <input
                                         type="text"
                                         value={answerA}
+                                        required
                                         onChange={(event) =>
                                                 setAnswerA(event.target.value)
                                         }
@@ -735,6 +761,7 @@ export function TriviaForm(props: TriviaFormProps) {
                                 <input
                                         type="text"
                                         value={answerB}
+                                        required
                                         onChange={(event) =>
                                                 setAnswerB(event.target.value)
                                         }
@@ -747,6 +774,7 @@ export function TriviaForm(props: TriviaFormProps) {
                                 <input
                                         type="text"
                                         value={answerC}
+                                        required
                                         onChange={(event) =>
                                                 setAnswerC(event.target.value)
                                         }
@@ -759,6 +787,7 @@ export function TriviaForm(props: TriviaFormProps) {
                                 <input
                                         type="text"
                                         value={answerD}
+                                        required
                                         onChange={(event) =>
                                                 setAnswerD(event.target.value)
                                         }
@@ -770,6 +799,7 @@ export function TriviaForm(props: TriviaFormProps) {
                                 Correct Answer *
                                 <select
                                         value={correctAnswer}
+                                        required
                                         onChange={(event) =>
                                                 setCorrectAnswer(event.target.value)
                                         }
