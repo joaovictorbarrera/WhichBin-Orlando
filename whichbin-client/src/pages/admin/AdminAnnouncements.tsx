@@ -597,7 +597,7 @@ async function handleConfirmDelete() {
               )
             })}
           </div>
-        )}
+        )}:
         {!loading && !error && (
           <Pagination
             currentPage={currentPage}
