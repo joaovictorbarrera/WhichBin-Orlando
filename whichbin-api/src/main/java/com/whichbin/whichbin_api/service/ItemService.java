@@ -3,6 +3,9 @@ package com.whichbin.whichbin_api.service;
 import com.whichbin.whichbin_api.model.Item;
 import com.whichbin.whichbin_api.repository.ItemRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,6 +24,19 @@ public class ItemService {
 
     public ItemService(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Item> searchItems(String searchText, Boolean recyclable, int page, int size) {
+        if (page < 0 || size < 1 || size > 100) {
+            throw badRequest("Page must be non-negative and size must be between 1 and 100.");
+        }
+        String text = searchText == null ? "" : searchText.trim();
+        if (text.length() > 150) {
+            throw badRequest("Search text cannot exceed 150 characters.");
+        }
+        return itemRepository.searchItems(text.toLowerCase(Locale.ROOT), recyclable,
+                PageRequest.of(page, size, Sort.by("name", "id")));
     }
 
     @Transactional(readOnly = true)
@@ -83,6 +99,12 @@ public class ItemService {
         target.setName(source.getName());
         target.setRecyclable(source.getRecyclable());
         target.setLargeItem(source.getLargeItem());
+        if (source.getDisposalMethod() != null) {
+            target.setDisposalMethod(source.getDisposalMethod());
+        } else if (target.getDisposalMethod() != null
+                && Boolean.TRUE.equals(source.getRecyclable()) != (target.getDisposalMethod() == com.whichbin.whichbin_api.model.DisposalMethod.RECYCLING)) {
+            target.setDisposalMethod(null);
+        }
         target.setInformation(source.getInformation());
 
         target.getKeywords().clear();

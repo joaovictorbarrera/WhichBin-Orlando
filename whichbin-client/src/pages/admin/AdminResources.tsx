@@ -577,83 +577,95 @@ export default function AdminResources() {
         }
 
         async function handleAddResource(event: FormEvent<HTMLFormElement>) {
-                event.preventDefault()
+        event.preventDefault()
 
-                if (
-                        !title.trim() ||
-                        !description.trim() ||
-                        !content.trim() ||
-                        !styleType
-                ) {
+        if (
+                !title.trim() ||
+                !description.trim() ||
+                !content.trim() ||
+                !styleType
+        ) {
+                setFormError(true)
+                return
+        }
+
+        // Clean up all resource sections before saving.
+        const cleanedSections = sections.map((section) => ({
+                heading: section.heading.trim(),
+                styleType: section.styleType,
+                items: section.items
+                        .split(/\r?\n|\|/)
+                        .map((item) => item.trim())
+                        .filter(Boolean)
+                        .join('|'),
+        }))
+
+        // Every section that has been added must have a heading
+        // and at least one item.
+        const hasIncompleteSection = cleanedSections.some(
+                (section) => !section.heading || !section.items
+        )
+
+        // Stop the save if any section is incomplete.
+        // Do not silently remove incomplete sections.
+        if (hasIncompleteSection) {
+                setFormError(true)
+                return
+        }
+
+        setSaving(true)
+        setFormError(false)
+
+        if (editingResource) {
+                const updatedResource = await updateResource(editingResource.id, {
+                        title: title.trim(),
+                        description: description.trim(),
+                        content: content.trim(),
+                        styleType,
+                        pdfUrl: pdfUrl.trim() || null,
+                        sections: cleanedSections,
+                })
+
+                if (!updatedResource) {
                         setFormError(true)
+                        setSaving(false)
                         return
                 }
 
-                const cleanedSections = sections
-                        .map((section) => ({
-                                heading: section.heading.trim(),
-                                styleType: section.styleType,
-                                items: section.items
-                                        .split(/\r?\n|\|/)
-                                        .map((item) => item.trim())
-                                        .filter(Boolean)
-                                        .join('|'),
-                        }))
-                        .filter((section) => section.heading && section.items)
-
-                setSaving(true)
-                setFormError(false)
-
-                if (editingResource) {
-                        const updatedResource = await updateResource(editingResource.id, {
-                                title: title.trim(),
-                                description: description.trim(),
-                                content: content.trim(),
-                                styleType,
-                                pdfUrl: pdfUrl.trim() || null,
-                                sections: cleanedSections,
-                        })
-
-                        if (!updatedResource) {
-                                setFormError(true)
-                                setSaving(false)
-                                return
-                        }
-
-                        setResources((current) =>
-                                current.map((resource) =>
-                                        resource.id === updatedResource.id
-                                                ? updatedResource
-                                                : resource
-                                )
+                setResources((current) =>
+                        current.map((resource) =>
+                                resource.id === updatedResource.id
+                                        ? updatedResource
+                                        : resource
                         )
-                } else {
-                        const newResource = await createResource({
-                                title: title.trim(),
-                                description: description.trim(),
-                                content: content.trim(),
-                                styleType,
-                                pdfUrl: pdfUrl.trim() || null,
-                                sections: cleanedSections,
-                        })
+                )
+        } else {
+                const newResource = await createResource({
+                        title: title.trim(),
+                        description: description.trim(),
+                        content: content.trim(),
+                        styleType,
+                        pdfUrl: pdfUrl.trim() || null,
+                        sections: cleanedSections,
+                })
 
-                        if (!newResource) {
-                                setFormError(true)
-                                setSaving(false)
-                                return
-                        }
-
-                        const newTotal = (totalItems ?? 0) + 1
-                        setTotalItems(newTotal)
-
-                        const lastPage = Math.max(1, Math.ceil(newTotal / pageSize))
-                        setCurrentPage(lastPage)
-                        setResourceRefresh((current) => current + 1)
+                if (!newResource) {
+                        setFormError(true)
+                        setSaving(false)
+                        return
                 }
 
-                setSaving(false)
-                handleCancelAdd()
+                const newTotal = (totalItems ?? 0) + 1
+                setTotalItems(newTotal)
+
+                const lastPage = Math.max(1, Math.ceil(newTotal / pageSize))
+                setCurrentPage(lastPage)
+                setResourceRefresh((current) => current + 1)
         }
+
+        setSaving(false)
+        handleCancelAdd()
+}
 
         function resetChallengeForm() {
                 setChallengeTitle('')
