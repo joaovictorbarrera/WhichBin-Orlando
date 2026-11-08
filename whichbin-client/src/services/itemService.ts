@@ -1,5 +1,6 @@
 import { apiFetch } from './apiClient'
 import { isAbortError } from '../helpers/ErrorHelper'
+import type { PaginatedResponse } from '../types/PaginatedResponse'
 
 export interface Item {
   id: number
@@ -21,23 +22,15 @@ export interface ItemInput {
   keywords?: string[]
 }
 
-export interface ItemPage {
-  content: Item[]
-  number: number
-  size: number
-  totalElements: number
-  totalPages: number
-}
-
 export async function fetchItems(
   searchText = '',
   recyclable?: boolean,
   signal?: AbortSignal,
   page = 1,
   pageSize = 10
-): Promise<ItemPage | null> {
+): Promise<PaginatedResponse<Item> | null> {
   try {
-    const params = new URLSearchParams({ page: String(page - 1), size: String(pageSize) })
+    const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) })
     if (searchText.trim()) {
       params.append('searchText', searchText.trim())
     }
@@ -51,7 +44,7 @@ export async function fetchItems(
       return null
     }
 
-    return (await response.json()) as ItemPage
+    return (await response.json()) as PaginatedResponse<Item>
   } catch (error) {
     if (isAbortError(error)) {
       throw error

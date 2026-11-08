@@ -12,7 +12,7 @@ import {
 import { FaRecycle } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
-import Pagination from '../../components/Pagination'
+import Pagination from '../../components/Pagination/Pagination'
 import DeleteConfirmModal from '../../components/DeleteConfirmModal'
 import {
   createItem,
@@ -32,7 +32,6 @@ function AdminItems() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(5)
   const [totalItems, setTotalItems] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
 
   const [searchText, setSearchText] = useState('')
   const [debouncedSearchText, setDebouncedSearchText] = useState('')
@@ -102,9 +101,8 @@ function AdminItems() {
           setPage(Math.max(1, result.totalPages))
           return
         }
-        setItems(result.content)
-        setTotalItems(result.totalElements)
-        setTotalPages(result.totalPages)
+        setItems(result.items)
+        setTotalItems(result.totalItems)
       }
 
       setLoading(false)
@@ -601,7 +599,6 @@ function AdminItems() {
       {!loading && !loadError && (
         <Pagination
           currentPage={page}
-          totalPages={totalPages}
           totalItems={totalItems}
           pageSize={pageSize}
           onPageChange={setPage}

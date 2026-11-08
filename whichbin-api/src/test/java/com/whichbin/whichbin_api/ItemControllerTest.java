@@ -67,8 +67,10 @@ public class ItemControllerTest {
         mockMvc.perform(get("/items"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.content").isEmpty())
-                .andExpect(jsonPath("$.totalElements").value(0));
+                .andExpect(jsonPath("$.items").isEmpty())
+                .andExpect(jsonPath("$.totalItems").value(0))
+                .andExpect(jsonPath("$.currentPage").value(1))
+                .andExpect(jsonPath("$.pageSize").value(10));
     }
 
     @Test
@@ -130,8 +132,8 @@ public class ItemControllerTest {
         mockMvc.perform(get("/items")
                         .param("searchText", "nonexistent-item-xyz"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isEmpty())
-                .andExpect(jsonPath("$.totalElements").value(0));
+                .andExpect(jsonPath("$.items").isEmpty())
+                .andExpect(jsonPath("$.totalItems").value(0));
     }
 
     @Test
@@ -142,8 +144,8 @@ public class ItemControllerTest {
         mockMvc.perform(get("/items")
                         .param("searchText", "Plastic"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content[0].name").value("Plastic Bottle"));
+                .andExpect(jsonPath("$.items.length()").value(1))
+                .andExpect(jsonPath("$.items[0].name").value("Plastic Bottle"));
     }
 
     @Test
@@ -154,9 +156,9 @@ public class ItemControllerTest {
         mockMvc.perform(get("/items")
                         .param("recyclable", "false"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content[0].name").value("Broken Ceramic"))
-                .andExpect(jsonPath("$.content[0].recyclable").value(false));
+                .andExpect(jsonPath("$.items.length()").value(1))
+                .andExpect(jsonPath("$.items[0].name").value("Broken Ceramic"))
+                .andExpect(jsonPath("$.items[0].recyclable").value(false));
     }
 
     @Test
@@ -221,22 +223,22 @@ public class ItemControllerTest {
         createItem("Zinc Can", true);
         createItem("Apple Box", true);
         createItem("Milk Jug", true);
-        mockMvc.perform(get("/items").param("size", "2"))
+        mockMvc.perform(get("/items").param("pageSize", "2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(2))
-                .andExpect(jsonPath("$.content[0].name").value("Apple Box"))
-                .andExpect(jsonPath("$.content[1].name").value("Milk Jug"))
-                .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.items.length()").value(2))
+                .andExpect(jsonPath("$.items[0].name").value("Apple Box"))
+                .andExpect(jsonPath("$.items[1].name").value("Milk Jug"))
+                .andExpect(jsonPath("$.totalItems").value(3))
                 .andExpect(jsonPath("$.totalPages").value(2));
-        mockMvc.perform(get("/items").param("page", "1").param("size", "2"))
+        mockMvc.perform(get("/items").param("page", "2").param("pageSize", "2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.number").value(1))
-                .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content[0].name").value("Zinc Can"));
-        mockMvc.perform(get("/items").param("page", "2").param("size", "2"))
+                .andExpect(jsonPath("$.currentPage").value(2))
+                .andExpect(jsonPath("$.items.length()").value(1))
+                .andExpect(jsonPath("$.items[0].name").value("Zinc Can"));
+        mockMvc.perform(get("/items").param("page", "3").param("pageSize", "2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isEmpty())
-                .andExpect(jsonPath("$.totalElements").value(3));
+                .andExpect(jsonPath("$.items").isEmpty())
+                .andExpect(jsonPath("$.totalItems").value(3));
     }
 
     @Test
@@ -247,25 +249,25 @@ public class ItemControllerTest {
         createItem("Glass Bottle", true);
         createItem("Plastic Bag", false);
         createItem("Food Scraps", false);
-        mockMvc.perform(get("/items").param("recyclable", "true").param("size", "1"))
+        mockMvc.perform(get("/items").param("recyclable", "true").param("pageSize", "1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].name").value("Plastic Water Bottle"))
-                .andExpect(jsonPath("$.totalElements").value(3));
-        mockMvc.perform(get("/items").param("recyclable", "false").param("size", "1"))
+                .andExpect(jsonPath("$.items[0].name").value("Plastic Water Bottle"))
+                .andExpect(jsonPath("$.totalItems").value(3));
+        mockMvc.perform(get("/items").param("recyclable", "false").param("pageSize", "1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].name").value("Plastic Bag"))
-                .andExpect(jsonPath("$.totalElements").value(3));
-        mockMvc.perform(get("/items").param("size", "2"))
+                .andExpect(jsonPath("$.items[0].name").value("Plastic Bag"))
+                .andExpect(jsonPath("$.totalItems").value(3));
+        mockMvc.perform(get("/items").param("pageSize", "2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].name").value("Plastic Water Bottle"))
-                .andExpect(jsonPath("$.content[1].name").value("Plastic Bag"))
-                .andExpect(jsonPath("$.totalElements").value(6));
-        mockMvc.perform(get("/items").param("recyclable", "true").param("size", "1").param("page", "1"))
+                .andExpect(jsonPath("$.items[0].name").value("Plastic Water Bottle"))
+                .andExpect(jsonPath("$.items[1].name").value("Plastic Bag"))
+                .andExpect(jsonPath("$.totalItems").value(6));
+        mockMvc.perform(get("/items").param("recyclable", "true").param("pageSize", "1").param("page", "2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].name").value("Glass Bottle"));
+                .andExpect(jsonPath("$.items[0].name").value("Glass Bottle"));
         mockMvc.perform(get("/items").param("searchText", "AAA").param("recyclable", "true"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].name").value("AAA uncommon recyclable"));
+                .andExpect(jsonPath("$.items[0].name").value("AAA uncommon recyclable"));
     }
 
     @Test
@@ -274,15 +276,15 @@ public class ItemControllerTest {
         createItem("Test Jar", true);
         createItem("Test Ceramic", false);
         mockMvc.perform(get("/items").param("searchText", "  TEST  ")
-                        .param("recyclable", "true").param("size", "1").param("page", "1"))
+                        .param("recyclable", "true").param("pageSize", "1").param("page", "2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].name").value("Test Jar"))
-                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.items[0].name").value("Test Jar"))
+                .andExpect(jsonPath("$.totalItems").value(2))
                 .andExpect(jsonPath("$.totalPages").value(2));
         mockMvc.perform(get("/items").param("searchText", "test").param("recyclable", "false"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].name").value("Test Ceramic"))
-                .andExpect(jsonPath("$.totalElements").value(1));
+                .andExpect(jsonPath("$.items[0].name").value("Test Ceramic"))
+                .andExpect(jsonPath("$.totalItems").value(1));
     }
 
     @Test
@@ -290,16 +292,16 @@ public class ItemControllerTest {
         createItem("Glass Jar", true);
         mockMvc.perform(get("/items").param("searchText", "TEST"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].name").value("Glass Jar"));
+                .andExpect(jsonPath("$.items[0].name").value("Glass Jar"));
     }
 
     @Test
     void shouldRejectInvalidPaginationAndSearch() throws Exception {
-        for (String page : new String[]{"-1", "invalid"}) {
+        for (String page : new String[]{"-1", "0", "invalid"}) {
             mockMvc.perform(get("/items").param("page", page)).andExpect(status().isBadRequest());
         }
-        for (String size : new String[]{"0", "-1", "101", "invalid"}) {
-            mockMvc.perform(get("/items").param("size", size)).andExpect(status().isBadRequest());
+        for (String pageSize : new String[]{"0", "-1", "101", "invalid"}) {
+            mockMvc.perform(get("/items").param("pageSize", pageSize)).andExpect(status().isBadRequest());
         }
         mockMvc.perform(get("/items").param("searchText", "x".repeat(151)))
                 .andExpect(status().isBadRequest());

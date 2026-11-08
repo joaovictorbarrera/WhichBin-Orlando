@@ -11,7 +11,7 @@ import {
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
 import PageLayout from '../../components/PageLayout'
-import Pagination from '../../components/Pagination'
+import Pagination from '../../components/Pagination/Pagination'
 import { fetchItems, type Item } from '../../services/itemService'
 import { isAbortError } from '../../helpers/ErrorHelper'
 import './ItemSearch.css'
@@ -26,7 +26,6 @@ function ItemSearch() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [totalItems, setTotalItems] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -74,9 +73,8 @@ function ItemSearch() {
               setPage(Math.max(1, data.totalPages))
               return
             }
-            setItems(data.content)
-            setTotalItems(data.totalElements)
-            setTotalPages(data.totalPages)
+            setItems(data.items)
+            setTotalItems(data.totalItems)
             setError(null)
           } else {
             setItems([])
@@ -273,7 +271,6 @@ function ItemSearch() {
       {!loading && !error && (
         <Pagination
           currentPage={page}
-          totalPages={totalPages}
           totalItems={totalItems}
           pageSize={pageSize}
           onPageChange={setPage}
