@@ -12,6 +12,7 @@ import {
 import { FaRecycle } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
+import Pagination from '../../components/Pagination/Pagination'
 import DeleteConfirmModal from '../../components/DeleteConfirmModal'
 import {
   createItem,
@@ -28,10 +29,15 @@ type FilterOption = 'all' | 'recyclable' | 'non-recyclable'
 
 function AdminItems() {
   const [items, setItems] = useState<Item[]>([])
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(5)
+  const [totalItems, setTotalItems] = useState(0)
+
   const [searchText, setSearchText] = useState('')
   const [debouncedSearchText, setDebouncedSearchText] = useState('')
   const [filter, setFilter] = useState<FilterOption>('all')
   const [loading, setLoading] = useState(true)
+  const [hasLoaded, setHasLoaded] = useState(false)
   const [loadError, setLoadError] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const [showForm, setShowForm] = useState(false)
@@ -47,48 +53,80 @@ function AdminItems() {
   const [deleteTarget, setDeleteTarget] = useState<Item | null>(null)
   const [deleting, setDeleting] = useState(false)
 
+  function changeFilter(value: FilterOption) {
+    setFilter(value)
+    setPage(1)
+  }
+
+  function changePageSize(value: number) {
+    setPageSize(value)
+    setPage(1)
+  }
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchText(searchText)
+      setPage(1)
     }, 250)
 
     return () => clearTimeout(timer)
   }, [searchText])
 
   useEffect(() => {
+    const controller = new AbortController()
     let isMounted = true
 
-    async function loadItems() {
+    const timer = setTimeout(() => {
       setLoading(true)
       setLoadError(false)
 
-      const recyclableParam =
-        filter === 'recyclable'
-          ? true
-          : filter === 'non-recyclable'
-            ? false
-            : undefined
-      const result = await fetchItems(
-        debouncedSearchText.trim(),
-        recyclableParam
-      )
-      if (!isMounted) return
+      async function loadItems() {
+        try {
+          const recyclableParam =
+            filter === 'recyclable'
+              ? true
+              : filter === 'non-recyclable'
+                ? false
+                : undefined
+          const result = await fetchItems(
+            debouncedSearchText.trim(),
+            recyclableParam,
+            controller.signal,
+            page,
+            pageSize
+          )
+          if (!isMounted) return
 
-      if (result === null) {
-        setItems([])
-        setLoadError(true)
-      } else {
-        setItems(result)
+          if (result === null) {
+            setLoadError(true)
+            return
+          }
+
+          if (page > Math.max(1, result.totalPages)) {
+            setPage(Math.max(1, result.totalPages))
+            return
+          }
+
+          setItems(result.items)
+          setTotalItems(result.totalItems)
+          setHasLoaded(true)
+        } catch {
+          if (!isMounted || controller.signal.aborted) return
+          setLoadError(true)
+        } finally {
+          if (isMounted) setLoading(false)
+        }
       }
 
-      setLoading(false)
-    }
+      void loadItems()
+    }, 0)
 
-    void loadItems()
     return () => {
       isMounted = false
+      controller.abort()
+      clearTimeout(timer)
     }
-  }, [debouncedSearchText, filter, refreshKey])
+  }, [debouncedSearchText, filter, refreshKey, page, pageSize])
 
   function resetForm() {
     setName('')
@@ -205,7 +243,7 @@ function AdminItems() {
       return
     }
 
-    setItems((current) => current.filter((item) => item.id !== deleteTarget.id))
+    setRefreshKey((current) => current + 1)
     setDeleting(false)
     setDeleteTarget(null)
   }
@@ -439,7 +477,7 @@ function AdminItems() {
             <button
               type="button"
               className={`admin-items-filter ${filter === 'all' ? 'active' : ''}`}
-              onClick={() => setFilter('all')}
+              onClick={() => changeFilter('all')}
               aria-pressed={filter === 'all'}
             >
               All Items
@@ -447,7 +485,7 @@ function AdminItems() {
             <button
               type="button"
               className={`admin-items-filter ${filter === 'recyclable' ? 'active' : ''}`}
-              onClick={() => setFilter('recyclable')}
+              onClick={() => changeFilter('recyclable')}
               aria-pressed={filter === 'recyclable'}
             >
               <FaRecycle aria-hidden="true" />
@@ -456,7 +494,7 @@ function AdminItems() {
             <button
               type="button"
               className={`admin-items-filter ${filter === 'non-recyclable' ? 'active' : ''}`}
-              onClick={() => setFilter('non-recyclable')}
+              onClick={() => changeFilter('non-recyclable')}
               aria-pressed={filter === 'non-recyclable'}
             >
               <FiTrash2 aria-hidden="true" />
@@ -470,14 +508,12 @@ function AdminItems() {
             <h2 id="items-list-heading">Items</h2>
             <p>Items shown in public search and detail pages.</p>
           </div>
-          {!loading && !loadError && (
-            <span>{items.length} {items.length === 1 ? 'item' : 'items'}</span>
-          )}
+          {!loading && !loadError && hasLoaded ? (
+            <span>{totalItems} {totalItems === 1 ? 'item' : 'items'}</span>
+          ) : null}
         </div>
 
-        {loading && <p className="admin-items-status" role="status">Loading items...</p>}
-
-        {!loading && loadError && (
+        {!loading && loadError && items.length === 0 && (
           <div className="admin-items-empty admin-items-error" role="alert">
             <p>Items could not be loaded. Check your connection and try again.</p>
             <button type="button" onClick={() => setRefreshKey((current) => current + 1)}>
@@ -487,7 +523,17 @@ function AdminItems() {
           </div>
         )}
 
-        {!loading && !loadError && items.length === 0 && (
+        {!loading && loadError && items.length > 0 && (
+          <div className="admin-items-load-error" role="alert">
+            <p>Items could not be updated. Showing the previous results.</p>
+            <button type="button" onClick={() => setRefreshKey((current) => current + 1)}>
+              <FiRefreshCw aria-hidden="true" />
+              Try again
+            </button>
+          </div>
+        )}
+
+        {!loading && !loadError && hasLoaded && items.length === 0 && (
           <div className="admin-items-empty">
             <p>
               {debouncedSearchText.trim()
@@ -501,7 +547,7 @@ function AdminItems() {
                 type="button"
                 onClick={() => {
                   setSearchText('')
-                  setFilter('all')
+                  changeFilter('all')
                 }}
               >
                 Clear search &amp; filters
@@ -510,9 +556,9 @@ function AdminItems() {
           </div>
         )}
 
-        {!loading && !loadError && items.length > 0 && (
-          <div className="admin-items-list">
-            {[...items].sort((a, b) => a.name.localeCompare(b.name)).map((item) => (
+        {items.length > 0 && (
+          <div className="admin-items-list" aria-busy={loading}>
+            {items.map((item) => (
               <article className="admin-item-card" key={item.id}>
                 <div className="admin-item-card-content">
                   <div className="admin-item-card-labels">
@@ -570,6 +616,28 @@ function AdminItems() {
           loading={deleting}
           onCancel={handleCloseDeleteModal}
           onConfirm={handleConfirmDelete}
+        />
+      )}
+      <div
+        className={`admin-items-loading${loading ? '' : ' is-hidden'}`}
+        role={loading ? 'status' : undefined}
+        aria-hidden={!loading}
+      >
+        {loading && (
+          <>
+            <span className="admin-items-loading-spinner" aria-hidden="true" />
+            {hasLoaded ? 'Updating items...' : 'Loading items...'}
+          </>
+        )}
+      </div>
+      {hasLoaded && (
+        <Pagination
+          currentPage={page}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={changePageSize}
+          pageSizeOptions={[5, 10, 20, 50]}
         />
       )}
     </PageLayout>

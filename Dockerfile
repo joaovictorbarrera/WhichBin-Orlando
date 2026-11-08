@@ -1,5 +1,8 @@
 # Stage 1: Build the Spring Boot application
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM maven:3.9-eclipse-temurin-21-alpine AS build
+
+# Apply security updates to the build image.
+RUN apk upgrade --no-cache
 
 WORKDIR /app
 
@@ -18,19 +21,15 @@ RUN set -eu; \
     cp "$JAR" /app/app.jar
 
 
-# Stage 2: Run the application
-FROM eclipse-temurin:21-jre
+# Stage 2: Run the application in a minimal, non-root runtime image.
+FROM gcr.io/distroless/java21-debian13:nonroot
 
 WORKDIR /app
 
 COPY --from=build /app/app.jar ./app.jar
 
-# Run as a non-root user.
-RUN useradd --system --uid 10001 appuser \
-    && chown appuser:appuser /app/app.jar
+ENV PORT=443
 
-USER appuser
+EXPOSE 443
 
-EXPOSE 8080
-
-ENTRYPOINT ["sh", "-c", "exec java ${JAVA_OPTS:--Xms64m -Xmx512m} -Dserver.port=${PORT:-8080} -jar /app/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

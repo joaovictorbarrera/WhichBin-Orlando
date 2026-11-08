@@ -20,8 +20,12 @@ public class Item {
     @Column(nullable = false, length = 150)
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "recyclable", nullable = false)
     private Boolean recyclable;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 40)
+    private DisposalMethod disposalMethod;
 
     @Column
     private Boolean largeItem = false;
@@ -83,6 +87,10 @@ public class Item {
     public void setRecyclable(Boolean recyclable) {
         this.recyclable = recyclable;
     }
+
+    public DisposalMethod getDisposalMethod() { return disposalMethod; }
+
+    public void setDisposalMethod(DisposalMethod disposalMethod) { this.disposalMethod = disposalMethod; }
 
     public Boolean getLargeItem() {
         return Boolean.TRUE.equals(largeItem);
