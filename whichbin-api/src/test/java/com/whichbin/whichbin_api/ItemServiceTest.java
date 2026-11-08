@@ -12,10 +12,27 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-import java.util.*;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import java.util.stream.IntStream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 class ItemServiceTest {
     private ItemRepository repository;
@@ -32,16 +49,20 @@ class ItemServiceTest {
         item.setName("  Plastic Bottle  ");
         item.setRecyclable(true);
         item.setInformation("  Empty and rinse.  ");
-        item.setKeywords(new LinkedHashSet<>(List.of(" Plastic ", "PLASTIC", "bottle")));
+        item.setKeywords(new LinkedHashSet<>(
+                List.of(" Plastic ", "PLASTIC", "bottle")));
         return item;
     }
 
     @Test
-    void createsNormalizedItemIgnoringClientId() {
+    void shouldCreateNormalizedItemIgnoringClientId() {
         Item input = validItem();
         input.setId(99L);
-        when(repository.saveAndFlush(any(Item.class))).thenAnswer(call -> call.getArgument(0));
+        when(repository.saveAndFlush(any(Item.class)))
+                .thenAnswer(call -> call.getArgument(0));
+
         Item result = service.createItem(input);
+
         assertNull(result.getId());
         assertEquals("Plastic Bottle", result.getName());
         assertEquals("Empty and rinse.", result.getInformation());
@@ -49,86 +70,116 @@ class ItemServiceTest {
     }
 
     @Test
-    void updatesExistingItemAndReplacesKeywords() {
+    void shouldUpdateExistingItemAndReplaceKeywords() {
         Item existing = validItem();
         existing.setId(1L);
         when(repository.findById(1L)).thenReturn(Optional.of(existing));
         when(repository.saveAndFlush(existing)).thenReturn(existing);
+
         Item input = validItem();
         input.setName("Glass Jar");
         input.setKeywords(Set.of("glass"));
+
         Item result = service.updateItem(1L, input);
+
         assertEquals(1L, result.getId());
         assertEquals("Glass Jar", result.getName());
         assertEquals(Set.of("glass"), result.getKeywords());
     }
 
     @Test
-    void retrievesAndDeletesExistingItem() {
+    void shouldRetrieveAndDeleteExistingItem() {
         Item item = validItem();
         when(repository.findById(1L)).thenReturn(Optional.of(item));
+
         assertSame(item, service.getItemById(1L).orElseThrow());
         service.deleteItem(1L);
+
         verify(repository).delete(item);
     }
 
     @Test
-    void reportsMissingItemsWithoutWriting() {
+    void shouldReportMissingItemsWithoutWriting() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
+
         assertTrue(service.getItemById(1L).isEmpty());
-        assertEquals(HttpStatus.NOT_FOUND, assertThrows(ResponseStatusException.class,
-                () -> service.updateItem(1L, validItem())).getStatusCode());
-        assertEquals(HttpStatus.NOT_FOUND, assertThrows(ResponseStatusException.class,
-                () -> service.deleteItem(1L)).getStatusCode());
+        assertEquals(
+                HttpStatus.NOT_FOUND,
+                assertThrows(
+                        ResponseStatusException.class,
+                        () -> service.updateItem(1L, validItem()))
+                        .getStatusCode());
+        assertEquals(
+                HttpStatus.NOT_FOUND,
+                assertThrows(
+                        ResponseStatusException.class,
+                        () -> service.deleteItem(1L))
+                        .getStatusCode());
+
         verify(repository, never()).delete(any());
         verify(repository, never()).saveAndFlush(any());
     }
 
     @Test
-    void normalizesSearchAndRequestsStableDatabasePagination() {
+    void shouldNormalizeSearchAndRequestStableDatabasePagination() {
         var pageable = PageRequest.of(1, 10, Sort.by("name", "id"));
         var expected = new PageImpl<Item>(List.of(), pageable, 0);
-        when(repository.searchItems("plastic", false, pageable)).thenReturn(expected);
+        when(repository.searchItems("plastic", false, pageable))
+                .thenReturn(expected);
+
         assertSame(expected, service.searchItems("  PLASTIC  ", false, 1, 10));
         verify(repository).searchItems("plastic", false, pageable);
     }
 
     @Test
-    void acceptsEmptySearchAndMaximumPageSize() {
+    void shouldAcceptEmptySearchAndMaximumPageSize() {
         service.searchItems(null, null, 0, 100);
-        verify(repository).searchItems("", null, PageRequest.of(0, 100, Sort.by("name", "id")));
+        verify(repository).searchItems(
+                "",
+                null,
+                PageRequest.of(0, 100, Sort.by("name", "id")));
     }
 
     @Test
-    void rejectsInvalidPaginationBeforeQuerying() {
-        for (int[] args : new int[][]{{-1, 10}, {0, 0}, {0, -1}, {0, 101}}) {
-            assertBadRequest(() -> service.searchItems("", null, args[0], args[1]));
+    void shouldRejectInvalidPaginationBeforeQuerying() {
+        int[][] invalidPagination = {{-1, 10}, {0, 0}, {0, -1}, {0, 101}};
+        for (int[] args : invalidPagination) {
+            assertBadRequest(() ->
+                    service.searchItems("", null, args[0], args[1]));
         }
         assertBadRequest(() -> service.searchItems("x".repeat(151), null, 0, 10));
+
         verifyNoInteractions(repository);
     }
 
     @ParameterizedTest
     @ValueSource(longs = {0, -1})
-    void rejectsInvalidIds(long id) {
+    void shouldRejectInvalidIds(long id) {
         assertBadRequest(() -> service.getItemById(id));
         assertBadRequest(() -> service.deleteItem(id));
         assertBadRequest(() -> service.updateItem(id, validItem()));
+
         verifyNoInteractions(repository);
     }
 
     @Test
-    void rejectsInvalidFieldsWithoutSaving() {
+    void shouldRejectInvalidFieldsWithoutSaving() {
         List<Consumer<Item>> invalidations = List.of(
-                i -> i.setName(null), i -> i.setName(" "),
-                i -> i.setName("x".repeat(151)), i -> i.setRecyclable(null),
-                i -> i.setInformation(null), i -> i.setInformation(" "),
+                i -> i.setName(null),
+                i -> i.setName(" "),
+                i -> i.setName("x".repeat(151)),
+                i -> i.setRecyclable(null),
+                i -> i.setInformation(null),
+                i -> i.setInformation(" "),
                 i -> i.setInformation("x".repeat(5001)),
                 i -> i.setKeywords(Set.of(" ")),
                 i -> i.setKeywords(new HashSet<>(Arrays.asList((String) null))),
                 i -> i.setKeywords(Set.of("x".repeat(101))),
-                i -> i.setKeywords(new HashSet<>(java.util.stream.IntStream.range(0, 21)
-                        .mapToObj(Integer::toString).toList())));
+                i -> i.setKeywords(new HashSet<>(
+                        IntStream.range(0, 21)
+                                .mapToObj(Integer::toString)
+                                .toList())));
+
         assertBadRequest(() -> service.createItem(null));
         for (Consumer<Item> invalidation : invalidations) {
             Item input = validItem();
@@ -139,7 +190,9 @@ class ItemServiceTest {
     }
 
     private void assertBadRequest(Runnable action) {
-        assertEquals(HttpStatus.BAD_REQUEST,
-                assertThrows(ResponseStatusException.class, action::run).getStatusCode());
+        assertEquals(
+                HttpStatus.BAD_REQUEST,
+                assertThrows(ResponseStatusException.class, action::run)
+                        .getStatusCode());
     }
 }
