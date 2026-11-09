@@ -11,6 +11,7 @@ import {
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
 import PageLayout from '../../components/PageLayout'
+import Pagination from '../../components/Pagination/Pagination'
 import { fetchItems, type Item } from '../../services/itemService'
 import { isAbortError } from '../../helpers/ErrorHelper'
 import './ItemSearch.css'
@@ -20,15 +21,31 @@ type FilterOption = 'all' | 'recyclable' | 'non-recyclable'
 function ItemSearch() {
   const [searchText, setSearchText] = useState('')
   const [debouncedSearchText, setDebouncedSearchText] = useState('')
-  const [filter, setFilter] = useState<FilterOption>('all')
+  const [filter, setFilter] = useState<FilterOption>('recyclable')
   const [items, setItems] = useState<Item[]>([])
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalItems, setTotalItems] = useState(0)
+
   const [loading, setLoading] = useState(true)
+  const [hasLoaded, setHasLoaded] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
+
+  function changeFilter(value: FilterOption) {
+    setFilter(value)
+    setPage(1)
+  }
+
+  function changePageSize(value: number) {
+    setPageSize(value)
+    setPage(1)
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchText(searchText)
+      setPage(1)
     }, 250)
 
     return () => clearTimeout(timer)
@@ -42,31 +59,45 @@ function ItemSearch() {
       setLoading(true)
       setError(null)
 
-      const recyclableParam =
-        filter === 'recyclable'
-          ? true
-          : filter === 'non-recyclable'
-            ? false
-            : undefined
-
-      fetchItems(debouncedSearchText.trim(), recyclableParam, controller.signal)
-        .then((data) => {
+      async function loadItems() {
+        try {
+          const recyclableParam =
+            filter === 'recyclable'
+              ? true
+              : filter === 'non-recyclable'
+                ? false
+                : undefined
+          const data = await fetchItems(
+            debouncedSearchText.trim(),
+            recyclableParam,
+            controller.signal,
+            page,
+            pageSize
+          )
           if (!isMounted) return
-          if (data) {
-            setItems(data)
-            setError(null)
-          } else {
-            setItems([])
+
+          if (data === null) {
             setError('Unable to load items. Please try again later.')
+            return
           }
-          setLoading(false)
-        })
-        .catch((err) => {
-          if (!isMounted || isAbortError(err)) return
+
+          if (page > Math.max(1, data.totalPages)) {
+            setPage(Math.max(1, data.totalPages))
+            return
+          }
+
+          setItems(data.items)
+          setTotalItems(data.totalItems)
+          setHasLoaded(true)
+        } catch (requestError) {
+          if (!isMounted || isAbortError(requestError)) return
           setError('Unable to load items. Please try again later.')
-          setItems([])
-          setLoading(false)
-        })
+        } finally {
+          if (isMounted) setLoading(false)
+        }
+      }
+
+      void loadItems()
     }, 0)
 
     return () => {
@@ -74,7 +105,7 @@ function ItemSearch() {
       controller.abort()
       clearTimeout(timer)
     }
-  }, [debouncedSearchText, filter, refreshKey])
+  }, [debouncedSearchText, filter, refreshKey, page, pageSize])
 
   function forceRefresh() {
     setRefreshKey((prev) => prev + 1)
@@ -126,18 +157,11 @@ function ItemSearch() {
           role="group"
           aria-label="Filter items by recyclability"
         >
-          <button
-            type="button"
-            className={`item-filter-btn ${filter === 'all' ? 'active' : ''}`}
-            onClick={() => setFilter('all')}
-            aria-pressed={filter === 'all'}
-          >
-            All Items
-          </button>
+
           <button
             type="button"
             className={`item-filter-btn ${filter === 'recyclable' ? 'active' : ''}`}
-            onClick={() => setFilter('recyclable')}
+            onClick={() => changeFilter('recyclable')}
             aria-pressed={filter === 'recyclable'}
           >
             <FaRecycle aria-hidden="true" />
@@ -146,23 +170,24 @@ function ItemSearch() {
           <button
             type="button"
             className={`item-filter-btn ${filter === 'non-recyclable' ? 'active' : ''}`}
-            onClick={() => setFilter('non-recyclable')}
+            onClick={() => changeFilter('non-recyclable')}
             aria-pressed={filter === 'non-recyclable'}
           >
             <FiTrash2 aria-hidden="true" />
             Non-Recyclable
           </button>
+          <button
+            type="button"
+            className={`item-filter-btn ${filter === 'all' ? 'active' : ''}`}
+            onClick={() => changeFilter('all')}
+            aria-pressed={filter === 'all'}
+          >
+            All Items
+          </button>
         </div>
       </section>
 
-      {loading && (
-        <div className="item-search-status item-search-loading" role="status">
-          <div className="loading-spinner" aria-hidden="true" />
-          <p>Loading items...</p>
-        </div>
-      )}
-
-      {!loading && error && (
+      {!loading && error && items.length === 0 && (
         <div className="item-search-status item-search-error" role="alert">
           <FiAlertCircle className="status-icon" aria-hidden="true" />
           <h2>Unable to load items</h2>
@@ -178,7 +203,16 @@ function ItemSearch() {
         </div>
       )}
 
-      {!loading && !error && items.length === 0 && (
+      {!loading && error && items.length > 0 && (
+        <div className="item-search-inline-error" role="alert">
+          <span>{error}</span>
+          <button type="button" onClick={forceRefresh}>
+            Try again
+          </button>
+        </div>
+      )}
+
+      {!loading && !error && hasLoaded && items.length === 0 && (
         <div className="item-search-status item-search-empty">
           <p>
             {searchText.trim()
@@ -191,7 +225,7 @@ function ItemSearch() {
               className="item-search-reset-btn"
               onClick={() => {
                 setSearchText('')
-                setFilter('all')
+                changeFilter('all')
               }}
             >
               Clear search & filters
@@ -200,8 +234,8 @@ function ItemSearch() {
         </div>
       )}
 
-      {!loading && !error && items.length > 0 && (
-        <div className="item-search-list">
+      {items.length > 0 && (
+        <div className="item-search-list" aria-busy={loading}>
           {items.map((item) => (
             <Link
               to={`/item-search/${item.id}`}
@@ -245,6 +279,27 @@ function ItemSearch() {
             </Link>
           ))}
         </div>
+      )}
+      <div
+        className={`item-search-loading-indicator${loading ? '' : ' is-hidden'}`}
+        role={loading ? 'status' : undefined}
+        aria-hidden={!loading}
+      >
+        {loading && (
+          <>
+            <div className="loading-spinner" aria-hidden="true" />
+            <span>{hasLoaded ? 'Updating items...' : 'Loading items...'}</span>
+          </>
+        )}
+      </div>
+      {hasLoaded && (
+        <Pagination
+          currentPage={page}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={changePageSize}
+        />
       )}
     </PageLayout>
   )

@@ -233,3 +233,68 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Keep the details card within the screen width */
+.announcement-details-card {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Display the full announcement title */
+.announcement-details-card h1 {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+
+/* Display the full announcement message */
+.announcement-details-message {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+/* Prevent date information from overflowing */
+.announcement-date-item {
+  min-width: 0;
+}
+
+.announcement-date-item div {
+  min-width: 0;
+}
+
+.announcement-date-item strong {
+  overflow-wrap: anywhere;
+}
+
+/* Keep the icon at its original size */
+.announcement-details-heading .announcement-details-icon {
+  flex: 0 0 3.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+/* Let only the text area use the remaining space */
+.announcement-details-heading > div:not(.announcement-details-icon) {
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+/* Keep the full title visible without breaking the layout */
+.announcement-details-card h1 {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+/* Preserve the original mobile icon size */
+@media (max-width: 600px) {
+  .announcement-details-heading .announcement-details-icon {
+    flex-basis: 3rem;
+    width: 3rem;
+    height: 3rem;
+  }
+}

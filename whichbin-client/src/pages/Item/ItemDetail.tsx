@@ -130,32 +130,16 @@ function ItemDetail() {
         </div>
 
         <div className="item-detail-classification-banner">
-          {item.recyclable ? (
-            <>
-              <FiTrash2 className="item-detail-bin-icon item-detail-bin-icon-blue" aria-hidden="true" />
-              <div>
-                <strong>Orlando Recycling Cart (Blue Bin)</strong>
-                <p>
-                  This item is accepted in Orlando&apos;s residential recycling program.
-                  Ensure it is empty, clean, and dry before placing it loose in your cart.
-                </p>
-              </div>
-            </>
-          ) : (
-            <>
-              <FiTrash2 className="item-detail-bin-icon item-detail-bin-icon-gray" aria-hidden="true" />
-              <div>
-                <strong>Regular Trash Cart (Garbage)</strong>
-                <p>
-                  This item cannot be placed in the recycling bin. Please dispose of it in
-                  your standard garbage cart.
-                </p>
-              </div>
-            </>
-          )}
+          <FiInfo aria-hidden="true" />
+          <div>
+            <strong>{item.disposalMethod
+              ? item.disposalMethod.toLowerCase().replaceAll('_', ' ')
+              : item.recyclable ? 'Recycling' : 'Disposal guidance'}</strong>
+            <p>Follow the preparation requirements and collection options below.</p>
+          </div>
         </div>
 
-        {item.recyclable && item.largeItem && (
+        {item.largeItem && (
           <section className="item-detail-large-item-banner" aria-labelledby="large-item-heading">
             <FiBox aria-hidden="true" />
             <div>
@@ -185,6 +169,9 @@ function ItemDetail() {
             Disposal Instructions
           </h2>
           <p className="item-detail-instructions">{item.information}</p>
+          <a href="https://www.orlando.gov/Trash-Recycling/What-Goes-Where" target="_blank" rel="noreferrer">
+            Further instructions from the City of Orlando
+          </a>
         </section>
 
         <aside className="item-detail-reuse-banner" aria-labelledby="reuse-heading">

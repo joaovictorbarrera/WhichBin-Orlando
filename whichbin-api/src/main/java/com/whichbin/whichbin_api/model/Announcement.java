@@ -7,6 +7,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +20,12 @@ public class Announcement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(max = 255, message = "Announcement title cannot exceed 255 characters")
+    @Column(length = 255)
     private String title;
+
+    @Size(max = 2000, message = "Announcement message cannot exceed 2000 characters")
+    @Column(columnDefinition = "TEXT")
     private String message;
 
     @Enumerated(EnumType.STRING)
