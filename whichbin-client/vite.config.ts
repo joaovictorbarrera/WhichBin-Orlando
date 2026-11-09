@@ -1,7 +1,8 @@
+/// <reference types="vitest" />
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 
 const rootPomPath = fileURLToPath(new URL('../pom.xml', import.meta.url))
 const rootPom = readFileSync(rootPomPath, 'utf8')
@@ -22,5 +23,9 @@ export default defineConfig({
   },
   server: {
     port: 7000,
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
   },
 })
