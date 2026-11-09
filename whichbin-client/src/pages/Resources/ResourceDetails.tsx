@@ -169,7 +169,7 @@ function ResourceDetails() {
                                                 className="resource-article-content"
                                                 aria-label="Article content"
                                         >
-                                                <h2>Article Content</h2>
+                                                <h2>Quick Summary</h2>
 
                                                 <div className="resource-article-text">
                                                         {articleContent}
