@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import {
   FiArrowLeft,
   FiBell,
@@ -56,24 +56,10 @@ function AdminAnnouncements() {
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Announcement | null>(null)
 
-  useEffect(() => {
-    const controller = new AbortController()
-
-    void loadAnnouncements(
-      announcementFilter || undefined,
-      controller.signal
-    )
-
-    return () => {
-      controller.abort()
-      announcementLoadRequest.current += 1
-    }
-  }, [announcementFilter, currentPage, pageSize])
-
-  async function loadAnnouncements(
+  const loadAnnouncements = useCallback(async (
     type?: AnnouncementType,
     signal?: AbortSignal
-  ) {
+  ) => {
     const requestId = ++announcementLoadRequest.current
 
     setLoading(true)
@@ -106,7 +92,25 @@ function AdminAnnouncements() {
       setLoading(false)
     }
   }
-}
+  }, [currentPage, pageSize])
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    void Promise.resolve().then(() => {
+      if (!controller.signal.aborted) {
+        return loadAnnouncements(
+          announcementFilter || undefined,
+          controller.signal
+        )
+      }
+    })
+
+    return () => {
+      controller.abort()
+      announcementLoadRequest.current += 1
+    }
+  }, [announcementFilter, loadAnnouncements])
 
 
 function handlePageChange(nextPage: number) {
@@ -187,7 +191,7 @@ function handleFilterChange(nextFilter: AnnouncementType | '') {
       )
       return
     }
-    
+
     const announcementInput: AnnouncementInput = {
       title: title.trim(),
       message: message.trim(),
@@ -597,7 +601,7 @@ async function handleConfirmDelete() {
               )
             })}
           </div>
-        )}:
+        )}
         {!loading && !error && (
           <Pagination
             currentPage={currentPage}

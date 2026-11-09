@@ -27,57 +27,58 @@ function formatDateTime(dateTime: string) {
 
 function Announcements() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
-  const [loading, setLoading] = useState(true)
   const [filterType, setFilterType] = useState<AnnouncementType | ''>('')
 
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(5)
   const [totalItems, setTotalItems] = useState<number>()
   const [error, setError] = useState<string>()
-useEffect(() => {
-  let isLatestRequest = true
-  const abortController = new AbortController()
+  const queryKey = `${currentPage}:${pageSize}:${filterType}`
+  const [loadedQueryKey, setLoadedQueryKey] = useState<string | null>(null)
+  const loading = loadedQueryKey !== queryKey
 
-  setLoading(true)
-  setError(undefined)
+  useEffect(() => {
+    let isLatestRequest = true
+    const abortController = new AbortController()
 
-  getAnnouncementsPaged(
-    currentPage,
-    pageSize,
-    filterType || undefined,
-    abortController.signal
-  )
-    .then((response) => {
-      if (!isLatestRequest) {
-        return
-      }
+    getAnnouncementsPaged(
+      currentPage,
+      pageSize,
+      filterType || undefined,
+      abortController.signal
+    )
+      .then((response) => {
+        if (!isLatestRequest) {
+          return
+        }
 
-      setAnnouncements(response.items)
-      setTotalItems(response.totalItems)
-    })
-    .catch((requestError: unknown) => {
-      if (!isLatestRequest || abortController.signal.aborted) {
-        return
-      }
+        setAnnouncements(response.items)
+        setTotalItems(response.totalItems)
+        setError(undefined)
+      })
+      .catch((requestError: unknown) => {
+        if (!isLatestRequest || abortController.signal.aborted) {
+          return
+        }
 
-      setAnnouncements([])
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : 'Could not load announcements.'
-      )
-    })
-    .finally(() => {
-      if (isLatestRequest) {
-        setLoading(false)
-      }
-    })
+        setAnnouncements([])
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : 'Could not load announcements.'
+        )
+      })
+      .finally(() => {
+        if (isLatestRequest) {
+          setLoadedQueryKey(queryKey)
+        }
+      })
 
-  return () => {
-    isLatestRequest = false
-    abortController.abort()
-  }
-}, [currentPage, pageSize, filterType])
+    return () => {
+      isLatestRequest = false
+      abortController.abort()
+    }
+  }, [currentPage, pageSize, filterType, queryKey])
 
 function handlePageChange(nextPage: number) {
   setCurrentPage(nextPage)
