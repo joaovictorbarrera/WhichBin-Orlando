@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import {
   FiArrowLeft,
   FiBell,
@@ -34,11 +34,14 @@ function AdminAnnouncements() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
   const [announcementFilter, setAnnouncementFilter] = useState<AnnouncementType | ''>('')
   const [loading, setLoading] = useState(true)
+  const [hasLoaded, setHasLoaded] = useState(false)
   const [error, setError] = useState(false)
   const announcementLoadRequest = useRef(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(5)
   const [totalItems, setTotalItems] = useState<number>()
+  const paginationAnchorRef = useRef<HTMLDivElement>(null)
+  const pendingPaginationTop = useRef<number | null>(null)
 
   const [showForm, setShowForm] = useState(false)
   const [editingAnnouncement, setEditingAnnouncement] =
@@ -79,6 +82,7 @@ function AdminAnnouncements() {
 
     setAnnouncements(result.items)
     setTotalItems(result.totalItems)
+    setHasLoaded(true)
   } catch {
     if (requestId !== announcementLoadRequest.current) {
       return
@@ -112,12 +116,31 @@ function AdminAnnouncements() {
     }
   }, [announcementFilter, loadAnnouncements])
 
+  useLayoutEffect(() => {
+    if (loading || pendingPaginationTop.current === null) {
+      return
+    }
+
+    const paginationTop = paginationAnchorRef.current?.getBoundingClientRect().top
+    if (paginationTop !== undefined) {
+      window.scrollBy(0, paginationTop - pendingPaginationTop.current)
+    }
+
+    pendingPaginationTop.current = null
+  }, [announcements, loading])
+
+function preservePaginationPosition() {
+  const paginationTop = paginationAnchorRef.current?.getBoundingClientRect().top
+  pendingPaginationTop.current = paginationTop ?? null
+}
 
 function handlePageChange(nextPage: number) {
+  preservePaginationPosition()
   setCurrentPage(nextPage)
 }
 
 function handlePageSizeChange(nextPageSize: number) {
+  preservePaginationPosition()
   setPageSize(nextPageSize)
   setCurrentPage(1)
 }
@@ -487,7 +510,7 @@ async function handleConfirmDelete() {
                 </option>
               ))}
             </select>
-            {!loading && !error && totalItems !== undefined && (
+            {!error && totalItems !== undefined && (
               <span>
                 {totalItems}{' '}
                 {totalItems === 1 ? 'announcement' : 'announcements'}
@@ -495,12 +518,6 @@ async function handleConfirmDelete() {
             )}
           </div>
         </div>
-
-        {loading && (
-          <p className="admin-announcements-loading">
-            Loading announcements...
-          </p>
-        )}
 
         {!loading && error && (
           <div className="admin-announcements-empty">
@@ -521,7 +538,7 @@ async function handleConfirmDelete() {
           </div>
         )}
 
-        {!loading && !error && announcements.length > 0 && (
+        {!error && announcements.length > 0 && (
           <div className="admin-announcements-list">
             {announcements.map((announcement) => {
               const status = getAnnouncementStatus(announcement)
@@ -602,17 +619,31 @@ async function handleConfirmDelete() {
             })}
           </div>
         )}
-        {!loading && !error && (
-          <Pagination
-            currentPage={currentPage}
-            totalItems={totalItems}
-            pageSize={pageSize}
-            pageSizeOptions={[5, 10, 20]}
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
-            siblingCount={1}
-          />
-        )}
+        <div ref={paginationAnchorRef}>
+          <div
+            className={`admin-announcements-loading-indicator${loading ? '' : ' is-hidden'}`}
+            role={loading ? 'status' : undefined}
+            aria-hidden={!loading}
+          >
+            {loading && (
+              <>
+                <span className="admin-announcements-loading-spinner" aria-hidden="true" />
+                {hasLoaded ? 'Updating announcements...' : 'Loading announcements...'}
+              </>
+            )}
+          </div>
+          {!error && totalItems !== undefined && (
+            <Pagination
+              currentPage={currentPage}
+              totalItems={totalItems}
+              pageSize={pageSize}
+              pageSizeOptions={[5, 10, 20]}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              siblingCount={1}
+            />
+          )}
+        </div>
       </section>
 
       {deleteTarget && (
