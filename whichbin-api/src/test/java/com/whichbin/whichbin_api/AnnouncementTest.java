@@ -260,9 +260,9 @@ public class AnnouncementTest {
         // Verify the announcement appears in the public list
         mockMvc.perform(get("/announcements"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.id == " + announcementId + ")]")
+                .andExpect(jsonPath("$.items[?(@.id == " + announcementId + ")]")
                         .isNotEmpty())
-                .andExpect(jsonPath("$[?(@.title == 'Current Recycling Announcement')]")
+                .andExpect(jsonPath("$.items[?(@.title == 'Current Recycling Announcement')]")
                         .isNotEmpty());
     }
 
@@ -330,9 +330,9 @@ public class AnnouncementTest {
         mockMvc.perform(get("/announcements")
                         .param("type", "GENERAL"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.id == " + generalId + ")]").isNotEmpty())
-                .andExpect(jsonPath("$[?(@.id == " + serviceId + ")]").isEmpty())
-                .andExpect(jsonPath("$[*].type",
+                .andExpect(jsonPath("$.items[?(@.id == " + generalId + ")]").isNotEmpty())
+                .andExpect(jsonPath("$.items[?(@.id == " + serviceId + ")]").isEmpty())
+                .andExpect(jsonPath("$.items[*].type",
                         org.hamcrest.Matchers.everyItem(
                                 org.hamcrest.Matchers.is("GENERAL"))));
     }

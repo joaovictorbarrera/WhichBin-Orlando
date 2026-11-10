@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FiBell, FiChevronRight } from 'react-icons/fi'
 import {
   announcementTypes,
-  getAnnouncements,
+  getAnnouncementsPaged,
   type AnnouncementType,
   type Announcement,
 } from '../../services/announcementService'
 import PageLayout from '../../components/PageLayout'
+import Pagination from '../../components/Pagination/Pagination'
 import './Announcements.css'
 
 function formatType(type: string) {
@@ -26,31 +27,94 @@ function formatDateTime(dateTime: string) {
 
 function Announcements() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
-  const [loading, setLoading] = useState(true)
   const [filterType, setFilterType] = useState<AnnouncementType | ''>('')
 
-  useEffect(() => {
-    let isMounted = true
-    setLoading(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(5)
+  const [totalItems, setTotalItems] = useState<number>()
+  const [error, setError] = useState<string>()
+  const queryKey = `${currentPage}:${pageSize}:${filterType}`
+  const [loadedQueryKey, setLoadedQueryKey] = useState<string | null>(null)
+  const loading = loadedQueryKey !== queryKey
+  const paginationAnchorRef = useRef<HTMLDivElement>(null)
+  const pendingPaginationTop = useRef<number | null>(null)
 
-    getAnnouncements(filterType || undefined)
-      .then((data) => {
-        if (isMounted) {
-          setAnnouncements(data ?? [])
-          setLoading(false)
+  useEffect(() => {
+    let isLatestRequest = true
+    const abortController = new AbortController()
+
+    getAnnouncementsPaged(
+      currentPage,
+      pageSize,
+      filterType || undefined,
+      abortController.signal
+    )
+      .then((response) => {
+        if (!isLatestRequest) {
+          return
         }
+
+        setAnnouncements(response.items)
+        setTotalItems(response.totalItems)
+        setError(undefined)
       })
-      .catch(() => {
-        if (isMounted) {
-          setAnnouncements([])
-          setLoading(false)
+      .catch((requestError: unknown) => {
+        if (!isLatestRequest || abortController.signal.aborted) {
+          return
+        }
+
+        setAnnouncements([])
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : 'Could not load announcements.'
+        )
+      })
+      .finally(() => {
+        if (isLatestRequest) {
+          setLoadedQueryKey(queryKey)
         }
       })
 
     return () => {
-      isMounted = false
+      isLatestRequest = false
+      abortController.abort()
     }
-  }, [filterType])
+  }, [currentPage, pageSize, filterType, queryKey])
+
+  useLayoutEffect(() => {
+    if (loading || pendingPaginationTop.current === null) {
+      return
+    }
+
+    const paginationTop = paginationAnchorRef.current?.getBoundingClientRect().top
+    if (paginationTop !== undefined) {
+      window.scrollBy(0, paginationTop - pendingPaginationTop.current)
+    }
+
+    pendingPaginationTop.current = null
+  }, [announcements, loading])
+
+function preservePaginationPosition() {
+  const paginationTop = paginationAnchorRef.current?.getBoundingClientRect().top
+  pendingPaginationTop.current = paginationTop ?? null
+}
+
+function handlePageChange(nextPage: number) {
+  preservePaginationPosition()
+  setCurrentPage(nextPage)
+}
+
+function handlePageSizeChange(nextPageSize: number) {
+  preservePaginationPosition()
+  setPageSize(nextPageSize)
+  setCurrentPage(1)
+}
+
+function handleFilterChange(nextFilter: AnnouncementType | '') {
+  setFilterType(nextFilter)
+  setCurrentPage(1)
+}
 
   return (
     <PageLayout className="announcements-page" width="wide">
@@ -74,7 +138,7 @@ function Announcements() {
           id="announcements-type-filter"
           value={filterType}
           onChange={(event) =>
-            setFilterType(event.target.value as AnnouncementType | '')
+            handleFilterChange(event.target.value as AnnouncementType | '')
           }
         >
           <option value="">All types</option>
@@ -85,12 +149,6 @@ function Announcements() {
           ))}
         </select>
       </div>
-
-      {loading && (
-        <p className="announcements-loading">
-          Loading announcements...
-        </p>
-      )}
 
       {!loading && announcements.length === 0 && (
         <div className="announcements-status">
@@ -106,7 +164,7 @@ function Announcements() {
         </div>
       )}
 
-      {!loading && announcements.length > 0 && (
+      {!error && announcements.length > 0 && (
         <div className="announcements-list">
           {announcements.map((announcement) => (
             <Link
@@ -148,6 +206,36 @@ function Announcements() {
           ))}
         </div>
       )}
+      <div
+        ref={paginationAnchorRef}
+      >
+        <div
+          className={`announcements-loading-indicator${loading ? '' : ' is-hidden'}`}
+          role={loading ? 'status' : undefined}
+          aria-hidden={!loading}
+        >
+          {loading && (
+            <>
+              <span className="announcements-loading-spinner" aria-hidden="true" />
+              {loadedQueryKey === null
+                ? 'Loading announcements...'
+                : 'Updating announcements...'}
+            </>
+          )}
+        </div>
+        {!error && totalItems !== undefined && (
+          <Pagination
+            currentPage={currentPage}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            pageSizeOptions={[5, 10, 20]}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            siblingCount={1}
+          />
+        )}
+      </div>
+
     </PageLayout>
   )
 }
