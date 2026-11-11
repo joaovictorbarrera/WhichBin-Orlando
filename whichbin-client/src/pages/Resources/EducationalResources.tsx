@@ -193,17 +193,6 @@ function EducationalResources() {
     )
   }
 
-  if (totalItems === 0 && triviaTotalItems === 0) {
-    return (
-      <PageLayout className="resources-page" width="wide">
-        {pageHeader}
-        <p className="resources-intro">
-          No educational resources are available right now.
-        </p>
-      </PageLayout>
-    )
-  }
-
   return (
     <PageLayout className="resources-page" width="wide">
       {pageHeader}
@@ -234,10 +223,25 @@ function EducationalResources() {
         </button>
       </div>
 
+      {filter === 'all' &&
+        resources.length === 0 &&
+        triviaChallenges.length === 0 && (
+          <p className="resources-empty-message">
+            No educational resources are available right now.
+          </p>
+        )}
+
       {/* Educational Articles */}
-      {showArticles && (resources.length > 0 || (totalItems ?? 0) > 0) && (
+      {showArticles && (
         <section className="resources-section">
           {filter === 'all' && <h2>Articles</h2>}
+
+          {resources.length === 0 &&
+            (filter === 'articles' || triviaChallenges.length > 0) && (
+              <p className="resources-empty-message">
+                No articles are available right now.
+              </p>
+            )}
 
           <div className="resources-list">
             {resources.map((resource) => (
@@ -278,9 +282,16 @@ function EducationalResources() {
       )}
 
       {/* Trivia Challenges */}
-      {showTrivia && (triviaChallenges.length > 0 || (triviaTotalItems ?? 0) > 0) && (
+      {showTrivia && (
         <section className="resources-section">
           {filter === 'all' && <h2>Trivia</h2>}
+
+      {triviaChallenges.length === 0 &&
+        (filter === 'trivia' || resources.length > 0) && (
+          <p className="resources-empty-message">
+            No trivia challenges are available right now.
+          </p>
+        )}
 
           <div className="resources-list">
             {triviaChallenges.map((challenge) => (
