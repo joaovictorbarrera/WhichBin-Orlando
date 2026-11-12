@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   FiArrowLeft,
-  FiAlertCircle,
   FiInfo,
   FiBox,
   FiClock,
@@ -10,15 +9,36 @@ import {
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
 import PageLayout from '../../components/PageLayout'
+import DetailStatus, {
+  type DetailStatusType,
+} from '../../components/DetailStatus'
 import { fetchItemById, type Item } from '../../services/itemService'
-import { isAbortError } from '../../helpers/ErrorHelper'
+import { isAbortError, isNotFoundError } from '../../helpers/ErrorHelper'
 import './ItemDetail.css'
+
+type ItemDetailState = DetailStatusType | 'success'
+
+type ItemDetailViewState = {
+  itemId: string | undefined
+  status: ItemDetailState
+  item: Item | null
+}
 
 function ItemDetail() {
   const { itemId } = useParams<{ itemId: string }>()
-  const [item, setItem] = useState<Item | null>(null)
-  const [loading, setLoading] = useState(Boolean(itemId))
-  const [error, setError] = useState<string | null>(null)
+  const [detailState, setDetailState] = useState<ItemDetailViewState>({
+    itemId,
+    status: itemId ? 'loading' : 'failed',
+    item: null,
+  })
+  const [retryCount, setRetryCount] = useState(0)
+  const status =
+    detailState.itemId === itemId
+      ? detailState.status
+      : itemId
+        ? 'loading'
+        : 'failed'
+  const item = detailState.itemId === itemId ? detailState.item : null
 
   useEffect(() => {
     if (!itemId) {
@@ -31,29 +51,24 @@ function ItemDetail() {
     fetchItemById(itemId, controller.signal)
       .then((data) => {
         if (!isMounted) return
-        if (data) {
-          setItem(data)
-          setError(null)
-        } else {
-          setItem(null)
-          setError('The requested item could not be found.')
-        }
-        setLoading(false)
+        setDetailState({ itemId, status: 'success', item: data })
       })
       .catch((err) => {
         if (!isMounted || isAbortError(err)) return
-        setItem(null)
-        setError('Failed to load item details. Please check your connection and try again.')
-        setLoading(false)
+        setDetailState({
+          itemId,
+          status: isNotFoundError(err) ? 'not-found' : 'failed',
+          item: null,
+        })
       })
 
     return () => {
       isMounted = false
       controller.abort()
     }
-  }, [itemId])
+  }, [itemId, retryCount])
 
-  if (loading) {
+  if (status !== 'success' || !item) {
     return (
       <PageLayout className="item-detail-page" width="wide">
         <Link className="item-detail-back-link" to="/item-search">
@@ -61,30 +76,14 @@ function ItemDetail() {
           Back to Item Search
         </Link>
 
-        <div className="item-detail-status" role="status">
-          <div className="loading-spinner" aria-hidden="true" />
-          <p>Loading item details...</p>
-        </div>
-      </PageLayout>
-    )
-  }
-
-  if (error || !item) {
-    return (
-      <PageLayout className="item-detail-page" width="wide">
-        <Link className="item-detail-back-link" to="/item-search">
-          <FiArrowLeft aria-hidden="true" />
-          Back to Item Search
-        </Link>
-
-        <div className="item-detail-status item-detail-error" role="alert">
-          <FiAlertCircle className="status-icon" aria-hidden="true" />
-          <h1>Item Not Found</h1>
-          <p>{error || 'The requested item could not be found.'}</p>
-          <Link to="/item-search" className="item-detail-action-btn">
-            Return to search
-          </Link>
-        </div>
+        <DetailStatus
+          featureName="item"
+          status={status === 'success' ? 'failed' : status}
+          onRetry={() => {
+            setDetailState({ itemId, status: 'loading', item: null })
+            setRetryCount((count) => count + 1)
+          }}
+        />
       </PageLayout>
     )
   }

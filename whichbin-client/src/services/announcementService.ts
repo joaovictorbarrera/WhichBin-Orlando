@@ -1,4 +1,5 @@
 import { apiFetch } from './apiClient'
+import { ApiResponseError } from '../helpers/ErrorHelper'
 import type { PaginatedResponse } from '../types/PaginatedResponse'
 
 export const announcementTypes = [
@@ -109,18 +110,17 @@ export async function getAllAnnouncementsPaged(
 
 export async function getAnnouncementById(
   announcementId: string
-): Promise<Announcement | null> {
-  try {
-    const response = await apiFetch(`announcements/${announcementId}`)
+): Promise<Announcement> {
+  const response = await apiFetch(`announcements/${announcementId}`)
 
-    if (!response.ok) {
-      return null
-    }
-
-    return (await response.json()) as Announcement
-  } catch {
-    return null
+  if (!response.ok) {
+    throw new ApiResponseError(
+      response.status,
+      `Failed to load announcement details (${response.status})`
+    )
   }
+
+  return (await response.json()) as Announcement
 }
 
 export type AnnouncementInput = {

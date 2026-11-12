@@ -300,63 +300,6 @@
   line-height: 1.45;
 }
 
-/* Status Cards: Loading, Error */
-.item-detail-status {
-  display: grid;
-  place-items: center;
-  max-width: 34rem;
-  margin: 3rem auto;
-  padding: 2.75rem 1.75rem;
-  text-align: center;
-  background: var(--color-surface);
-  border: 0.065rem solid var(--color-border-soft);
-  border-radius: 0.75rem;
-  box-shadow: var(--shadow-card);
-}
-
-.item-detail-status .status-icon {
-  margin-bottom: 0.75rem;
-  color: var(--color-brand);
-  font-size: 2.25rem;
-}
-
-.item-detail-status.item-detail-error .status-icon {
-  color: var(--color-danger);
-}
-
-.item-detail-status h1 {
-  margin: 0 0 0.5rem;
-  color: var(--color-heading-soft);
-  font-size: 1.35rem;
-}
-
-.item-detail-status p {
-  margin: 0;
-  color: var(--color-text-muted);
-  line-height: 1.55;
-}
-
-.item-detail-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1.25rem;
-  padding: 0.625rem 1.25rem;
-  font-family: inherit;
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: #ffffff;
-  background: var(--color-brand);
-  border-radius: 0.5rem;
-  text-decoration: none;
-  transition: background-color 0.15s ease, transform 0.15s ease;
-}
-
-.item-detail-action-btn:hover {
-  background: var(--color-brand-dark);
-  transform: translateY(-0.0625rem);
-}
-
 @media (max-width: 600px) {
   .item-detail-page {
     padding-top: 2.5rem;

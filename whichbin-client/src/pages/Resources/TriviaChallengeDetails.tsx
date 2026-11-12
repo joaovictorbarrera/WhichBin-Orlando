@@ -2,22 +2,48 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   FiArrowLeft,
-  FiInfo,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa6'
+import DetailStatus, {
+  type DetailStatusType,
+} from '../../components/DetailStatus'
 import {
   getTriviaChallengeById,
   type TriviaChallenge,
 } from '../../services/triviaService'
+import { isNotFoundError } from '../../helpers/ErrorHelper'
 import PageLayout from '../../components/PageLayout'
 import './ResourceDetails.css'
+
+type ChallengeDetailState = DetailStatusType | 'success'
+
+type ChallengeDetailViewState = {
+  challengeId: string | undefined
+  status: ChallengeDetailState
+  challenge: TriviaChallenge | null
+}
 
 function TriviaChallengeDetails() {
   const { challengeId } = useParams()
   const navigate = useNavigate()
 
-  const [challenge, setChallenge] = useState<TriviaChallenge | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [detailState, setDetailState] = useState<ChallengeDetailViewState>({
+    challengeId,
+    status: challengeId ? 'loading' : 'failed',
+    challenge: null,
+  })
+  const [retryCount, setRetryCount] = useState(0)
+  const parsedChallengeId = Number(challengeId)
+  const challengeIdIsValid =
+    Number.isInteger(parsedChallengeId) && parsedChallengeId > 0
+  const status =
+    !challengeId || !challengeIdIsValid
+      ? 'failed'
+      : detailState.challengeId === challengeId
+        ? detailState.status
+        : 'loading'
+  const challenge =
+    detailState.challengeId === challengeId ? detailState.challenge : null
 
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
@@ -25,38 +51,36 @@ function TriviaChallengeDetails() {
   const [quizComplete, setQuizComplete] = useState(false)
 
   useEffect(() => {
-    if (!challengeId) {
-      setLoading(false)
-      return
-    }
-
-    const id = Number(challengeId)
-
-    if (!Number.isInteger(id) || id <= 0) {
-      setLoading(false)
+    if (!challengeId || !challengeIdIsValid) {
       return
     }
 
     let isMounted = true
 
-    getTriviaChallengeById(id)
+    getTriviaChallengeById(parsedChallengeId)
       .then((data) => {
         if (isMounted) {
-          setChallenge(data)
-          setLoading(false)
+          setDetailState({
+            challengeId,
+            status: 'success',
+            challenge: data,
+          })
         }
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (isMounted) {
-          setChallenge(null)
-          setLoading(false)
+          setDetailState({
+            challengeId,
+            status: isNotFoundError(error) ? 'not-found' : 'failed',
+            challenge: null,
+          })
         }
       })
 
     return () => {
       isMounted = false
     }
-  }, [challengeId])
+  }, [challengeId, challengeIdIsValid, parsedChallengeId, retryCount])
 
   function handleAnswer(answer: string) {
     const question = challenge?.questions[currentQuestion]
@@ -115,7 +139,7 @@ function TriviaChallengeDetails() {
     return 'trivia-answer'
   }
 
-  if (loading) {
+  if (status !== 'success' || !challenge) {
     return (
       <PageLayout className="resource-details-page" width="wide">
         <Link to="/resources" className="resource-back-link">
@@ -123,34 +147,20 @@ function TriviaChallengeDetails() {
           Back to Educational Resources
         </Link>
 
-        <div className="resource-details-card">
-          <div className="resource-loading-message">
-            Loading challenge...
-          </div>
-        </div>
-      </PageLayout>
-    )
-  }
-
-  if (!challenge) {
-    return (
-      <PageLayout className="resource-details-page" width="wide">
-        <Link to="/resources" className="resource-back-link">
-          <FiArrowLeft aria-hidden="true" />
-          Back to Educational Resources
-        </Link>
-
-        <div className="resource-details-card">
-          <div className="resource-empty-icon">
-            <FiInfo aria-hidden="true" />
-          </div>
-
-          <h1>Challenge Not Found</h1>
-
-          <p>
-            This trivia challenge could not be found.
-          </p>
-        </div>
+        <DetailStatus
+          featureName="challenge"
+          status={status === 'success' ? 'failed' : status}
+          onRetry={() => {
+            if (challengeId && challengeIdIsValid) {
+              setDetailState({
+                challengeId,
+                status: 'loading',
+                challenge: null,
+              })
+            }
+            setRetryCount((count) => count + 1)
+          }}
+        />
       </PageLayout>
     )
   }
