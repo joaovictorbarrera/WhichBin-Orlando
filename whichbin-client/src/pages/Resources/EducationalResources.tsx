@@ -25,30 +25,30 @@ import '../Announcements/Announcements.css'
 
 type ResourceFilter = 'all' | 'articles' | 'trivia'
 
-function EducationalResources() {
-  const [resources, setResources] = useState<Resource[]>([])
-  const [triviaChallenges, setTriviaChallenges] = useState<TriviaChallenge[]>([])
+type PageResult<T> =
+  | { key: string; status: 'success'; items: T[]; totalItems: number }
+  | { key: string; status: 'error' }
 
-  const [resourcesLoading, setResourcesLoading] = useState(true)
-  const [triviaLoading, setTriviaLoading] = useState(true)
+function EducationalResources() {
+  const [resourcesResult, setResourcesResult] =
+    useState<PageResult<Resource> | null>(null)
+  const [triviaResult, setTriviaResult] =
+    useState<PageResult<TriviaChallenge> | null>(null)
 
   const [filter, setFilter] = useState<ResourceFilter>('all')
 
   // Article pagination
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [totalItems, setTotalItems] = useState<number | null>(null)
 
   // Trivia pagination
   const [triviaCurrentPage, setTriviaCurrentPage] = useState(1)
   const [triviaPageSize, setTriviaPageSize] = useState(5)
-  const [triviaTotalItems, setTriviaTotalItems] = useState<number | null>(null)
 
   // Load paginated educational articles
   useEffect(() => {
     const controller = new AbortController()
-
-    setResourcesLoading(true)
+    const key = `${currentPage}:${pageSize}`
 
     getResources(currentPage, pageSize, controller.signal)
       .then((result) => {
@@ -57,23 +57,22 @@ function EducationalResources() {
         }
 
         if (result) {
-          setResources(result.items ?? [])
-          setTotalItems(result.totalItems)
+          setResourcesResult({
+            key,
+            status: 'success',
+            items: result.items ?? [],
+            totalItems: result.totalItems,
+          })
         } else {
-          setResources([])
-          setTotalItems(0)
+          setResourcesResult({ key, status: 'error' })
         }
-
-        setResourcesLoading(false)
       })
       .catch(() => {
         if (controller.signal.aborted) {
           return
         }
 
-        setResources([])
-        setTotalItems(0)
-        setResourcesLoading(false)
+        setResourcesResult({ key, status: 'error' })
       })
 
     return () => {
@@ -84,8 +83,7 @@ function EducationalResources() {
   // Load paginated trivia challenges
   useEffect(() => {
     const controller = new AbortController()
-
-    setTriviaLoading(true)
+    const key = `${triviaCurrentPage}:${triviaPageSize}`
 
     getPaginatedTriviaChallenges(
       triviaCurrentPage,
@@ -98,23 +96,22 @@ function EducationalResources() {
         }
 
         if (result) {
-          setTriviaChallenges(result.items ?? [])
-          setTriviaTotalItems(result.totalItems)
+          setTriviaResult({
+            key,
+            status: 'success',
+            items: result.items ?? [],
+            totalItems: result.totalItems,
+          })
         } else {
-          setTriviaChallenges([])
-          setTriviaTotalItems(0)
+          setTriviaResult({ key, status: 'error' })
         }
-
-        setTriviaLoading(false)
       })
       .catch(() => {
         if (controller.signal.aborted) {
           return
         }
 
-        setTriviaChallenges([])
-        setTriviaTotalItems(0)
-        setTriviaLoading(false)
+        setTriviaResult({ key, status: 'error' })
       })
 
     return () => {
@@ -183,6 +180,34 @@ function EducationalResources() {
 
   const showArticles = filter === 'all' || filter === 'articles'
   const showTrivia = filter === 'all' || filter === 'trivia'
+  const currentResourcesResult =
+    resourcesResult?.key === `${currentPage}:${pageSize}`
+      ? resourcesResult
+      : null
+  const currentTriviaResult =
+    triviaResult?.key === `${triviaCurrentPage}:${triviaPageSize}`
+      ? triviaResult
+      : null
+  const resourcesLoading = currentResourcesResult === null
+  const triviaLoading = currentTriviaResult === null
+  const resourcesFailed = currentResourcesResult?.status === 'error'
+  const triviaFailed = currentTriviaResult?.status === 'error'
+  const resources =
+    currentResourcesResult?.status === 'success'
+      ? currentResourcesResult.items
+      : []
+  const triviaChallenges =
+    currentTriviaResult?.status === 'success'
+      ? currentTriviaResult.items
+      : []
+  const totalItems =
+    currentResourcesResult?.status === 'success'
+      ? currentResourcesResult.totalItems
+      : null
+  const triviaTotalItems =
+    currentTriviaResult?.status === 'success'
+      ? currentTriviaResult.totalItems
+      : null
 
   if (resourcesLoading || triviaLoading) {
     return (
@@ -223,25 +248,16 @@ function EducationalResources() {
         </button>
       </div>
 
-      {filter === 'all' &&
-        resources.length === 0 &&
-        triviaChallenges.length === 0 && (
-          <p className="resources-empty-message">
-            No educational resources are available right now.
-          </p>
-        )}
-
       {/* Educational Articles */}
       {showArticles && (
         <section className="resources-section">
           {filter === 'all' && <h2>Articles</h2>}
 
-          {resources.length === 0 &&
-            (filter === 'articles' || triviaChallenges.length > 0) && (
-              <p className="resources-empty-message">
-                No articles are available right now.
-              </p>
-            )}
+          {!resourcesFailed && resources.length === 0 && (
+            <p className="resources-empty-message">
+              No articles are available right now.
+            </p>
+          )}
 
           <div className="resources-list">
             {resources.map((resource) => (
@@ -269,15 +285,17 @@ function EducationalResources() {
             ))}
           </div>
 
-          <Pagination
-            currentPage={currentPage}
-            totalItems={totalItems}
-            pageSize={pageSize}
-            pageSizeOptions={[5, 10, 20]}
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
-            displayName="resources"
-          />
+          {!resourcesFailed && (
+            <Pagination
+              currentPage={currentPage}
+              totalItems={totalItems}
+              pageSize={pageSize}
+              pageSizeOptions={[5, 10, 20]}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              displayName="resources"
+            />
+          )}
         </section>
       )}
 
@@ -286,12 +304,11 @@ function EducationalResources() {
         <section className="resources-section">
           {filter === 'all' && <h2>Trivia</h2>}
 
-      {triviaChallenges.length === 0 &&
-        (filter === 'trivia' || resources.length > 0) && (
-          <p className="resources-empty-message">
-            No trivia challenges are available right now.
-          </p>
-        )}
+          {!triviaFailed && triviaChallenges.length === 0 && (
+            <p className="resources-empty-message">
+              No trivia challenges are available right now.
+            </p>
+          )}
 
           <div className="resources-list">
             {triviaChallenges.map((challenge) => (
@@ -317,15 +334,17 @@ function EducationalResources() {
             ))}
           </div>
 
-          <Pagination
-            currentPage={triviaCurrentPage}
-            totalItems={triviaTotalItems}
-            pageSize={triviaPageSize}
-            pageSizeOptions={[5, 10, 20]}
-            onPageChange={handleTriviaPageChange}
-            onPageSizeChange={handleTriviaPageSizeChange}
-            displayName="trivia challenges"
-          />
+          {!triviaFailed && (
+            <Pagination
+              currentPage={triviaCurrentPage}
+              totalItems={triviaTotalItems}
+              pageSize={triviaPageSize}
+              pageSizeOptions={[5, 10, 20]}
+              onPageChange={handleTriviaPageChange}
+              onPageSizeChange={handleTriviaPageSizeChange}
+              displayName="challenges"
+            />
+          )}
         </section>
       )}
     </PageLayout>
