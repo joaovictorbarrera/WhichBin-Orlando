@@ -172,13 +172,13 @@ function About() {
             </article>
             <article>
               <FiServer aria-hidden="true" />
-              <h3>Railway</h3>
-              <p>The Spring Boot API and MySQL database are hosted on Railway, with builds triggered directly from GitHub.</p>
+              <h3>Maven Tests</h3>
+              <p>Maven runs the backend unit tests, and GitHub Actions validates changes against a temporary MySQL database.</p>
             </article>
             <article>
               <FiGitBranch aria-hidden="true" />
               <h3>GitHub Actions</h3>
-              <p>GitHub Actions reports Vercel and Railway production deployment results to the team in Discord.</p>
+              <p>GitHub Actions reports Vercel production deployment results to the team in Discord.</p>
             </article>
           </div>
         </div>
