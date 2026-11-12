@@ -75,10 +75,10 @@ class UserControllerTest {
         JsonNode user = json(createUser(email));
 
         assertTrue(user.get("id").asLong() > 0);
-        assertEquals("Test", user.get("firstName").asText());
-        assertEquals("Person", user.get("lastName").asText());
-        assertEquals(email, user.get("email").asText());
-        assertFalse(user.get("invitationToken").asText().isBlank());
+        assertEquals("Test", user.get("firstName").asString());
+        assertEquals("Person", user.get("lastName").asString());
+        assertEquals(email, user.get("email").asString());
+        assertFalse(user.get("invitationToken").asString().isBlank());
     }
 
     @Test
@@ -232,7 +232,7 @@ class UserControllerTest {
     void shouldRegisterWithValidInvitation() throws Exception {
         String email = uniqueEmail();
         JsonNode created = json(createUser(email));
-        String invitation = created.get("invitationToken").asText();
+        String invitation = created.get("invitationToken").asString();
 
         String registration = """
                 {"email":"%s","password":"TestPassword123!",

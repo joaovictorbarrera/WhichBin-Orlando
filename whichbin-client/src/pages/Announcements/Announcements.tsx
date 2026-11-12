@@ -150,18 +150,24 @@ function handleFilterChange(nextFilter: AnnouncementType | '') {
         </select>
       </div>
 
-      {!loading && announcements.length === 0 && (
-        <div className="announcements-status">
-          <FiBell aria-hidden="true" />
-          <h2>
-            {filterType ? 'No announcements of this type' : 'No announcements right now'}
-          </h2>
-          <p>
-            {filterType
-              ? 'Try selecting another type to see more announcements.'
-              : 'Check back later for recycling updates and service notices.'}
-          </p>
-        </div>
+      {loading && (
+        <p className="announcements-loading">
+          Loading announcements...
+        </p>
+      )}
+
+      {!loading && error && (
+        <p className="announcements-empty-message" role="alert">
+          Unable to load announcements right now. Please try again later.
+      </p>
+      )}
+
+      {!loading && !error && announcements.length === 0 && (
+        <p className="announcements-empty-message">
+          {filterType
+            ? 'No announcements of this type are available right now.'
+            : 'No announcements are available right now.'}
+        </p>
       )}
 
       {!error && announcements.length > 0 && (
