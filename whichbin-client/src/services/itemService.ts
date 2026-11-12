@@ -1,5 +1,5 @@
 import { apiFetch } from './apiClient'
-import { isAbortError } from '../helpers/ErrorHelper'
+import { ApiResponseError, isAbortError } from '../helpers/ErrorHelper'
 import type { PaginatedResponse } from '../types/PaginatedResponse'
 
 export interface Item {
@@ -57,21 +57,16 @@ export async function fetchItems(
 export async function fetchItemById(
   id: string | number,
   signal?: AbortSignal
-): Promise<Item | null> {
-  try {
-    const response = await apiFetch(`items/${id}`, { signal })
-    if (!response.ok) {
-      return null
-    }
-
-    return (await response.json()) as Item
-  } catch (error) {
-    if (isAbortError(error)) {
-      throw error
-    }
-
-    return null
+): Promise<Item> {
+  const response = await apiFetch(`items/${id}`, { signal })
+  if (!response.ok) {
+    throw new ApiResponseError(
+      response.status,
+      `Failed to load item details (${response.status})`
+    )
   }
+
+  return (await response.json()) as Item
 }
 
 export async function createItem(item: ItemInput): Promise<Item | null> {

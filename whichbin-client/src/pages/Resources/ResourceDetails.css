@@ -233,24 +233,6 @@
 
 /* Empty / Loading States */
 
-.resource-empty-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  margin-bottom: 1rem;
-  border-radius: 0.75rem;
-  background: var(--color-surface-green);
-  color: var(--color-success);
-}
-
-.resource-empty-icon svg {
-  width: 1.75rem;
-  height: 1.75rem;
-}
-
-.resource-loading-message,
 .resource-empty-message {
   padding: 2rem;
   color: var(--color-text-muted);

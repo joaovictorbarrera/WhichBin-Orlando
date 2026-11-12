@@ -10,23 +10,48 @@ import {
         FiList,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa6'
+import DetailStatus, {
+        type DetailStatusType,
+} from '../../components/DetailStatus'
 import {
         getResourceById,
         type Resource,
 } from '../../services/resourceService'
+import { isNotFoundError } from '../../helpers/ErrorHelper'
 import PageLayout from '../../components/PageLayout'
 import './ResourceDetails.css'
 import '../Announcements/Announcements.css'
 
+type ResourceDetailState = DetailStatusType | 'success'
+
+type ResourceDetailViewState = {
+        resourceId: string | undefined
+        status: ResourceDetailState
+        resource: Resource | null
+}
+
 function ResourceDetails() {
         const { resourceId } = useParams()
 
-        const [resource, setResource] = useState<Resource | null>(null)
-        const [loading, setLoading] = useState(true)
+        const [detailState, setDetailState] = useState<ResourceDetailViewState>({
+                resourceId,
+                status: resourceId ? 'loading' : 'failed',
+                resource: null,
+        })
+        const [retryCount, setRetryCount] = useState(0)
+        const status =
+                detailState.resourceId === resourceId
+                        ? detailState.status
+                        : resourceId
+                                ? 'loading'
+                                : 'failed'
+        const resource =
+                detailState.resourceId === resourceId
+                        ? detailState.resource
+                        : null
 
         useEffect(() => {
                 if (!resourceId) {
-                        setLoading(false)
                         return
                 }
 
@@ -35,21 +60,29 @@ function ResourceDetails() {
                 getResourceById(resourceId)
                         .then((data) => {
                                 if (isMounted) {
-                                        setResource(data)
-                                        setLoading(false)
+                                        setDetailState({
+                                                resourceId,
+                                                status: 'success',
+                                                resource: data,
+                                        })
                                 }
                         })
-                        .catch(() => {
+                        .catch((error: unknown) => {
                                 if (isMounted) {
-                                        setResource(null)
-                                        setLoading(false)
+                                        setDetailState({
+                                                resourceId,
+                                                status: isNotFoundError(error)
+                                                        ? 'not-found'
+                                                        : 'failed',
+                                                resource: null,
+                                        })
                                 }
                         })
 
                 return () => {
                         isMounted = false
                 }
-        }, [resourceId])
+        }, [resourceId, retryCount])
 
         function getSectionIcon(styleType: string) {
                 if (styleType.includes('blue')) {
@@ -83,7 +116,7 @@ function ResourceDetails() {
                 return 'resource-section resource-section-green'
         }
 
-        if (loading) {
+        if (status !== 'success' || !resource) {
                 return (
                         <PageLayout
                                 className="resource-details-page"
@@ -97,36 +130,22 @@ function ResourceDetails() {
                                         Back to Educational Resources
                                 </Link>
 
-                                <div className="announcements-status">
-                                        <p>Loading resource...</p>
-                                </div>
-                        </PageLayout>
-                )
-        }
-
-        if (!resource || !resourceId) {
-                return (
-                        <PageLayout
-                                className="resource-details-page"
-                                width="wide"
-                        >
-                                <Link
-                                        to="/resources"
-                                        className="resource-back-link"
-                                >
-                                        <FiArrowLeft aria-hidden="true" />
-                                        Back to Educational Resources
-                                </Link>
-
-                                <div className="resource-details-card">
-                                        <div className="resource-empty-icon">
-                                                <FiInfo aria-hidden="true" />
-                                        </div>
-
-                                        <h1>Resource Not Found</h1>
-
-                                        <p>Resource not found.</p>
-                                </div>
+                                <DetailStatus
+                                        featureName="resource"
+                                        status={
+                                                status === 'success'
+                                                        ? 'failed'
+                                                        : status
+                                        }
+                                        onRetry={() => {
+                                                setDetailState({
+                                                        resourceId,
+                                                        status: 'loading',
+                                                        resource: null,
+                                                })
+                                                setRetryCount((count) => count + 1)
+                                        }}
+                                />
                         </PageLayout>
                 )
         }
