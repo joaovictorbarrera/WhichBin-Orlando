@@ -9,8 +9,9 @@ import {
   FiUsers,
   FiX,
 } from 'react-icons/fi'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
+import { useAuth } from '../../context/useAuth'
 import DeleteConfirmModal from '../../components/DeleteConfirmModal'
 import {
   createPasswordResetLink,
@@ -42,6 +43,8 @@ function createRegistrationLink(invitationToken: string, email: string) {
 }
 
 function AdminUsers() {
+  const { user: currentUser, logout } = useAuth()
+  const navigate = useNavigate()
   const [users, setUsers] = useState<ManagedUser[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -161,6 +164,16 @@ function AdminUsers() {
     setIsDeleting(true)
     try {
       await deleteUser(deleteTarget.id)
+      if (deleteTarget.id === currentUser?.id) {
+        try {
+          await logout()
+        } catch {
+          // The account has already been deleted, so the logout request may fail.
+        }
+
+        navigate('/admin/login', { replace: true })
+        return
+      }
       setUsers((currentUsers) =>
         currentUsers.filter((currentUser) => currentUser.id !== deleteTarget.id)
       )
@@ -177,11 +190,40 @@ function AdminUsers() {
   }
 
   async function handleResetPassword(managedUser: ManagedUser) {
+    if (managedUser.id === currentUser?.id) {
+      const confirmed = window.confirm(
+        'Warning: You are about to reset your own password. ' +
+        'Your current session will be invalidated and you will be logged out. ' +
+        'Your password reset link will appear on the login page. ' +
+        'Save it before navigating away. ' +
+        'Do you want to proceed?'
+      )
+
+      if (!confirmed) return
+    }
     setPageError('')
     setShareLink(null)
     setResettingUserId(managedUser.id)
     try {
       const invitationToken = await createPasswordResetLink(managedUser.id)
+      if (managedUser.id === currentUser?.id) {
+        const resetLink = createRegistrationLink(invitationToken, managedUser.email)
+
+        try {
+          await logout()
+        } catch {
+          // The backend already invalidated this session.
+        }
+
+        navigate('/admin/login', {
+          replace: true,
+          state: {
+            showLogin: true,
+            selfResetLink: resetLink,
+          },
+        })
+        return
+      }
       setShareLink({
         userId: managedUser.id,
         email: managedUser.email,
@@ -358,9 +400,13 @@ function AdminUsers() {
 
       {deleteTarget && (
         <DeleteConfirmModal
-          title="Delete user?"
+          title={deleteTarget.id === currentUser?.id ? "Delete your own account?" : "Delete user?"}
           itemName={`${deleteTarget.firstName} ${deleteTarget.lastName} (${deleteTarget.email})`}
-          description="This account and its active sessions will be permanently removed."
+          description={
+            deleteTarget.id === currentUser?.id
+              ? "Warning: You are about to permanently delete your own account. You will be logged out immediately and will no longer be able to sign in with this account."
+              : "This account and its active sessions will be permanently removed."
+          }
           confirmLabel="Delete user"
           loading={isDeleting}
           onCancel={() => {
