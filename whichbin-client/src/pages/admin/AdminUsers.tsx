@@ -208,20 +208,18 @@ function AdminUsers() {
       const invitationToken = await createPasswordResetLink(managedUser.id)
       if (managedUser.id === currentUser?.id) {
         const resetLink = createRegistrationLink(invitationToken, managedUser.email)
-
+      
+        navigate('/admin/login', {
+          replace: true,
+          state: { showLogin: true, selfResetLink: resetLink },
+        })
+      
         try {
           await logout()
         } catch {
-          // The backend already invalidated this session.
+          // Backend may have already invalidated the session.
         }
-
-        navigate('/admin/login', {
-          replace: true,
-          state: {
-            showLogin: true,
-            selfResetLink: resetLink,
-          },
-        })
+      
         return
       }
       setShareLink({
