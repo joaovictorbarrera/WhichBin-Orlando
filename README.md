@@ -145,6 +145,8 @@ The API serves HTTPS directly on port `443` using the Jenkins-managed PFX. Point
 
 ### Release versions
 
-Before merging a release branch into `main`, create a GitHub Release and a `vMAJOR.MINOR.PATCH` tag on that release branch. Then merge the release branch. Jenkins uses the nearest reachable version tag and appends the full commit count, for example `1.1.0.321`. Ensure the tag is pushed and reachable from `main` for the deployment build.
+For a staging candidate, create a tag such as `staging/1.0.0-rc.1`. The version script reads its `1.0.0` base and appends the full commit count, for example `1.0.0.324`; the `rc.1` suffix is not included in the application version. Only create the production `v1.0.0` GitHub Release/tag when version `1.0.0` goes live.
+
+Before merging a release branch into `main`, create the GitHub Release and its `vMAJOR.MINOR.PATCH` tag on that release branch. Then merge the release branch. Jenkins uses the nearest reachable version tag and appends the full commit count. Ensure the tag is pushed and reachable from `main` for the deployment build.
 
 The Compose stack keeps MySQL data in the persistent `mysql_data` volume across deployments. Do not remove that volume unless you intend to delete the production database.
