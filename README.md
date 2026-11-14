@@ -129,7 +129,7 @@ Create these credentials in Jenkins with the exact IDs below, in a scope availab
 | `whichbin-tls-keystore-password` | Secret text | Password for the PFX |
 | `whichbin-client-url` | Secret text | Exact Vercel/custom-domain origin, e.g. `https://www.whichbin-orlando.org` |
 
-The certificate is mounted read-only into the API container at runtime; it is not copied into the image or committed to Git. Update the Jenkins secret-file credential before the certificate expires.
+The pipeline stages the Jenkins certificate credential at `secrets/whichbin-orlando.org-fullchain.pfx` in the Jenkins workspace so Docker Desktop can bind-mount it reliably. The file is Git-ignored and excluded from the Docker build context. It must remain on the host while the API container uses it, including across container restarts; restrict access to the Jenkins account and do not clean this workspace while the deployment is running. Update the Jenkins secret-file credential before the certificate expires.
 
 ### Configure Vercel and HTTPS
 
