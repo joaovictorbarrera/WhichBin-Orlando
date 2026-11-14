@@ -1,3 +1,4 @@
+import CollectionState from '../../components/CollectionState'
 import { useEffect, useState, type FormEvent } from 'react'
 import {
   FiArrowLeft,
@@ -267,15 +268,6 @@ function AdminUsers() {
         </header>
 
         {pageError && <p className="admin-users-error" role="alert">{pageError}</p>}
-        {loadError && (
-          <div className="admin-users-load-error" role="alert">
-            <p>{loadError}</p>
-            <button type="button" onClick={() => setReloadCount((count) => count + 1)}>
-              Try again
-            </button>
-          </div>
-        )}
-
         {isCreating && (
           <UserForm
             title="Create user"
@@ -312,15 +304,17 @@ function AdminUsers() {
 
         <div className="admin-users-list-heading">
           <h2>Users</h2>
-          <span>{users.length} {users.length === 1 ? 'account' : 'accounts'}</span>
+          {!isLoading && !loadError && <span>{users.length} {users.length === 1 ? 'account' : 'accounts'}</span>}
         </div>
 
         {isLoading ? (
-          <p className="admin-users-status" role="status">Loading users...</p>
-        ) : users.length === 0 && !loadError ? (
-          <p className="admin-users-status">No users have been created yet.</p>
+          <CollectionState state="loading" name="users" />
+        ) : loadError ? (
+          <CollectionState state="error" name="users" onRetry={() => setReloadCount((count) => count + 1)} />
+        ) : users.length === 0 ? (
+          <CollectionState state="empty" name="users" description="No users have been created yet." />
         ) : (
-          <div className="admin-users-list">
+          <div className="admin-users-list collection-list">
             {users.map((managedUser) => (
               <article className="admin-user-card" key={managedUser.id}>
                 <div className="admin-user-summary">

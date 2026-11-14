@@ -1,3 +1,4 @@
+import CollectionState from '../../components/CollectionState'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -5,9 +6,7 @@ import {
   FiX,
   FiTrash2,
   FiBox,
-  FiAlertCircle,
   FiChevronRight,
-  FiRefreshCw,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
 import PageLayout from '../../components/PageLayout'
@@ -107,10 +106,6 @@ function ItemSearch() {
     }
   }, [debouncedSearchText, filter, refreshKey, page, pageSize])
 
-  function forceRefresh() {
-    setRefreshKey((prev) => prev + 1)
-  }
-
   return (
     <PageLayout className="item-search-page" width="wide">
       <div className="item-search-header">
@@ -187,33 +182,11 @@ function ItemSearch() {
         </div>
       </section>
 
-      {!loading && error && items.length === 0 && (
-        <div className="item-search-status item-search-error" role="alert">
-          <FiAlertCircle className="status-icon" aria-hidden="true" />
-          <h2>Unable to load items</h2>
-          <p>{error}</p>
-          <button
-            type="button"
-            className="item-search-retry-btn"
-            onClick={forceRefresh}
-          >
-            <FiRefreshCw aria-hidden="true" />
-            Try again
-          </button>
-        </div>
-      )}
-
-      {!loading && error && items.length > 0 && (
-        <div className="item-search-inline-error" role="alert">
-          <span>{error}</span>
-          <button type="button" onClick={forceRefresh}>
-            Try again
-          </button>
-        </div>
-      )}
+      {loading && !hasLoaded && <CollectionState state="loading" name="items" />}
+      {!loading && error && <CollectionState state="error" name="items" onRetry={() => setRefreshKey((key) => key + 1)} />}
 
       {!loading && !error && hasLoaded && items.length === 0 && (
-        <div className="item-search-status item-search-empty">
+        <CollectionState state="empty" name="items" description={null}>
           <p>
             {searchText.trim()
               ? `No items matched "${debouncedSearchText.trim()}". Try another search or adjust the filter.`
@@ -231,11 +204,11 @@ function ItemSearch() {
               Clear search & filters
             </button>
           )}
-        </div>
+        </CollectionState>
       )}
 
       {items.length > 0 && (
-        <div className="item-search-list" aria-busy={loading}>
+        <div className="item-search-list collection-list" aria-busy={loading}>
           {items.map((item) => (
             <Link
               to={`/item-search/${item.id}`}

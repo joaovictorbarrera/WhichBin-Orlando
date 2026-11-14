@@ -66,17 +66,17 @@ describe('EducationalResources', () => {
       Array.from(articleSection.children).indexOf(
         within(articleSection).getByRole('heading', { name: 'Articles' })
       )
-    ).toBeLessThan(Array.from(articleSection.children).indexOf(articlesMessage))
+    ).toBeLessThan(Array.from(articleSection.children).indexOf(articlesMessage.closest('.collection-state')!))
     expect(
-      Array.from(articleSection.children).indexOf(articlesMessage)
+      Array.from(articleSection.children).indexOf(articlesMessage.closest('.collection-state')!)
     ).toBeLessThan(Array.from(articleSection.children).indexOf(articlePagination))
     expect(
       Array.from(triviaSection.children).indexOf(
         within(triviaSection).getByRole('heading', { name: 'Trivia' })
       )
-    ).toBeLessThan(Array.from(triviaSection.children).indexOf(triviaMessage))
+    ).toBeLessThan(Array.from(triviaSection.children).indexOf(triviaMessage.closest('.collection-state')!))
     expect(
-      Array.from(triviaSection.children).indexOf(triviaMessage)
+      Array.from(triviaSection.children).indexOf(triviaMessage.closest('.collection-state')!)
     ).toBeLessThan(Array.from(triviaSection.children).indexOf(triviaPagination))
   })
 

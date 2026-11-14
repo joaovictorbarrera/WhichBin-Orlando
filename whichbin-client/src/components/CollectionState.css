@@ -1,0 +1,45 @@
+.collection-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 15rem;
+  padding: 2.5rem 1.25rem;
+  margin: 1.5rem 0;
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 1rem;
+}
+.collection-state .collection-state__icon { width: 2rem; height: 2rem; color: var(--color-brand); }
+.collection-state h2 { margin: 0; font-size: 1.25rem; color: var(--color-heading); }
+.collection-state p { margin: 0; max-width: 32rem; color: var(--color-text-muted); }
+.collection-state button, .collection-error button {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 2.75rem; padding: .65rem 1.1rem;
+  border: 1px solid var(--color-brand); border-radius: .6rem;
+  background: var(--color-brand); color: white; font: inherit; font-weight: 600; cursor: pointer;
+}
+.collection-state button:hover { background: var(--color-brand-dark); }
+.collection-state button:focus-visible { outline: 3px solid var(--color-brand); outline-offset: 3px; }
+.collection-state--loading .collection-state__icon { animation: collection-spin 1.2s linear infinite; }
+.collection-list { display: grid; gap: 1rem; }
+@keyframes collection-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .collection-state--loading .collection-state__icon { animation: none; } }
+
+.collection-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  text-align: left;
+}
+.collection-error p { margin: 0; color: #c43131; }
+.collection-error button { flex-shrink: 0; }
+.collection-error button:hover { background: var(--color-brand-dark); }
+.collection-error button:focus-visible { outline: 3px solid var(--color-brand); outline-offset: 3px; }
+@media (max-width: 640px) {
+  .collection-error { flex-direction: column; align-items: flex-start; }
+}

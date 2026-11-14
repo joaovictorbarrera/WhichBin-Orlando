@@ -1,10 +1,10 @@
+import CollectionState from '../../components/CollectionState'
 import { useEffect, useState, type FormEvent } from 'react'
 import {
   FiArrowLeft,
   FiBox,
   FiEdit,
   FiPlus,
-  FiRefreshCw,
   FiSearch,
   FiTrash2,
   FiX,
@@ -513,28 +513,11 @@ function AdminItems() {
           ) : null}
         </div>
 
-        {!loading && loadError && items.length === 0 && (
-          <div className="admin-items-empty admin-items-error" role="alert">
-            <p>Items could not be loaded. Check your connection and try again.</p>
-            <button type="button" onClick={() => setRefreshKey((current) => current + 1)}>
-              <FiRefreshCw aria-hidden="true" />
-              Try again
-            </button>
-          </div>
-        )}
+      {loading && !hasLoaded && <CollectionState state="loading" name="items" />}
+      {!loading && loadError && <CollectionState state="error" name="items" onRetry={() => setRefreshKey((key) => key + 1)} />}
 
-        {!loading && loadError && items.length > 0 && (
-          <div className="admin-items-load-error" role="alert">
-            <p>Items could not be updated. Showing the previous results.</p>
-            <button type="button" onClick={() => setRefreshKey((current) => current + 1)}>
-              <FiRefreshCw aria-hidden="true" />
-              Try again
-            </button>
-          </div>
-        )}
-
-        {!loading && !loadError && hasLoaded && items.length === 0 && (
-          <div className="admin-items-empty">
+      {!loading && !loadError && hasLoaded && items.length === 0 && (
+          <CollectionState state="empty" name="items" description={null}>
             <p>
               {debouncedSearchText.trim()
                 ? `No items matched "${debouncedSearchText.trim()}". Try another search or adjust the filter.`
@@ -553,11 +536,11 @@ function AdminItems() {
                 Clear search &amp; filters
               </button>
             )}
-          </div>
+          </CollectionState>
         )}
 
         {items.length > 0 && (
-          <div className="admin-items-list" aria-busy={loading}>
+          <div className="admin-items-list collection-list" aria-busy={loading}>
             {items.map((item) => (
               <article className="admin-item-card" key={item.id}>
                 <div className="admin-item-card-content">

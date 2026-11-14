@@ -1,3 +1,4 @@
+import CollectionState from '../../components/CollectionState'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FiBell, FiChevronRight } from 'react-icons/fi'
@@ -33,7 +34,8 @@ function Announcements() {
   const [pageSize, setPageSize] = useState(5)
   const [totalItems, setTotalItems] = useState<number>()
   const [error, setError] = useState<string>()
-  const queryKey = `${currentPage}:${pageSize}:${filterType}`
+  const [refreshKey, setRefreshKey] = useState(0)
+  const queryKey = `${currentPage}:${pageSize}:${filterType}:${refreshKey}`
   const [loadedQueryKey, setLoadedQueryKey] = useState<string | null>(null)
   const loading = loadedQueryKey !== queryKey
   const paginationAnchorRef = useRef<HTMLDivElement>(null)
@@ -150,28 +152,19 @@ function handleFilterChange(nextFilter: AnnouncementType | '') {
         </select>
       </div>
 
-      {loading && (
-        <p className="announcements-loading">
-          Loading announcements...
-        </p>
-      )}
-
-      {!loading && error && (
-        <p className="announcements-empty-message" role="alert">
-          Unable to load announcements right now. Please try again later.
-      </p>
-      )}
+      {loading && loadedQueryKey === null && <CollectionState state="loading" name="announcements" />}
+      {!loading && error && <CollectionState state="error" name="announcements" onRetry={() => setRefreshKey((key) => key + 1)} />}
 
       {!loading && !error && announcements.length === 0 && (
-        <p className="announcements-empty-message">
+        <CollectionState state="empty" name="announcements" description={null}><p>
           {filterType
             ? 'No announcements of this type are available right now.'
             : 'No announcements are available right now.'}
-        </p>
+        </p></CollectionState>
       )}
 
       {!error && announcements.length > 0 && (
-        <div className="announcements-list">
+        <div className="announcements-list collection-list">
           {announcements.map((announcement) => (
             <Link
               to={`/announcements/${announcement.id}`}
@@ -229,7 +222,7 @@ function handleFilterChange(nextFilter: AnnouncementType | '') {
             </>
           )}
         </div>
-        {!error && totalItems !== undefined && (
+        {totalItems !== undefined && (
           <Pagination
             currentPage={currentPage}
             totalItems={totalItems}

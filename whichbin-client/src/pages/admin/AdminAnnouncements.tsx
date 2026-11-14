@@ -1,3 +1,4 @@
+import CollectionState from '../../components/CollectionState'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import {
   FiArrowLeft,
@@ -90,7 +91,6 @@ function AdminAnnouncements() {
 
     setError(true)
     setAnnouncements([])
-    setTotalItems(undefined)
   } finally {
     if (requestId === announcementLoadRequest.current) {
       setLoading(false)
@@ -510,7 +510,7 @@ async function handleConfirmDelete() {
                 </option>
               ))}
             </select>
-            {!error && totalItems !== undefined && (
+            {totalItems !== undefined && (
               <span>
                 {totalItems}{' '}
                 {totalItems === 1 ? 'announcement' : 'announcements'}
@@ -519,27 +519,21 @@ async function handleConfirmDelete() {
           </div>
         </div>
 
-        {!loading && error && (
-          <div className="admin-announcements-empty">
-            <p>Announcements could not be loaded.</p>
-            <button type="button" onClick={() => void loadAnnouncements(announcementFilter || undefined)}>
-              Try Again
-            </button>
-          </div>
-        )}
+        {loading && !hasLoaded && <CollectionState state="loading" name="announcements" />}
+        {!loading && error && <CollectionState state="error" name="announcements" onRetry={() => void loadAnnouncements(announcementFilter || undefined)} />}
 
         {!loading && !error && announcements.length === 0 && (
-          <div className="admin-announcements-empty">
+          <CollectionState state="empty" name="announcements" description={null}>
             <p>
               {announcementFilter
                 ? 'No announcements match the selected type.'
                 : 'No announcements have been created yet.'}
             </p>
-          </div>
+          </CollectionState>
         )}
 
         {!error && announcements.length > 0 && (
-          <div className="admin-announcements-list">
+          <div className="admin-announcements-list collection-list">
             {announcements.map((announcement) => {
               const status = getAnnouncementStatus(announcement)
 
@@ -632,7 +626,7 @@ async function handleConfirmDelete() {
               </>
             )}
           </div>
-          {!error && totalItems !== undefined && (
+          {totalItems !== undefined && (
             <Pagination
               currentPage={currentPage}
               totalItems={totalItems}
