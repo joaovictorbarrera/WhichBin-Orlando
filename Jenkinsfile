@@ -80,7 +80,7 @@ pipeline {
                         $env:SPRING_DATASOURCE_PASSWORD = 'test-password'
                         Push-Location 'whichbin-api'
                         try {
-                            & .\mvnw.cmd --batch-mode --no-transfer-progress "-Drevision=$env:APP_VERSION" test
+                            & (Join-Path (Get-Location) 'mvnw.cmd') --batch-mode --no-transfer-progress "-Drevision=$env:APP_VERSION" test
                             if ($LASTEXITCODE -ne 0) {
                                 throw 'Backend Maven tests failed.'
                             }
