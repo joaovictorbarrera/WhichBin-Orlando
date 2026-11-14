@@ -97,7 +97,7 @@ pipeline {
         stage('Build and deploy') {
             steps {
                 withCredentials([
-                    file(credentialsId: 'whichbin-tls-pfx', variable: 'TLS_CERT_FILE'),
+                    file(credentialsId: 'whichbin-tls-pfx', variable: 'JENKINS_TLS_CERT_FILE'),
                     string(credentialsId: 'whichbin-db-username', variable: 'DB_USERNAME'),
                     string(credentialsId: 'whichbin-db-password', variable: 'DB_PASSWORD'),
                     string(credentialsId: 'whichbin-db-root-password', variable: 'DB_ROOT_PASSWORD'),
@@ -106,6 +106,16 @@ pipeline {
                 ]) {
                     powershell '''
                         $PSNativeCommandUseErrorActionPreference = $false
+                        $secretsDirectory = Join-Path $env:WORKSPACE 'secrets'
+                        $certificatePath = Join-Path $secretsDirectory 'whichbin-orlando.org-fullchain.pfx'
+
+                        New-Item -ItemType Directory -Path $secretsDirectory -Force | Out-Null
+                        Copy-Item -LiteralPath $env:JENKINS_TLS_CERT_FILE -Destination $certificatePath -Force
+                        if (-not (Test-Path -LiteralPath $certificatePath -PathType Leaf)) {
+                            throw 'Could not stage the TLS certificate for Docker Compose.'
+                        }
+
+                        $env:TLS_CERT_FILE = $certificatePath
                         docker compose up -d --build --remove-orphans
                         if ($LASTEXITCODE -ne 0) {
                             throw 'Docker Compose deployment failed.'
