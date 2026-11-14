@@ -9,15 +9,46 @@ const tagArgs = [
   'v[0-9]*',
 ];
 
-if (git(['rev-parse', '--is-shallow-repository']) === 'true') {
-  git(['fetch', '--unshallow', '--tags', 'origin']);
+function getFetchRemote() {
+  try {
+    return git(['remote', 'get-url', 'origin']);
+  } catch {
+    const owner = process.env.VERCEL_GIT_REPO_OWNER;
+    const repository = process.env.VERCEL_GIT_REPO_SLUG;
+    if (owner && repository) {
+      return `https://github.com/${owner}/${repository}.git`;
+    }
+
+    throw new Error(
+      'Cannot fetch Git tags or history: no origin remote or Vercel repository metadata is available.',
+    );
+  }
+}
+
+const shallow = git(['rev-parse', '--is-shallow-repository']) === 'true';
+if (shallow) {
+  const remote = getFetchRemote();
+  const branch = process.env.VERCEL_GIT_COMMIT_REF;
+  if (!branch) {
+    throw new Error(
+      'Cannot calculate a full commit count from a shallow checkout without VERCEL_GIT_COMMIT_REF.',
+    );
+  }
+
+  git([
+    'fetch',
+    '--unshallow',
+    '--tags',
+    remote,
+    `+refs/heads/${branch}:refs/remotes/version/${branch}`,
+  ]);
 }
 
 let tag;
 try {
   tag = git(tagArgs);
 } catch {
-  git(['fetch', '--tags', 'origin']);
+  git(['fetch', '--tags', getFetchRemote()]);
   tag = git(tagArgs);
 }
 

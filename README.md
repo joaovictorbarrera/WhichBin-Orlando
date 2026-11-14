@@ -139,7 +139,7 @@ In Vercel, set the project **Root Directory** to `whichbin-client`, enable **Inc
 | --- | --- |
 | `VITE_API_URL` | `https://<api-domain>/api/` |
 
-Production builds on Vercel use the shared version script; it fetches tags and, when needed, the full commit history so Vercel's Git checkout can calculate the release and commit-count version. The local Vite dev server uses the POM version instead.
+Production builds on Vercel use the shared version script; when Vercel's checkout is shallow or lacks tags, it uses Vercel's repository and branch metadata to fetch the reachable release tag and full commit history. The local Vite dev server uses the POM version instead.
 
 The API serves HTTPS directly on port `443` using the Jenkins-managed PFX. Point the API domain's DNS to the Docker host and allow inbound TCP port `443` in the host firewall. Set `whichbin-client`'s `VITE_API_URL` to that API domain. Set the Jenkins `whichbin-client-url` credential to the frontend's exact origin (scheme and hostname only, no path or trailing slash) for API CORS.
 
