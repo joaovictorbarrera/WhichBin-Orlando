@@ -1,4 +1,5 @@
 import { apiFetch } from './apiClient'
+import { ApiResponseError } from '../helpers/ErrorHelper'
 import type { PaginatedResponse } from '../types/PaginatedResponse'
 
 export type ResourceSection = {
@@ -51,18 +52,17 @@ export async function getResources(
   }
 }
 
-export async function getResourceById(resourceId: string): Promise<Resource | null> {
-  try {
-    const response = await apiFetch(`resources/${resourceId}`)
+export async function getResourceById(resourceId: string): Promise<Resource> {
+  const response = await apiFetch(`resources/${resourceId}`)
 
-    if (!response.ok) {
-      return null
-    }
-
-    return (await response.json()) as Resource
-  } catch {
-    return null
+  if (!response.ok) {
+    throw new ApiResponseError(
+      response.status,
+      `Failed to load resource details (${response.status})`
+    )
   }
+
+  return (await response.json()) as Resource
 }
 
 export async function createResource(

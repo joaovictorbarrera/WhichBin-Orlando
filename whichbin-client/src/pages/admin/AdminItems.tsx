@@ -540,7 +540,7 @@ function AdminItems() {
                 ? `No items matched "${debouncedSearchText.trim()}". Try another search or adjust the filter.`
                 : filter !== 'all'
                   ? 'There are no items matching the selected filter.'
-                  : 'No items yet. Add an item to get started.'}
+                  : 'No items have been created yet.'}
             </p>
             {(searchText.trim() || filter !== 'all') && (
               <button
@@ -605,6 +605,17 @@ function AdminItems() {
             ))}
           </div>
         )}
+
+        {hasLoaded && (
+          <Pagination
+            currentPage={page}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={changePageSize}
+            pageSizeOptions={[5, 10, 20, 50]}
+          />
+        )}
       </section>
 
       {deleteTarget && (
@@ -630,16 +641,6 @@ function AdminItems() {
           </>
         )}
       </div>
-      {hasLoaded && (
-        <Pagination
-          currentPage={page}
-          totalItems={totalItems}
-          pageSize={pageSize}
-          onPageChange={setPage}
-          onPageSizeChange={changePageSize}
-          pageSizeOptions={[5, 10, 20, 50]}
-        />
-      )}
     </PageLayout>
   )
 }

@@ -5,12 +5,24 @@ import {
   FiBell,
   FiCalendar,
 } from 'react-icons/fi'
+import DetailStatus, {
+  type DetailStatusType,
+} from '../../components/DetailStatus'
+import { isNotFoundError } from '../../helpers/ErrorHelper'
 import {
   getAnnouncementById,
   type Announcement,
 } from '../../services/announcementService'
 import PageLayout from '../../components/PageLayout'
 import './AnnouncementDetails.css'
+
+type AnnouncementDetailState = DetailStatusType | 'success'
+
+type AnnouncementDetailViewState = {
+  announcementId: string | undefined
+  status: AnnouncementDetailState
+  announcement: Announcement | null
+}
 
 function formatType(type: string) {
   return type.replaceAll('_', ' ')
@@ -29,8 +41,22 @@ function formatDateTime(dateTime: string) {
 function AnnouncementDetails() {
   const { announcementId } = useParams()
 
-  const [announcement, setAnnouncement] = useState<Announcement | null>(null)
-  const [loading, setLoading] = useState(Boolean(announcementId))
+  const [detailState, setDetailState] = useState<AnnouncementDetailViewState>({
+    announcementId,
+    status: announcementId ? 'loading' : 'failed',
+    announcement: null,
+  })
+  const [retryCount, setRetryCount] = useState(0)
+  const status =
+    detailState.announcementId === announcementId
+      ? detailState.status
+      : announcementId
+        ? 'loading'
+        : 'failed'
+  const announcement =
+    detailState.announcementId === announcementId
+      ? detailState.announcement
+      : null
 
   useEffect(() => {
     if (!announcementId) {
@@ -42,26 +68,29 @@ function AnnouncementDetails() {
     getAnnouncementById(announcementId)
       .then((data) => {
         if (isMounted) {
-          setAnnouncement(data)
+          setDetailState({
+            announcementId,
+            status: 'success',
+            announcement: data,
+          })
         }
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (isMounted) {
-          setAnnouncement(null)
-        }
-      })
-      .finally(() => {
-        if (isMounted) {
-          setLoading(false)
+          setDetailState({
+            announcementId,
+            status: isNotFoundError(error) ? 'not-found' : 'failed',
+            announcement: null,
+          })
         }
       })
 
     return () => {
       isMounted = false
     }
-  }, [announcementId])
+  }, [announcementId, retryCount])
 
-  if (loading) {
+  if (status !== 'success' || !announcement) {
     return (
       <PageLayout className="announcement-details-page" width="wide">
         <Link className="announcement-back-link" to="/announcements">
@@ -69,26 +98,18 @@ function AnnouncementDetails() {
           Back to Announcements
         </Link>
 
-        <div className="announcement-details-status">
-          <p>Loading announcement...</p>
-        </div>
-      </PageLayout>
-    )
-  }
-
-  if (!announcementId || !announcement) {
-    return (
-      <PageLayout className="announcement-details-page" width="wide">
-        <Link className="announcement-back-link" to="/announcements">
-          <FiArrowLeft aria-hidden="true" />
-          Back to Announcements
-        </Link>
-
-        <div className="announcement-details-status">
-          <FiBell aria-hidden="true" />
-          <h1>Announcement Not Found</h1>
-          <p>The requested announcement could not be found.</p>
-        </div>
+        <DetailStatus
+          featureName="announcement"
+          status={status === 'success' ? 'failed' : status}
+          onRetry={() => {
+            setDetailState({
+              announcementId,
+              status: 'loading',
+              announcement: null,
+            })
+            setRetryCount((count) => count + 1)
+          }}
+        />
       </PageLayout>
     )
   }

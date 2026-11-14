@@ -1,4 +1,6 @@
 import { apiFetch } from './apiClient'
+import { ApiResponseError } from '../helpers/ErrorHelper'
+import type { PaginatedResponse } from '../types/PaginatedResponse'
 
 export const announcementTypes = [
   { value: 'GENERAL', label: 'General' },
@@ -37,6 +39,32 @@ export async function getAnnouncements(
   }
 }
 
+export async function getAnnouncementsPaged(
+  page: number,
+  pageSize: number,
+  type?: AnnouncementType,
+  signal?: AbortSignal
+): Promise<PaginatedResponse<Announcement>> {
+  const params = new URLSearchParams({
+    page: String(page),
+    pageSize: String(pageSize),
+  })
+
+  if (type) {
+    params.set('type', type)
+  }
+
+  const response = await apiFetch(`announcements?${params}`, {
+    signal,
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to load announcements (${response.status})`)
+  }
+
+  return (await response.json()) as PaginatedResponse<Announcement>
+}
+
 export async function getAllAnnouncements(
   type?: AnnouncementType
 ): Promise<Announcement[] | null> {
@@ -54,20 +82,45 @@ export async function getAllAnnouncements(
   }
 }
 
+export async function getAllAnnouncementsPaged(
+  page: number,
+  pageSize: number,
+  type?: AnnouncementType,
+  signal?: AbortSignal
+): Promise<PaginatedResponse<Announcement>> {
+  const params = new URLSearchParams({
+    page: String(page),
+    pageSize: String(pageSize),
+  })
+
+  if (type) {
+    params.set('type', type)
+  }
+
+  const response = await apiFetch(`announcements/all?${params}`, {
+    signal,
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to load admin announcements (${response.status})`)
+  }
+
+  return (await response.json()) as PaginatedResponse<Announcement>
+}
+
 export async function getAnnouncementById(
   announcementId: string
-): Promise<Announcement | null> {
-  try {
-    const response = await apiFetch(`announcements/${announcementId}`)
+): Promise<Announcement> {
+  const response = await apiFetch(`announcements/${announcementId}`)
 
-    if (!response.ok) {
-      return null
-    }
-
-    return (await response.json()) as Announcement
-  } catch {
-    return null
+  if (!response.ok) {
+    throw new ApiResponseError(
+      response.status,
+      `Failed to load announcement details (${response.status})`
+    )
   }
+
+  return (await response.json()) as Announcement
 }
 
 export type AnnouncementInput = {

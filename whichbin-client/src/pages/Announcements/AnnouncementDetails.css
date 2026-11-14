@@ -176,31 +176,6 @@
   --announcement-tint: var(--color-surface-red);
 }
 
-.announcement-details-status {
-  padding: 2.5rem 1.5rem;
-  text-align: center;
-  background: var(--color-surface);
-  border: 0.065rem solid var(--color-border-soft);
-  border-radius: 0.875rem;
-  box-shadow: var(--shadow-card);
-}
-
-.announcement-details-status > svg {
-  margin-bottom: 0.75rem;
-  color: var(--color-brand);
-  font-size: 2rem;
-}
-
-.announcement-details-status h1 {
-  margin: 0 0 0.5rem;
-  color: var(--color-heading-deep);
-}
-
-.announcement-details-status p {
-  margin: 0;
-  color: var(--color-text-muted);
-}
-
 @media (max-width: 600px) {
   .announcement-details-page {
     padding-right: 1rem;

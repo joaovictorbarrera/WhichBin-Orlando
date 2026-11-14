@@ -1,5 +1,6 @@
 
 import { apiFetch } from './apiClient'
+import { ApiResponseError } from '../helpers/ErrorHelper'
 import type { PaginatedResponse } from '../types/PaginatedResponse'
 
 export type TriviaQuestion = {
@@ -189,20 +190,19 @@ export async function getAllTriviaChallenges(
 
 export async function getTriviaChallengeById(
   challengeId: number
-): Promise<TriviaChallenge | null> {
-  try {
-    const response = await apiFetch(
-      `resources/trivia/challenges/${challengeId}`
+): Promise<TriviaChallenge> {
+  const response = await apiFetch(
+    `resources/trivia/challenges/${challengeId}`
+  )
+
+  if (!response.ok) {
+    throw new ApiResponseError(
+      response.status,
+      `Failed to load challenge details (${response.status})`
     )
-
-    if (!response.ok) {
-      return null
-    }
-
-    return (await response.json()) as TriviaChallenge
-  } catch {
-    return null
   }
+
+  return (await response.json()) as TriviaChallenge
 }
 
 export async function createTriviaChallenge(

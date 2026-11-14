@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import com.whichbin.whichbin_api.dto.PaginatedResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class AnnouncementService {
@@ -20,6 +24,37 @@ public class AnnouncementService {
 
     public List<Announcement> getCurrentAnnouncements() {
         return announcementRepository.findCurrentAnnouncements(LocalDateTime.now());
+    }
+
+    public PaginatedResponse<Announcement> getCurrentAnnouncementsPaged(
+             AnnouncementType type,
+             int page,
+             int size
+    ) {
+        PageRequest pageable = PageRequest.of(page - 1, size);
+
+         Page<Announcement> results;
+
+          if (type == null) {
+            results = announcementRepository.findCurrentAnnouncementsPaged(
+                    LocalDateTime.now(),
+                    pageable
+            );
+        } else {
+            results = announcementRepository.findCurrentAnnouncementsByTypePaged(
+                    LocalDateTime.now(),
+                    type,
+                    pageable
+            );
+        }
+
+        return new PaginatedResponse<>(
+                results.getNumber() + 1,
+                results.getTotalPages(),
+                results.getSize(),
+                results.getTotalElements(),
+                results.getContent()
+        );
     }
 
     public List<Announcement> getCurrentAnnouncements(AnnouncementType type) {
@@ -41,6 +76,40 @@ public class AnnouncementService {
         return type == null
                 ? getAllAnnouncements()
                 : announcementRepository.findByTypeOrderByStartDateDesc(type);
+    }
+
+    public PaginatedResponse<Announcement> getAllAnnouncementsPaged(
+            AnnouncementType type,
+            int page,
+            int pageSize
+    ) {
+        PageRequest pageable = PageRequest.of(
+                page - 1,
+                pageSize,
+                Sort.by(
+                        Sort.Order.desc("startDate"),
+                        Sort.Order.desc("id")
+                )
+        );
+
+        Page<Announcement> results;
+
+        if (type == null) {
+            results = announcementRepository.findAll(pageable);
+        } else {
+            results = announcementRepository.findByTypeOrderByStartDateDescIdDesc(
+                    type,
+                    pageable
+            );
+        }
+
+        return new PaginatedResponse<>(
+                results.getNumber() + 1,
+                results.getTotalPages(),
+                results.getSize(),
+                results.getTotalElements(),
+                results.getContent()
+        );
     }
 
     public Optional<Announcement> getAnnouncementById(Long id) {

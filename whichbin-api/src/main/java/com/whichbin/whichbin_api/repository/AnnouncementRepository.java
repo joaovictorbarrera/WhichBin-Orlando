@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface AnnouncementRepository extends JpaRepository<Announcement, Long> {
@@ -29,6 +31,16 @@ public interface AnnouncementRepository extends JpaRepository<Announcement, Long
             WHERE a.active = true
               AND a.startDate <= :now
               AND (a.endDate IS NULL OR a.endDate >= :now)
+            ORDER BY a.startDate DESC, a.id DESC
+            """)
+    Page<Announcement> findCurrentAnnouncementsPaged(@Param("now") LocalDateTime now, Pageable pageable);
+
+    @Query("""
+            SELECT a
+            FROM Announcement a
+            WHERE a.active = true
+              AND a.startDate <= :now
+              AND (a.endDate IS NULL OR a.endDate >= :now)
               AND a.type = :type
             ORDER BY a.startDate DESC
             """)
@@ -38,6 +50,26 @@ public interface AnnouncementRepository extends JpaRepository<Announcement, Long
     );
 
     List<Announcement> findByTypeOrderByStartDateDesc(AnnouncementType type);
+
+    Page<Announcement> findByTypeOrderByStartDateDescIdDesc(
+        AnnouncementType type,
+        Pageable pageable
+    );
+
+    @Query("""
+            SELECT a
+            FROM Announcement a
+            WHERE a.active = true
+              AND a.startDate <= :now
+              AND (a.endDate IS NULL OR a.endDate >= :now)
+              AND a.type = :type
+            ORDER BY a.startDate DESC, a.id DESC
+            """)
+    Page<Announcement> findCurrentAnnouncementsByTypePaged(
+            @Param("now") LocalDateTime now,
+            @Param("type") AnnouncementType type,
+            Pageable pageable
+    );
     
     boolean existsByTitle(String title);
 }

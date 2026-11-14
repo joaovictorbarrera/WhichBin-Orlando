@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import type { ReactNode } from 'react'
 import { FiAlertTriangle, FiTrash2, FiX } from 'react-icons/fi'
 import { createPortal } from 'react-dom'
 import './DeleteConfirmModal.css'
@@ -8,6 +9,7 @@ type DeleteConfirmModalProps = {
 	itemName: string
 	description: string
 	confirmLabel: string
+	confirmIcon?: ReactNode
 	loading?: boolean
 	onCancel: () => void
 	onConfirm: () => void
@@ -18,6 +20,7 @@ export default function DeleteConfirmModal({
 	itemName,
 	description,
 	confirmLabel,
+	confirmIcon,
 	loading = false,
 	onCancel,
 	onConfirm,
@@ -97,7 +100,7 @@ export default function DeleteConfirmModal({
 						onClick={onConfirm}
 						disabled={loading}
 					>
-						<FiTrash2 />
+						{confirmIcon ?? <FiTrash2 />}
 
 						{loading ? 'Deleting...' : confirmLabel}
 					</button>

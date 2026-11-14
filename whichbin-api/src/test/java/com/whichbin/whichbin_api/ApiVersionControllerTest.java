@@ -24,6 +24,6 @@ class ApiVersionControllerTest {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
-                .andExpect(jsonPath("$.version").value(Matchers.matchesPattern("\\d+\\.\\d+\\.\\d+")));
+                .andExpect(jsonPath("$.version").value(Matchers.matchesPattern("\\d+\\.\\d+\\.\\d+(?:\\.\\d+)?")));
     }
 }

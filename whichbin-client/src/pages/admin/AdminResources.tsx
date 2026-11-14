@@ -1027,7 +1027,7 @@ export default function AdminResources() {
                                                 !error &&
                                                 resources.length === 0 && (
                                                         <p className="admin-resource-status">
-                                                                No resources have been added yet.
+                                                                No resources have been created yet.
                                                         </p>
                                                 )}
 
@@ -1107,7 +1107,7 @@ export default function AdminResources() {
                                                         </div>
                                                 )}
 
-                                        {!loading && !error && (totalItems ?? 0) > 0 && (
+                                        {!loading && !error && (
                                                 <Pagination
                                                         currentPage={currentPage}
                                                         totalItems={totalItems}
@@ -1174,7 +1174,7 @@ export default function AdminResources() {
                                                 !triviaError &&
                                                 triviaChallenges.length === 0 && (
                                                         <p className="admin-resource-status">
-                                                                No trivia challenges have been added
+                                                                No trivia challenges have been created
                                                                 yet.
                                                         </p>
                                                 )}
@@ -1490,9 +1490,7 @@ export default function AdminResources() {
                                                         </div>
                                                 )}
 
-                                        {!triviaLoading &&
-                                                !triviaError &&
-                                                (triviaTotalItems ?? 0) > 0 && (
+                                        {!triviaLoading && !triviaError && (
                                                         <Pagination
                                                                 currentPage={triviaCurrentPage}
                                                                 totalItems={triviaTotalItems}

@@ -9,9 +9,11 @@ function AdminLogin() {
   const { isAuthenticated, login } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
-  const showLogin = Boolean(
-    (location.state as { showLogin?: boolean } | null)?.showLogin
-  )
+  const navigationState = location.state as {
+    showLogin?: boolean
+  } | null
+
+  const showLogin = Boolean(navigationState?.showLogin)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -51,7 +53,6 @@ function AdminLogin() {
             WhichBin experience.
           </p>
         </div>
-
         <form className="admin-login-form" onSubmit={handleSubmit}>
           <label htmlFor="admin-email">
             Email address
