@@ -9,8 +9,9 @@ import {
   FiUsers,
   FiX,
 } from 'react-icons/fi'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
+import { useAuth } from '../../context/useAuth'
 import DeleteConfirmModal from '../../components/DeleteConfirmModal'
 import {
   createPasswordResetLink,
@@ -36,12 +37,18 @@ const emptyUserInput: UserInput = {
   email: '',
 }
 
-function createRegistrationLink(invitationToken: string, email: string) {
+function createRegistrationPath(invitationToken: string, email: string) {
   const query = `invitationToken=${encodeURIComponent(invitationToken)}&userEmail=${encodeURIComponent(email)}`
-  return `${window.location.origin}/admin/register?${query}`
+  return `/admin/register?${query}`
+}
+
+function createRegistrationLink(invitationToken: string, email: string) {
+  return `${window.location.origin}${createRegistrationPath(invitationToken, email)}`
 }
 
 function AdminUsers() {
+  const { user: currentUser, logout } = useAuth()
+  const navigate = useNavigate()
   const [users, setUsers] = useState<ManagedUser[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -55,6 +62,7 @@ function AdminUsers() {
   const [deleteTarget, setDeleteTarget] = useState<ManagedUser | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [resettingUserId, setResettingUserId] = useState<number | null>(null)
+  const [resetTarget, setResetTarget] = useState<ManagedUser | null>(null)
   const [shareLink, setShareLink] = useState<ShareLink | null>(null)
   const [copied, setCopied] = useState(false)
 
@@ -161,6 +169,16 @@ function AdminUsers() {
     setIsDeleting(true)
     try {
       await deleteUser(deleteTarget.id)
+      if (deleteTarget.id === currentUser?.id) {
+        try {
+          await logout()
+        } catch {
+          // The account has already been deleted, so the logout request may fail.
+        }
+
+        navigate('/admin/login', { replace: true })
+        return
+      }
       setUsers((currentUsers) =>
         currentUsers.filter((currentUser) => currentUser.id !== deleteTarget.id)
       )
@@ -182,16 +200,29 @@ function AdminUsers() {
     setResettingUserId(managedUser.id)
     try {
       const invitationToken = await createPasswordResetLink(managedUser.id)
+      if (managedUser.id === currentUser?.id) {
+        navigate(createRegistrationPath(invitationToken, managedUser.email), { replace: true })
+
+        try {
+          await logout()
+        } catch {
+          // Backend may have already invalidated the session.
+        }
+
+        return
+      }
       setShareLink({
         userId: managedUser.id,
         email: managedUser.email,
         url: createRegistrationLink(invitationToken, managedUser.email),
       })
       setCopied(false)
+      setResetTarget(null)
     } catch (error) {
       setPageError(
         error instanceof Error ? error.message : 'Unable to generate a password reset link.'
       )
+      setResetTarget(null)
     } finally {
       setResettingUserId(null)
     }
@@ -324,7 +355,13 @@ function AdminUsers() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => void handleResetPassword(managedUser)}
+                      onClick={() => {
+                        if (managedUser.id === currentUser?.id) {
+                          setResetTarget(managedUser)
+                        } else {
+                          void handleResetPassword(managedUser)
+                        }
+                      }}
                       disabled={resettingUserId !== null}
                     >
                       <FiKey aria-hidden="true" />
@@ -358,9 +395,13 @@ function AdminUsers() {
 
       {deleteTarget && (
         <DeleteConfirmModal
-          title="Delete user?"
+          title={deleteTarget.id === currentUser?.id ? "Delete your own account?" : "Delete user?"}
           itemName={`${deleteTarget.firstName} ${deleteTarget.lastName} (${deleteTarget.email})`}
-          description="This account and its active sessions will be permanently removed."
+          description={
+            deleteTarget.id === currentUser?.id
+              ? "Warning: You are about to permanently delete your own account. You will be logged out immediately and will no longer be able to sign in with this account."
+              : "This account and its active sessions will be permanently removed."
+          }
           confirmLabel="Delete user"
           loading={isDeleting}
           onCancel={() => {
@@ -369,6 +410,22 @@ function AdminUsers() {
           onConfirm={() => void handleDelete()}
         />
       )}
+
+      {resetTarget && resetTarget.id === currentUser?.id && (
+        <DeleteConfirmModal
+          title="Reset your password?"
+          itemName={resetTarget.email}
+          description="Warning: resetting your password will invalidate your current session and log you out. You will be redirected directly to the password reset page to choose a new password."
+          confirmLabel="Reset password"
+          confirmIcon={<FiKey aria-hidden="true" />}
+          loading={resettingUserId === resetTarget.id}
+          onCancel={() => {
+            if (resettingUserId === null) setResetTarget(null)
+          }}
+          onConfirm={() => void handleResetPassword(resetTarget)}
+        />
+      )}
+
     </PageLayout>
   )
 }
