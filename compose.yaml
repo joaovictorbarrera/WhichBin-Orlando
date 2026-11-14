@@ -19,9 +19,12 @@ services:
       start_period: 30s
 
   whichbin-api:
+    image: whichbin-api:${APP_VERSION:-0.0.0}
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        APP_VERSION: ${APP_VERSION:-0.0.0}
     restart: unless-stopped
     depends_on:
       mysql:
@@ -36,9 +39,12 @@ services:
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       TLS_KEYSTORE_PASSWORD: ${TLS_KEYSTORE_PASSWORD}
-      CLIENT_URL: ${CLIENT_URL:-https://www.whichbin-orlando.org}
+      CLIENT_URL: ${CLIENT_URL}
     volumes:
-      - ./secrets/whichbin-orlando.org-fullchain.pfx:/run/secrets/whichbin-orlando.org-fullchain.pfx:ro
+      - type: bind
+        source: ${TLS_CERT_FILE:-./secrets/whichbin-orlando.org-fullchain.pfx}
+        target: /run/secrets/whichbin-orlando.org-fullchain.pfx
+        read_only: true
 
 volumes:
   mysql_data:

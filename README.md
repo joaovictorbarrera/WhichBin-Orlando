@@ -112,7 +112,7 @@ These variables configure the Spring Boot API. Local defaults are shown; Docker 
 
 | Variable | Local default or Compose value | Description |
 | --- | --- | --- |
-| `CLIENT_URL` | Local: `http://localhost:7000`; Compose fallback: `https://www.whichbin-orlando.org` | Allowed frontend origin for CORS. Set to the frontend's exact origin, including scheme but without a path or trailing slash. |
+| `CLIENT_URL` | Local: `http://localhost:7000`; Compose: required in root `.env` or Jenkins | Allowed frontend origin for CORS. Set to the frontend's exact origin, including scheme but without a path or trailing slash. |
 | `PORT` | `443` (`dev` profile: `5000`); Compose: `443` | HTTPS port used by the API. |
 | `DB_URL` | `jdbc:mysql://localhost:3306/whichbin_db`; Compose: `jdbc:mysql://mysql:3306/whichbin_db` | JDBC URL for the application database. Compose uses the MySQL service name `mysql`. |
 | `DB_USERNAME` | Local: `root`; Compose: required in root `.env` | MySQL application-user name. |
@@ -122,7 +122,7 @@ These variables configure the Spring Boot API. Local defaults are shown; Docker 
 | `AUTH_TOKEN_TTL` | `PT24H` | Authorization token lifetime, expressed as a Java duration. |
 | `AUTH_TOKEN_CLEANUP_CRON` | `0 0 3 * * *` | Schedule for cleaning up expired tokens (daily at 3:00 a.m. server time). |
 
-The MySQL container also requires `DB_ROOT_PASSWORD` in the root `.env`. This is used by the MySQL image to initialize the database root account; it is not a Spring Boot API variable. Changing it in `.env` does not change the root password in an already-initialized `mysql_data` volume. The root `.env` should define `DB_USERNAME`, `DB_PASSWORD`, `DB_ROOT_PASSWORD`, and `TLS_KEYSTORE_PASSWORD`; `CLIENT_URL` can also be set there to override the Compose fallback. See `.env.example` for placeholder entries. Never commit real secrets.
+The MySQL container also requires `DB_ROOT_PASSWORD` in the root `.env`. This is used by the MySQL image to initialize the database root account; it is not a Spring Boot API variable. Changing it in `.env` does not change the root password in an already-initialized `mysql_data` volume. The root `.env` should define `DB_USERNAME`, `DB_PASSWORD`, `DB_ROOT_PASSWORD`, `TLS_KEYSTORE_PASSWORD`, and `CLIENT_URL`. See `.env.example` for placeholder entries. Never commit real secrets.
 
 The Docker image starts the API with a 512 MB maximum Java heap and a 64 MB initial heap by default. Set `JAVA_OPTS` in the deployment environment to override these JVM options. The heap limit is not a hard limit on total process memory: leave room for the JVM, threads, and native memory in the hosting service's memory limit. Tomcat concurrency and the MySQL connection pool are also kept small by default and can be adjusted with the variables above if traffic requires it.
 
@@ -172,7 +172,28 @@ Each unit test is Transactional and rolls back any data created/modified after t
 
 The root `compose.yaml` builds and runs the API with MySQL 8.4. The API listens on HTTPS port `443` and connects to the private MySQL service; database data persists in a Docker volume. The API publishes port `443`. MySQL is available to host tools at `127.0.0.1:3307` and is not exposed to the network. The frontend remains hosted separately.
 
-On the server, from the repository root:
+#### Jenkins deployment pipeline
+
+The root `Jenkinsfile` polls the configured SCM branch every minute, runs the backend tests against a temporary MySQL 8.4 container, generates the version from the nearest reachable `vMAJOR.MINOR.PATCH` tag and total commit count, then builds and deploys the API and database with Docker Compose. Jenkins SCM polling uses minute-based schedules, so it cannot poll every 30 seconds. Configure the Jenkins Pipeline job's SCM branch as `*/main`. The Jenkins agent must be a Windows agent on the deployment host, using that host's Docker Desktop Linux-container engine, and have Java 21, Node.js, Git, PowerShell, Docker, and Docker Compose v2 installed. Give that agent Docker access and the `whichbin-deploy` label. Run the Jenkins agent under the same Windows account that runs Docker Desktop, and keep Docker Desktop running while jobs execute.
+
+Create these Jenkins credentials with these IDs before the first build:
+
+| Credential ID | Jenkins credential type | Value |
+| --- | --- | --- |
+| `whichbin-tls-pfx` | Secret file | The full-chain `.pfx` certificate |
+| `whichbin-db-username` | Secret text | MySQL application username |
+| `whichbin-db-password` | Secret text | MySQL application password |
+| `whichbin-db-root-password` | Secret text | MySQL root password |
+| `whichbin-tls-keystore-password` | Secret text | Password for the PFX |
+| `whichbin-client-url` | Secret text | Exact frontend origin, e.g. `https://www.whichbin-orlando.org` |
+
+The pipeline uses the PFX credential as a read-only runtime bind mount. It is not copied into the Docker image. Database and TLS values are supplied to Compose only during deployment; the MySQL data volume persists across deployments. Ensure inbound TCP port `443` is allowed on the deployment host and the API domain points to it.
+
+In development, both the Vite dev server and the backend use the root Maven `<revision>` value (`0.0.0` by default); developers can change it in `pom.xml` for local work. Production builds use the shared version script: Vercel runs it during the frontend build, and Jenkins passes its result to Maven and Docker for the backend. The script uses the nearest reachable `vMAJOR.MINOR.PATCH` tag and appends the full commit count, for example `1.1.0.321`.
+
+Release the version before merging a release branch into `main`: create a GitHub Release and a `vMAJOR.MINOR.PATCH` tag on the release branch, then merge that branch.
+
+For manual deployment instead of Jenkins, from the repository root:
 
 1. Keep the full-chain PFX at `secrets/whichbin-orlando.org-fullchain.pfx`. It is mounted read-only into the API container and excluded from Git and the Docker build context.
 2. Create `.env` from `.env.example` only if it does not already exist. Set `TLS_KEYSTORE_PASSWORD` to the PFX password. Keep `.env` private; it is excluded from Git. The database passwords are stored there as well.

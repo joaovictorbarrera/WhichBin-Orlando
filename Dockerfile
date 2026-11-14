@@ -6,12 +6,14 @@ RUN apk upgrade --no-cache
 
 WORKDIR /app
 
+ARG APP_VERSION=0.0.0
+
 # Copy the Maven project files and source code.
 COPY pom.xml .
 COPY whichbin-api/ ./whichbin-api/
 
 # Build the API module and its required Maven projects.
-RUN mvn -B -DskipTests clean package
+RUN mvn -B -DskipTests -Drevision="${APP_VERSION}" clean package
 
 # Find the executable Spring Boot JAR and give it a stable name.
 RUN set -eu; \
