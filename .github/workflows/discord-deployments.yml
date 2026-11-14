@@ -8,12 +8,8 @@ permissions: {}
 jobs:
   notify:
     if: >-
-      (
-        (github.event.deployment.creator.login == 'vercel[bot]' &&
-         github.event.deployment.environment == 'Production') ||
-        (github.event.deployment.creator.login == 'railway-app[bot]' &&
-         github.event.deployment.environment == 'WhichBin-API / production')
-      ) &&
+      github.event.deployment.creator.login == 'vercel[bot]' &&
+      github.event.deployment.environment == 'Production' &&
       (
         github.event.deployment_status.state == 'success' ||
         github.event.deployment_status.state == 'failure' ||
@@ -39,11 +35,7 @@ jobs:
           status = event["deployment_status"]
           repository = event["repository"]
 
-          service = (
-              "Vercel"
-              if deployment["creator"]["login"] == "vercel[bot]"
-              else "Railway"
-          )
+          service = "Vercel"
 
           succeeded = status["state"] == "success"
           result = "Deployed successfully" if succeeded else "Deployment failed"
