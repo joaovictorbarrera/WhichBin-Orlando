@@ -11,17 +11,13 @@ function AdminLogin() {
   const navigate = useNavigate()
   const navigationState = location.state as {
     showLogin?: boolean
-    selfResetLink?: string
   } | null
 
   const showLogin = Boolean(navigationState?.showLogin)
-  const selfResetLink = navigationState?.selfResetLink
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [linkCopied, setLinkCopied] = useState(false)
-  const [copyError, setCopyError] = useState('')
 
   if (isAuthenticated && !showLogin) {
     return <Navigate to="/admin" replace />
@@ -57,44 +53,6 @@ function AdminLogin() {
             WhichBin experience.
           </p>
         </div>
-        {selfResetLink && (
-          <div className="admin-login-form">
-            <h2>Password reset link ready</h2>
-            <p>
-              Your previous session has ended. Copy this link and use it
-              to set a new password before signing in again.
-            </p>
-            <input
-              type="text"
-              aria-label="Your password reset link"
-              value={selfResetLink}
-              readOnly
-              onFocus={(event) => event.currentTarget.select()}
-            />
-            <button
-              type="button"
-              onClick={async () => {
-                setCopyError('')
-                setLinkCopied(false)
-
-                try {
-                  await navigator.clipboard.writeText(selfResetLink)
-                  setLinkCopied(true)
-                } catch {
-                  setCopyError(
-                    'Unable to copy automatically. Select the link above and copy it manually.'
-                  )
-                }
-              }}
-            >
-              {linkCopied ? 'Copied!' : 'Copy Reset Link'}
-            </button>
-
-            {copyError && (
-              <p role="alert">{copyError}</p>
-            )}
-          </div>
-        )}
         <form className="admin-login-form" onSubmit={handleSubmit}>
           <label htmlFor="admin-email">
             Email address

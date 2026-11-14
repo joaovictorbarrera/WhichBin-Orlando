@@ -37,9 +37,13 @@ const emptyUserInput: UserInput = {
   email: '',
 }
 
-function createRegistrationLink(invitationToken: string, email: string) {
+function createRegistrationPath(invitationToken: string, email: string) {
   const query = `invitationToken=${encodeURIComponent(invitationToken)}&userEmail=${encodeURIComponent(email)}`
-  return `${window.location.origin}/admin/register?${query}`
+  return `/admin/register?${query}`
+}
+
+function createRegistrationLink(invitationToken: string, email: string) {
+  return `${window.location.origin}${createRegistrationPath(invitationToken, email)}`
 }
 
 function AdminUsers() {
@@ -58,6 +62,7 @@ function AdminUsers() {
   const [deleteTarget, setDeleteTarget] = useState<ManagedUser | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [resettingUserId, setResettingUserId] = useState<number | null>(null)
+  const [resetTarget, setResetTarget] = useState<ManagedUser | null>(null)
   const [shareLink, setShareLink] = useState<ShareLink | null>(null)
   const [copied, setCopied] = useState(false)
 
@@ -190,36 +195,20 @@ function AdminUsers() {
   }
 
   async function handleResetPassword(managedUser: ManagedUser) {
-    if (managedUser.id === currentUser?.id) {
-      const confirmed = window.confirm(
-        'Warning: You are about to reset your own password. ' +
-        'Your current session will be invalidated and you will be logged out. ' +
-        'Your password reset link will appear on the login page. ' +
-        'Save it before navigating away. ' +
-        'Do you want to proceed?'
-      )
-
-      if (!confirmed) return
-    }
     setPageError('')
     setShareLink(null)
     setResettingUserId(managedUser.id)
     try {
       const invitationToken = await createPasswordResetLink(managedUser.id)
       if (managedUser.id === currentUser?.id) {
-        const resetLink = createRegistrationLink(invitationToken, managedUser.email)
-      
-        navigate('/admin/login', {
-          replace: true,
-          state: { showLogin: true, selfResetLink: resetLink },
-        })
-      
+        navigate(createRegistrationPath(invitationToken, managedUser.email), { replace: true })
+
         try {
           await logout()
         } catch {
           // Backend may have already invalidated the session.
         }
-      
+
         return
       }
       setShareLink({
@@ -228,10 +217,12 @@ function AdminUsers() {
         url: createRegistrationLink(invitationToken, managedUser.email),
       })
       setCopied(false)
+      setResetTarget(null)
     } catch (error) {
       setPageError(
         error instanceof Error ? error.message : 'Unable to generate a password reset link.'
       )
+      setResetTarget(null)
     } finally {
       setResettingUserId(null)
     }
@@ -364,7 +355,13 @@ function AdminUsers() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => void handleResetPassword(managedUser)}
+                      onClick={() => {
+                        if (managedUser.id === currentUser?.id) {
+                          setResetTarget(managedUser)
+                        } else {
+                          void handleResetPassword(managedUser)
+                        }
+                      }}
                       disabled={resettingUserId !== null}
                     >
                       <FiKey aria-hidden="true" />
@@ -413,6 +410,22 @@ function AdminUsers() {
           onConfirm={() => void handleDelete()}
         />
       )}
+
+      {resetTarget && resetTarget.id === currentUser?.id && (
+        <DeleteConfirmModal
+          title="Reset your password?"
+          itemName={resetTarget.email}
+          description="Warning: resetting your password will invalidate your current session and log you out. You will be redirected directly to the password reset page to choose a new password."
+          confirmLabel="Reset password"
+          confirmIcon={<FiKey aria-hidden="true" />}
+          loading={resettingUserId === resetTarget.id}
+          onCancel={() => {
+            if (resettingUserId === null) setResetTarget(null)
+          }}
+          onConfirm={() => void handleResetPassword(resetTarget)}
+        />
+      )}
+
     </PageLayout>
   )
 }
