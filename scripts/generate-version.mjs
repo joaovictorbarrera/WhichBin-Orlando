@@ -7,6 +7,8 @@ const tagArgs = [
   '--abbrev=0',
   '--match',
   'v[0-9]*',
+  '--match',
+  'staging/[0-9]*',
 ];
 
 function getFetchRemote() {
@@ -52,10 +54,14 @@ try {
   tag = git(tagArgs);
 }
 
-const match = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.exec(tag);
+const match =
+  /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.exec(tag) ??
+  /^staging\/(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)-rc\.(0|[1-9]\d*)$/.exec(tag);
 
 if (!match) {
-  throw new Error(`Nearest reachable Git tag "${tag}" must use the vMAJOR.MINOR.PATCH format.`);
+  throw new Error(
+    `Nearest reachable Git tag "${tag}" must use vMAJOR.MINOR.PATCH or staging/MAJOR.MINOR.PATCH-rc.N format.`,
+  );
 }
 
 const commitCount = Number(git(['rev-list', '--count', 'HEAD']));
@@ -63,4 +69,5 @@ if (!Number.isSafeInteger(commitCount) || commitCount < 1) {
   throw new Error(`Invalid Git commit count: ${commitCount}`);
 }
 
-process.stdout.write(`${match[1]}.${match[2]}.${match[3]}.${commitCount}\n`);
+const [, major, minor, patch] = match;
+process.stdout.write(`${major}.${minor}.${patch}.${commitCount}\n`);
