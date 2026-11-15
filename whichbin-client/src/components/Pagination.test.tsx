@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
+import { useState } from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import Pagination from './Pagination/Pagination'
@@ -47,6 +48,29 @@ describe('Pagination Component', () => {
     fireEvent.click(nextButton)
     expect(handlePageChange).toHaveBeenCalledTimes(1)
     expect(handlePageChange).toHaveBeenCalledWith(2)
+  })
+
+  it('updates the selected page after a page option is tapped', () => {
+    function StatefulPagination() {
+      const [currentPage, setCurrentPage] = useState(1)
+
+      return (
+        <Pagination
+          currentPage={currentPage}
+          totalItems={100}
+          pageSize={10}
+          onPageChange={setCurrentPage}
+        />
+      )
+    }
+
+    render(<StatefulPagination />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Go to page 2' }))
+
+    expect(screen.getByRole('button', { name: 'Go to page 2' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('button', { name: 'Go to page 2' })).toHaveClass('active')
+    expect(screen.getByRole('button', { name: 'Go to page 1' })).not.toHaveClass('active')
   })
 
   it('handles loading state with null totalItems and disables controls', () => {
