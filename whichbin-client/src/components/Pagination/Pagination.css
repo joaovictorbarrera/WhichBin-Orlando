@@ -69,7 +69,8 @@
   box-shadow: 0 0 0 1px #16a34a;
 }
 
-.pagination-button.active {
+.pagination-button.active,
+.pagination-button.active:hover:not(:disabled) {
   background-color: #16a34a;
   border-color: #16a34a;
   color: #ffffff;
@@ -101,11 +102,6 @@
   font-size: 0.875rem;
   color: #64748b;
   font-weight: 500;
-}
-
-.pagination-size-label {
-  cursor: pointer;
-  user-select: none;
 }
 
 .pagination-page-size,

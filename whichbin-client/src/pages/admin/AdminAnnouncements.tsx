@@ -1,3 +1,4 @@
+import CollectionState from '../../components/CollectionState'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import {
   FiArrowLeft,
@@ -36,6 +37,7 @@ function AdminAnnouncements() {
   const [loading, setLoading] = useState(true)
   const [hasLoaded, setHasLoaded] = useState(false)
   const [error, setError] = useState(false)
+  const updating = loading && hasLoaded
   const announcementLoadRequest = useRef(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(5)
@@ -90,7 +92,6 @@ function AdminAnnouncements() {
 
     setError(true)
     setAnnouncements([])
-    setTotalItems(undefined)
   } finally {
     if (requestId === announcementLoadRequest.current) {
       setLoading(false)
@@ -146,8 +147,17 @@ function handlePageSizeChange(nextPageSize: number) {
 }
 
 function handleFilterChange(nextFilter: AnnouncementType | '') {
+  if (nextFilter === announcementFilter) {
+    return
+  }
+
   setAnnouncementFilter(nextFilter)
   setCurrentPage(1)
+  setAnnouncements([])
+  setTotalItems(undefined)
+  setHasLoaded(false)
+  setLoading(true)
+  setError(false)
 }
 
   function resetForm() {
@@ -510,7 +520,7 @@ async function handleConfirmDelete() {
                 </option>
               ))}
             </select>
-            {!error && totalItems !== undefined && (
+            {totalItems !== undefined && (
               <span>
                 {totalItems}{' '}
                 {totalItems === 1 ? 'announcement' : 'announcements'}
@@ -519,27 +529,21 @@ async function handleConfirmDelete() {
           </div>
         </div>
 
-        {!loading && error && (
-          <div className="admin-announcements-empty">
-            <p>Announcements could not be loaded.</p>
-            <button type="button" onClick={() => void loadAnnouncements(announcementFilter || undefined)}>
-              Try Again
-            </button>
-          </div>
-        )}
+        {loading && !hasLoaded && <CollectionState state="loading" name="announcements" />}
+        {!loading && error && <CollectionState state="error" name="announcements" onRetry={() => void loadAnnouncements(announcementFilter || undefined)} />}
 
         {!loading && !error && announcements.length === 0 && (
-          <div className="admin-announcements-empty">
+          <CollectionState state="empty" name="announcements" description={null}>
             <p>
               {announcementFilter
                 ? 'No announcements match the selected type.'
                 : 'No announcements have been created yet.'}
             </p>
-          </div>
+          </CollectionState>
         )}
 
         {!error && announcements.length > 0 && (
-          <div className="admin-announcements-list">
+          <div className="admin-announcements-list collection-list">
             {announcements.map((announcement) => {
               const status = getAnnouncementStatus(announcement)
 
@@ -621,18 +625,18 @@ async function handleConfirmDelete() {
         )}
         <div ref={paginationAnchorRef}>
           <div
-            className={`admin-announcements-loading-indicator${loading ? '' : ' is-hidden'}`}
-            role={loading ? 'status' : undefined}
-            aria-hidden={!loading}
+            className={`admin-announcements-loading-indicator${updating ? '' : ' is-hidden'}`}
+            role={updating ? 'status' : undefined}
+            aria-hidden={!updating}
           >
-            {loading && (
+            {updating && (
               <>
                 <span className="admin-announcements-loading-spinner" aria-hidden="true" />
-                {hasLoaded ? 'Updating announcements...' : 'Loading announcements...'}
+                Updating announcements...
               </>
             )}
           </div>
-          {!error && totalItems !== undefined && (
+          {totalItems !== undefined && (
             <Pagination
               currentPage={currentPage}
               totalItems={totalItems}
@@ -640,7 +644,6 @@ async function handleConfirmDelete() {
               pageSizeOptions={[5, 10, 20]}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
-              siblingCount={1}
             />
           )}
         </div>

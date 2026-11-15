@@ -1,10 +1,10 @@
+import CollectionState from '../../components/CollectionState'
 import { useEffect, useState, type FormEvent } from 'react'
 import {
   FiArrowLeft,
   FiBox,
   FiEdit,
   FiPlus,
-  FiRefreshCw,
   FiSearch,
   FiTrash2,
   FiX,
@@ -52,10 +52,27 @@ function AdminItems() {
   const [keywordInput, setKeywordInput] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Item | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const updating = loading && hasLoaded
+
+  function changeSearchText(value: string) {
+    setSearchText(value)
+    setPage(1)
+    setItems([])
+    setHasLoaded(false)
+    setLoading(true)
+    setLoadError(false)
+  }
 
   function changeFilter(value: FilterOption) {
+    if (value === filter) {
+      return
+    }
+
     setFilter(value)
     setPage(1)
+    setItems([])
+    setHasLoaded(false)
+    setLoading(true)
   }
 
   function changePageSize(value: number) {
@@ -98,6 +115,7 @@ function AdminItems() {
           if (!isMounted) return
 
           if (result === null) {
+            setItems([])
             setLoadError(true)
             return
           }
@@ -112,6 +130,7 @@ function AdminItems() {
           setHasLoaded(true)
         } catch {
           if (!isMounted || controller.signal.aborted) return
+          setItems([])
           setLoadError(true)
         } finally {
           if (isMounted) setLoading(false)
@@ -454,14 +473,14 @@ function AdminItems() {
               type="text"
               placeholder="Search items (e.g., plastic bottle, cardboard, battery)..."
               value={searchText}
-              onChange={(event) => setSearchText(event.target.value)}
+              onChange={(event) => changeSearchText(event.target.value)}
               aria-label="Search items"
             />
             {searchText && (
               <button
                 type="button"
                 className="admin-items-search-clear"
-                onClick={() => setSearchText('')}
+                onClick={() => changeSearchText('')}
                 aria-label="Clear search text"
               >
                 <FiX aria-hidden="true" />
@@ -513,28 +532,11 @@ function AdminItems() {
           ) : null}
         </div>
 
-        {!loading && loadError && items.length === 0 && (
-          <div className="admin-items-empty admin-items-error" role="alert">
-            <p>Items could not be loaded. Check your connection and try again.</p>
-            <button type="button" onClick={() => setRefreshKey((current) => current + 1)}>
-              <FiRefreshCw aria-hidden="true" />
-              Try again
-            </button>
-          </div>
-        )}
+      {loading && !hasLoaded && <CollectionState state="loading" name="items" />}
+      {!loading && loadError && <CollectionState state="error" name="items" onRetry={() => setRefreshKey((key) => key + 1)} />}
 
-        {!loading && loadError && items.length > 0 && (
-          <div className="admin-items-load-error" role="alert">
-            <p>Items could not be updated. Showing the previous results.</p>
-            <button type="button" onClick={() => setRefreshKey((current) => current + 1)}>
-              <FiRefreshCw aria-hidden="true" />
-              Try again
-            </button>
-          </div>
-        )}
-
-        {!loading && !loadError && hasLoaded && items.length === 0 && (
-          <div className="admin-items-empty">
+      {!loading && !loadError && hasLoaded && items.length === 0 && (
+          <CollectionState state="empty" name="items" description={null}>
             <p>
               {debouncedSearchText.trim()
                 ? `No items matched "${debouncedSearchText.trim()}". Try another search or adjust the filter.`
@@ -553,11 +555,11 @@ function AdminItems() {
                 Clear search &amp; filters
               </button>
             )}
-          </div>
+          </CollectionState>
         )}
 
         {items.length > 0 && (
-          <div className="admin-items-list" aria-busy={loading}>
+          <div className="admin-items-list collection-list" aria-busy={loading}>
             {items.map((item) => (
               <article className="admin-item-card" key={item.id}>
                 <div className="admin-item-card-content">
@@ -606,6 +608,18 @@ function AdminItems() {
           </div>
         )}
 
+        <div
+          className={`admin-items-loading${updating ? '' : ' is-hidden'}`}
+          role={updating ? 'status' : undefined}
+          aria-hidden={!updating}
+        >
+          {updating && (
+            <>
+              <span className="admin-items-loading-spinner" aria-hidden="true" />
+              Updating items...
+            </>
+          )}
+        </div>
         {hasLoaded && (
           <Pagination
             currentPage={page}
@@ -614,6 +628,7 @@ function AdminItems() {
             onPageChange={setPage}
             onPageSizeChange={changePageSize}
             pageSizeOptions={[5, 10, 20, 50]}
+            className="admin-items-pagination"
           />
         )}
       </section>
@@ -629,18 +644,6 @@ function AdminItems() {
           onConfirm={handleConfirmDelete}
         />
       )}
-      <div
-        className={`admin-items-loading${loading ? '' : ' is-hidden'}`}
-        role={loading ? 'status' : undefined}
-        aria-hidden={!loading}
-      >
-        {loading && (
-          <>
-            <span className="admin-items-loading-spinner" aria-hidden="true" />
-            {hasLoaded ? 'Updating items...' : 'Loading items...'}
-          </>
-        )}
-      </div>
     </PageLayout>
   )
 }

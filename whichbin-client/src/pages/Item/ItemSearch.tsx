@@ -1,3 +1,4 @@
+import CollectionState from '../../components/CollectionState'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -5,9 +6,7 @@ import {
   FiX,
   FiTrash2,
   FiBox,
-  FiAlertCircle,
   FiChevronRight,
-  FiRefreshCw,
 } from 'react-icons/fi'
 import { FaRecycle } from 'react-icons/fa'
 import PageLayout from '../../components/PageLayout'
@@ -21,7 +20,7 @@ type FilterOption = 'all' | 'recyclable' | 'non-recyclable'
 function ItemSearch() {
   const [searchText, setSearchText] = useState('')
   const [debouncedSearchText, setDebouncedSearchText] = useState('')
-  const [filter, setFilter] = useState<FilterOption>('recyclable')
+  const [filter, setFilter] = useState<FilterOption>('all')
   const [items, setItems] = useState<Item[]>([])
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
@@ -31,10 +30,28 @@ function ItemSearch() {
   const [hasLoaded, setHasLoaded] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
+  const updating = loading && hasLoaded
+
+  function changeSearchText(value: string) {
+    setSearchText(value)
+    setPage(1)
+    setItems([])
+    setHasLoaded(false)
+    setLoading(true)
+    setError(null)
+  }
 
   function changeFilter(value: FilterOption) {
+    if (value === filter) {
+      return
+    }
+
     setFilter(value)
     setPage(1)
+    setItems([])
+    setHasLoaded(false)
+    setLoading(true)
+    setError(null)
   }
 
   function changePageSize(value: number) {
@@ -77,6 +94,7 @@ function ItemSearch() {
           if (!isMounted) return
 
           if (data === null) {
+            setItems([])
             setError('Unable to load items. Please try again later.')
             return
           }
@@ -91,6 +109,7 @@ function ItemSearch() {
           setHasLoaded(true)
         } catch (requestError) {
           if (!isMounted || isAbortError(requestError)) return
+          setItems([])
           setError('Unable to load items. Please try again later.')
         } finally {
           if (isMounted) setLoading(false)
@@ -106,10 +125,6 @@ function ItemSearch() {
       clearTimeout(timer)
     }
   }, [debouncedSearchText, filter, refreshKey, page, pageSize])
-
-  function forceRefresh() {
-    setRefreshKey((prev) => prev + 1)
-  }
 
   return (
     <PageLayout className="item-search-page" width="wide">
@@ -137,14 +152,14 @@ function ItemSearch() {
             className="item-search-input"
             placeholder="Search items (e.g., plastic bottle, cardboard, battery)..."
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(e) => changeSearchText(e.target.value)}
             aria-label="Search items"
           />
           {searchText && (
             <button
               type="button"
               className="item-search-clear-btn"
-              onClick={() => setSearchText('')}
+              onClick={() => changeSearchText('')}
               aria-label="Clear search text"
             >
               <FiX aria-hidden="true" />
@@ -158,6 +173,14 @@ function ItemSearch() {
           aria-label="Filter items by recyclability"
         >
 
+          <button
+            type="button"
+            className={`item-filter-btn ${filter === 'all' ? 'active' : ''}`}
+            onClick={() => changeFilter('all')}
+            aria-pressed={filter === 'all'}
+          >
+            All Items
+          </button>
           <button
             type="button"
             className={`item-filter-btn ${filter === 'recyclable' ? 'active' : ''}`}
@@ -176,44 +199,14 @@ function ItemSearch() {
             <FiTrash2 aria-hidden="true" />
             Non-Recyclable
           </button>
-          <button
-            type="button"
-            className={`item-filter-btn ${filter === 'all' ? 'active' : ''}`}
-            onClick={() => changeFilter('all')}
-            aria-pressed={filter === 'all'}
-          >
-            All Items
-          </button>
         </div>
       </section>
 
-      {!loading && error && items.length === 0 && (
-        <div className="item-search-status item-search-error" role="alert">
-          <FiAlertCircle className="status-icon" aria-hidden="true" />
-          <h2>Unable to load items</h2>
-          <p>{error}</p>
-          <button
-            type="button"
-            className="item-search-retry-btn"
-            onClick={forceRefresh}
-          >
-            <FiRefreshCw aria-hidden="true" />
-            Try again
-          </button>
-        </div>
-      )}
-
-      {!loading && error && items.length > 0 && (
-        <div className="item-search-inline-error" role="alert">
-          <span>{error}</span>
-          <button type="button" onClick={forceRefresh}>
-            Try again
-          </button>
-        </div>
-      )}
+      {loading && !hasLoaded && <CollectionState state="loading" name="items" />}
+      {!loading && error && <CollectionState state="error" name="items" onRetry={() => setRefreshKey((key) => key + 1)} />}
 
       {!loading && !error && hasLoaded && items.length === 0 && (
-        <div className="item-search-status item-search-empty">
+        <CollectionState state="empty" name="items" description={null}>
           <p>
             {searchText.trim()
               ? `No items matched "${debouncedSearchText.trim()}". Try another search or adjust the filter.`
@@ -231,11 +224,11 @@ function ItemSearch() {
               Clear search & filters
             </button>
           )}
-        </div>
+        </CollectionState>
       )}
 
       {items.length > 0 && (
-        <div className="item-search-list" aria-busy={loading}>
+        <div className="item-search-list collection-list" aria-busy={loading}>
           {items.map((item) => (
             <Link
               to={`/item-search/${item.id}`}
@@ -281,14 +274,14 @@ function ItemSearch() {
         </div>
       )}
       <div
-        className={`item-search-loading-indicator${loading ? '' : ' is-hidden'}`}
-        role={loading ? 'status' : undefined}
-        aria-hidden={!loading}
+        className={`item-search-loading-indicator${updating ? '' : ' is-hidden'}`}
+        role={updating ? 'status' : undefined}
+        aria-hidden={!updating}
       >
-        {loading && (
+        {updating && (
           <>
             <div className="loading-spinner" aria-hidden="true" />
-            <span>{hasLoaded ? 'Updating items...' : 'Loading items...'}</span>
+            <span>Updating items...</span>
           </>
         )}
       </div>

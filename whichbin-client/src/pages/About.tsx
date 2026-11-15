@@ -172,13 +172,13 @@ function About() {
             </article>
             <article>
               <FiServer aria-hidden="true" />
-              <h3>Maven Tests</h3>
-              <p>Maven runs the backend unit tests, and GitHub Actions validates changes against a temporary MySQL database.</p>
+              <h3>Automated tests</h3>
+              <p>GitHub Actions runs backend unit tests with JUnit and Maven, plus frontend tests with Vitest, on every commit pushed to a pull request.</p>
             </article>
             <article>
               <FiGitBranch aria-hidden="true" />
-              <h3>GitHub Actions</h3>
-              <p>GitHub Actions reports Vercel production deployment results to the team in Discord.</p>
+              <h3>Jenkins</h3>
+              <p>When a build is merged, Jenkins runs the production pipeline, automatically tags the new build, and redeploys it.</p>
             </article>
           </div>
         </div>

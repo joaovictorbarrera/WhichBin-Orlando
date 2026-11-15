@@ -10,7 +10,6 @@ export interface PaginationProps {
   displayName?: string // Optional: e.g. "articles", "announcements", "items". Default: "items"
   onPageChange: (page: number) => void
   onPageSizeChange?: (pageSize: number) => void
-  siblingCount?: number
   className?: string
 }
 
@@ -18,38 +17,36 @@ type PaginationItem = number | 'ELLIPSIS_LEFT' | 'ELLIPSIS_RIGHT'
 
 function generatePaginationRange(
   currentPage: number,
-  totalPages: number,
-  siblingCount: number
+  totalPages: number
 ): PaginationItem[] {
   const safeTotalPages = Math.max(1, totalPages)
   const safeCurrentPage = Math.min(Math.max(1, currentPage), safeTotalPages)
-  const totalNumbersToShow = siblingCount * 2 + 5
+  const visibleSiblingCount = 1
 
-  if (safeTotalPages <= totalNumbersToShow) {
+  if (safeTotalPages <= 7) {
     return Array.from({ length: safeTotalPages }, (_, i) => i + 1)
   }
 
-  const leftSiblingIndex = Math.max(safeCurrentPage - siblingCount, 1)
-  const rightSiblingIndex = Math.min(safeCurrentPage + siblingCount, safeTotalPages)
+  const leftSiblingIndex = Math.max(safeCurrentPage - visibleSiblingCount, 1)
+  const rightSiblingIndex = Math.min(safeCurrentPage + visibleSiblingCount, safeTotalPages)
 
-  const shouldShowLeftDots = leftSiblingIndex > 2
-  const shouldShowRightDots = rightSiblingIndex < safeTotalPages - 2
-
-  if (!shouldShowLeftDots && shouldShowRightDots) {
-    const leftItemCount = 3 + 2 * siblingCount
-    const leftRange = Array.from({ length: leftItemCount }, (_, i) => i + 1)
-    return [...leftRange, 'ELLIPSIS_RIGHT', safeTotalPages]
+  if (safeCurrentPage <= 4) {
+    const firstRangeCount = 5
+    const firstRange = Array.from({ length: firstRangeCount }, (_, i) => i + 1)
+    return [...firstRange, 'ELLIPSIS_RIGHT', safeTotalPages]
   }
 
-  if (shouldShowLeftDots && !shouldShowRightDots) {
-    const rightItemCount = 3 + 2 * siblingCount
-    const startPage = safeTotalPages - rightItemCount + 1
-    const rightRange = Array.from({ length: rightItemCount }, (_, i) => startPage + i)
-    return [1, 'ELLIPSIS_LEFT', ...rightRange]
+  if (safeCurrentPage >= safeTotalPages - 3) {
+    const lastRangeCount = 5
+    const startPage = safeTotalPages - lastRangeCount + 1
+    const lastRange = Array.from({ length: lastRangeCount }, (_, i) => startPage + i)
+    return [1, 'ELLIPSIS_LEFT', ...lastRange]
   }
 
-  const middleRangeLength = rightSiblingIndex - leftSiblingIndex + 1
-  const middleRange = Array.from({ length: middleRangeLength }, (_, i) => leftSiblingIndex + i)
+  const middleRange = Array.from(
+    { length: rightSiblingIndex - leftSiblingIndex + 1 },
+    (_, i) => leftSiblingIndex + i
+  )
   return [1, 'ELLIPSIS_LEFT', ...middleRange, 'ELLIPSIS_RIGHT', safeTotalPages]
 }
 
@@ -61,7 +58,6 @@ export function Pagination({
   displayName = 'items',
   onPageChange,
   onPageSizeChange,
-  siblingCount = 1,
   className = '',
 }: PaginationProps) {
   const pageSizeSelectId = useId()
@@ -79,8 +75,8 @@ export function Pagination({
   }, [isDataLoaded, currentPage, totalPages, displayCurrentPage, onPageChange])
 
   const paginationRange = useMemo(
-    () => generatePaginationRange(displayCurrentPage, totalPages, siblingCount),
-    [displayCurrentPage, totalPages, siblingCount]
+    () => generatePaginationRange(displayCurrentPage, totalPages),
+    [displayCurrentPage, totalPages]
   )
 
   let statusText: string
