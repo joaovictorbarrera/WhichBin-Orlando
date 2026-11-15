@@ -54,6 +54,15 @@ function AdminItems() {
   const [deleting, setDeleting] = useState(false)
   const updating = loading && hasLoaded
 
+  function changeSearchText(value: string) {
+    setSearchText(value)
+    setPage(1)
+    setItems([])
+    setHasLoaded(false)
+    setLoading(true)
+    setLoadError(false)
+  }
+
   function changeFilter(value: FilterOption) {
     if (value === filter) {
       return
@@ -106,6 +115,7 @@ function AdminItems() {
           if (!isMounted) return
 
           if (result === null) {
+            setItems([])
             setLoadError(true)
             return
           }
@@ -120,6 +130,7 @@ function AdminItems() {
           setHasLoaded(true)
         } catch {
           if (!isMounted || controller.signal.aborted) return
+          setItems([])
           setLoadError(true)
         } finally {
           if (isMounted) setLoading(false)
@@ -462,14 +473,14 @@ function AdminItems() {
               type="text"
               placeholder="Search items (e.g., plastic bottle, cardboard, battery)..."
               value={searchText}
-              onChange={(event) => setSearchText(event.target.value)}
+              onChange={(event) => changeSearchText(event.target.value)}
               aria-label="Search items"
             />
             {searchText && (
               <button
                 type="button"
                 className="admin-items-search-clear"
-                onClick={() => setSearchText('')}
+                onClick={() => changeSearchText('')}
                 aria-label="Clear search text"
               >
                 <FiX aria-hidden="true" />

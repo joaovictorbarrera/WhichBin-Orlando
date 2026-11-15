@@ -32,6 +32,15 @@ function ItemSearch() {
   const [refreshKey, setRefreshKey] = useState(0)
   const updating = loading && hasLoaded
 
+  function changeSearchText(value: string) {
+    setSearchText(value)
+    setPage(1)
+    setItems([])
+    setHasLoaded(false)
+    setLoading(true)
+    setError(null)
+  }
+
   function changeFilter(value: FilterOption) {
     if (value === filter) {
       return
@@ -85,6 +94,7 @@ function ItemSearch() {
           if (!isMounted) return
 
           if (data === null) {
+            setItems([])
             setError('Unable to load items. Please try again later.')
             return
           }
@@ -99,6 +109,7 @@ function ItemSearch() {
           setHasLoaded(true)
         } catch (requestError) {
           if (!isMounted || isAbortError(requestError)) return
+          setItems([])
           setError('Unable to load items. Please try again later.')
         } finally {
           if (isMounted) setLoading(false)
@@ -141,14 +152,14 @@ function ItemSearch() {
             className="item-search-input"
             placeholder="Search items (e.g., plastic bottle, cardboard, battery)..."
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(e) => changeSearchText(e.target.value)}
             aria-label="Search items"
           />
           {searchText && (
             <button
               type="button"
               className="item-search-clear-btn"
-              onClick={() => setSearchText('')}
+              onClick={() => changeSearchText('')}
               aria-label="Clear search text"
             >
               <FiX aria-hidden="true" />

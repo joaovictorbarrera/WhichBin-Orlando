@@ -118,10 +118,53 @@ describe.each([
     label: 'public items',
     Page: ItemSearch,
     fetch: vi.mocked(fetchItems),
+    pageSize: 10,
+  },
+  {
+    label: 'admin items',
+    Page: AdminItems,
+    fetch: vi.mocked(fetchItems),
+    pageSize: 5,
+  },
+])('$label failed page fetch', ({ Page, fetch, pageSize }) => {
+  it('clears stale items but keeps pagination available after a later page fails', async () => {
+    fetch.mockResolvedValueOnce({
+      currentPage: 1,
+      totalPages: 6,
+      pageSize,
+      totalItems: 30,
+      items: [{
+        id: 1,
+        name: 'Stale item',
+        recyclable: true,
+        largeItem: false,
+        information: 'Old item instructions',
+      }],
+    })
+    render(<MemoryRouter><Page /></MemoryRouter>)
+
+    expect(await screen.findByText('Stale item')).toBeInTheDocument()
+    const pagination = screen.getByRole('navigation', { name: 'Pagination Navigation' })
+    fetch.mockResolvedValueOnce(null as never)
+    fireEvent.click(within(pagination).getByRole('button', { name: 'Go to next page' }))
+
+    expect(await screen.findByText(errorText('Items'))).toBeInTheDocument()
+    expect(screen.queryByText('Stale item')).not.toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Pagination Navigation' })).toBeInTheDocument()
+    expect(within(pagination).getByRole('button', { name: 'Go to page 2' })).toHaveAttribute('aria-current', 'page')
+  })
+})
+
+describe.each([
+  {
+    label: 'public items',
+    Page: ItemSearch,
+    fetch: vi.mocked(fetchItems),
     updatingText: 'Updating items...',
     indicator: '.item-search-loading-indicator',
     page: {
       ...emptyPage,
+      pageSize: 10,
       totalPages: 3,
       totalItems: 15,
       items: [{ id: 1, name: 'Test item', recyclable: true, largeItem: false, information: 'Test instructions' }],
@@ -242,6 +285,71 @@ describe('admin items filter loading', () => {
     } as never)
     expect(await screen.findByText('New item')).toBeInTheDocument()
     expect(container.querySelector('.collection-state--loading')).not.toBeInTheDocument()
+  })
+})
+
+describe.each([
+  {
+    label: 'public items',
+    Page: ItemSearch,
+    staleItem: 'Old item',
+    loadingText: 'Loading items...',
+    indicator: '.item-search-loading-indicator',
+    page: {
+      ...emptyPage,
+      pageSize: 10,
+      totalPages: 3,
+      totalItems: 15,
+      items: [{ id: 1, name: 'Old item', recyclable: true, largeItem: false, information: 'Old instructions' }],
+    },
+  },
+  {
+    label: 'admin items',
+    Page: AdminItems,
+    staleItem: 'Old item',
+    loadingText: 'Loading items...',
+    indicator: '.admin-items-loading',
+    page: {
+      ...emptyPage,
+      pageSize: 5,
+      totalPages: 3,
+      totalItems: 15,
+      items: [{ id: 1, name: 'Old item', recyclable: true, largeItem: false, information: 'Old instructions' }],
+    },
+  },
+])('$label search loading', ({ Page, staleItem, loadingText, indicator, page }) => {
+  it('clears stale results and shows the full loading state while searching', async () => {
+    let resolveSearch: (value: never) => void = () => {}
+    vi.mocked(fetchItems).mockResolvedValueOnce(page as never)
+    const { container } = render(<MemoryRouter><Page /></MemoryRouter>)
+
+    await screen.findByText(staleItem)
+    vi.mocked(fetchItems).mockImplementationOnce(() => new Promise((resolve) => {
+      resolveSearch = resolve
+    }) as never)
+    fireEvent.change(screen.getByRole('textbox', { name: 'Search items' }), {
+      target: { value: 'searched item' },
+    })
+
+    expect(await screen.findByText(loadingText)).toBeInTheDocument()
+    expect(screen.queryByText(staleItem)).not.toBeInTheDocument()
+    expect(screen.queryByText('Updating items...')).not.toBeInTheDocument()
+    expect(container.querySelector('.collection-state--loading')).toBeInTheDocument()
+    expect(container.querySelector(indicator)).toHaveClass('is-hidden')
+
+    await waitFor(() => expect(fetchItems).toHaveBeenLastCalledWith(
+      'searched item',
+      undefined,
+      expect.any(AbortSignal),
+      1,
+      page.pageSize
+    ))
+    resolveSearch({
+      ...emptyPage,
+      totalItems: 1,
+      items: [{ id: 2, name: 'Searched item', recyclable: true, largeItem: false, information: 'New instructions' }],
+    } as never)
+    expect(await screen.findByText('Searched item')).toBeInTheDocument()
   })
 })
 
