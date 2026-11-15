@@ -63,4 +63,39 @@ describe('Pagination Component', () => {
     expect(screen.getByRole('button', { name: /previous/i })).toBeDisabled()
     expect(screen.getByRole('button', { name: /next/i })).toBeDisabled()
   })
+
+  it.each([
+    { currentPage: 1, totalItems: 100, expectedPages: ['1', '2', '3', '4', '5', '10'], ellipses: 1 },
+    { currentPage: 5, totalItems: 100, expectedPages: ['1', '4', '5', '6', '10'], ellipses: 2 },
+    { currentPage: 10, totalItems: 100, expectedPages: ['1', '6', '7', '8', '9', '10'], ellipses: 1 },
+  ])('keeps page options and ellipses within seven slots on page $currentPage', ({ currentPage, totalItems, expectedPages, ellipses }) => {
+    render(
+      <Pagination
+        currentPage={currentPage}
+        totalItems={totalItems}
+        pageSize={10}
+        onPageChange={vi.fn()}
+      />
+    )
+
+    const pageButtons = screen.getAllByRole('button', { name: /^Go to page \d+$/ })
+    expect(pageButtons.map((button) => button.textContent)).toEqual(expectedPages)
+    expect(document.querySelectorAll('.pagination-ellipsis')).toHaveLength(ellipses)
+    expect(pageButtons.length + ellipses).toBeLessThanOrEqual(7)
+  })
+
+  it('keeps the page-size selector accessible with a visible label', () => {
+    render(
+      <Pagination
+        currentPage={1}
+        totalItems={45}
+        pageSize={10}
+        onPageChange={vi.fn()}
+        onPageSizeChange={vi.fn()}
+      />
+    )
+
+    expect(screen.getByRole('combobox', { name: 'Select page size' })).toBeInTheDocument()
+    expect(screen.getByText('Rows per page:')).toBeInTheDocument()
+  })
 })

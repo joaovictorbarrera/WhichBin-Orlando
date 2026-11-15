@@ -103,11 +103,6 @@
   font-weight: 500;
 }
 
-.pagination-size-label {
-  cursor: pointer;
-  user-select: none;
-}
-
 .pagination-page-size,
 .pagination-select {
   display: inline-flex;

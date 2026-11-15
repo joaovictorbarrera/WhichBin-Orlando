@@ -204,7 +204,6 @@ function PaginationDemo() {
           pageSizeOptions={[5, 10, 20]}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
-          siblingCount={1}
         />
       </section>
     </PageLayout>

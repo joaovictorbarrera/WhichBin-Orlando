@@ -1,4 +1,4 @@
-
+import CollectionState from '../../components/CollectionState'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -35,20 +35,25 @@ function EducationalResources() {
   const [triviaResult, setTriviaResult] =
     useState<PageResult<TriviaChallenge> | null>(null)
 
+  const [resourceRefresh, setResourceRefresh] = useState(0)
+  const [triviaRefresh, setTriviaRefresh] = useState(0)
+  const [lastResourceTotal, setLastResourceTotal] = useState<number | null>(null)
+  const [lastTriviaTotal, setLastTriviaTotal] = useState<number | null>(null)
+
   const [filter, setFilter] = useState<ResourceFilter>('all')
 
   // Article pagination
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(6)
 
   // Trivia pagination
   const [triviaCurrentPage, setTriviaCurrentPage] = useState(1)
-  const [triviaPageSize, setTriviaPageSize] = useState(5)
+  const [triviaPageSize, setTriviaPageSize] = useState(4)
 
   // Load paginated educational articles
   useEffect(() => {
     const controller = new AbortController()
-    const key = `${currentPage}:${pageSize}`
+    const key = `${currentPage}:${pageSize}:${resourceRefresh}`
 
     getResources(currentPage, pageSize, controller.signal)
       .then((result) => {
@@ -57,6 +62,7 @@ function EducationalResources() {
         }
 
         if (result) {
+          setLastResourceTotal(result.totalItems)
           setResourcesResult({
             key,
             status: 'success',
@@ -78,12 +84,12 @@ function EducationalResources() {
     return () => {
       controller.abort()
     }
-  }, [currentPage, pageSize])
+  }, [currentPage, pageSize, resourceRefresh])
 
   // Load paginated trivia challenges
   useEffect(() => {
     const controller = new AbortController()
-    const key = `${triviaCurrentPage}:${triviaPageSize}`
+    const key = `${triviaCurrentPage}:${triviaPageSize}:${triviaRefresh}`
 
     getPaginatedTriviaChallenges(
       triviaCurrentPage,
@@ -96,6 +102,7 @@ function EducationalResources() {
         }
 
         if (result) {
+          setLastTriviaTotal(result.totalItems)
           setTriviaResult({
             key,
             status: 'success',
@@ -117,7 +124,7 @@ function EducationalResources() {
     return () => {
       controller.abort()
     }
-  }, [triviaCurrentPage, triviaPageSize])
+  }, [triviaCurrentPage, triviaPageSize, triviaRefresh])
 
   // Article pagination handlers
   function handlePageChange(page: number) {
@@ -181,42 +188,41 @@ function EducationalResources() {
   const showArticles = filter === 'all' || filter === 'articles'
   const showTrivia = filter === 'all' || filter === 'trivia'
   const currentResourcesResult =
-    resourcesResult?.key === `${currentPage}:${pageSize}`
+    resourcesResult?.key === `${currentPage}:${pageSize}:${resourceRefresh}`
       ? resourcesResult
       : null
   const currentTriviaResult =
-    triviaResult?.key === `${triviaCurrentPage}:${triviaPageSize}`
+    triviaResult?.key === `${triviaCurrentPage}:${triviaPageSize}:${triviaRefresh}`
       ? triviaResult
       : null
   const resourcesLoading = currentResourcesResult === null
   const triviaLoading = currentTriviaResult === null
+  const resourcesUpdating =
+    resourcesLoading && resourcesResult?.status === 'success'
+  const triviaUpdating =
+    triviaLoading && triviaResult?.status === 'success'
   const resourcesFailed = currentResourcesResult?.status === 'error'
   const triviaFailed = currentTriviaResult?.status === 'error'
   const resources =
     currentResourcesResult?.status === 'success'
       ? currentResourcesResult.items
-      : []
+      : resourcesUpdating && resourcesResult?.status === 'success'
+        ? resourcesResult.items
+        : []
   const triviaChallenges =
     currentTriviaResult?.status === 'success'
       ? currentTriviaResult.items
-      : []
+      : triviaUpdating && triviaResult?.status === 'success'
+        ? triviaResult.items
+        : []
   const totalItems =
     currentResourcesResult?.status === 'success'
       ? currentResourcesResult.totalItems
-      : null
+      : lastResourceTotal
   const triviaTotalItems =
     currentTriviaResult?.status === 'success'
       ? currentTriviaResult.totalItems
-      : null
-
-  if (resourcesLoading || triviaLoading) {
-    return (
-      <PageLayout className="resources-page" width="wide">
-        {pageHeader}
-        <p className="resources-intro">Loading resources...</p>
-      </PageLayout>
-    )
-  }
+      : lastTriviaTotal
 
   return (
     <PageLayout className="resources-page" width="wide">
@@ -253,13 +259,13 @@ function EducationalResources() {
         <section className="resources-section">
           {filter === 'all' && <h2>Articles</h2>}
 
-          {!resourcesFailed && resources.length === 0 && (
-            <p className="resources-empty-message">
-              No articles are available right now.
-            </p>
+          {resourcesLoading && !resourcesUpdating && <CollectionState state="loading" name="resources" />}
+          {!resourcesLoading && resourcesFailed && <CollectionState state="error" name="resources" onRetry={() => setResourceRefresh((key) => key + 1)} />}
+          {!resourcesLoading && !resourcesFailed && resources.length === 0 && (
+            <CollectionState state="empty" name="resources" description="No articles are available right now." />
           )}
 
-          <div className="resources-list">
+          <div className="resources-list collection-list">
             {resources.map((resource) => (
               <Link
                 to={`/resources/${resource.id}`}
@@ -285,12 +291,24 @@ function EducationalResources() {
             ))}
           </div>
 
-          {!resourcesFailed && (
+          <div
+            className={`announcements-loading-indicator${resourcesUpdating ? '' : ' is-hidden'}`}
+            role={resourcesUpdating ? 'status' : undefined}
+            aria-hidden={!resourcesUpdating}
+          >
+            {resourcesUpdating && (
+              <>
+                <span className="announcements-loading-spinner" aria-hidden="true" />
+                Updating resources...
+              </>
+            )}
+          </div>
+          {totalItems !== null && (
             <Pagination
               currentPage={currentPage}
               totalItems={totalItems}
               pageSize={pageSize}
-              pageSizeOptions={[5, 10, 20]}
+              pageSizeOptions={[6, 10, 20]}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
               displayName="resources"
@@ -304,13 +322,13 @@ function EducationalResources() {
         <section className="resources-section">
           {filter === 'all' && <h2>Trivia</h2>}
 
-          {!triviaFailed && triviaChallenges.length === 0 && (
-            <p className="resources-empty-message">
-              No trivia challenges are available right now.
-            </p>
+          {triviaLoading && !triviaUpdating && <CollectionState state="loading" name="trivia challenges" />}
+          {!triviaLoading && triviaFailed && <CollectionState state="error" name="trivia challenges" onRetry={() => setTriviaRefresh((key) => key + 1)} />}
+          {!triviaLoading && !triviaFailed && triviaChallenges.length === 0 && (
+            <CollectionState state="empty" name="trivia challenges" description="No trivia challenges are available right now." />
           )}
 
-          <div className="resources-list">
+          <div className="resources-list collection-list">
             {triviaChallenges.map((challenge) => (
               <Link
                 to={`/resources/trivia/${challenge.id}`}
@@ -334,12 +352,24 @@ function EducationalResources() {
             ))}
           </div>
 
-          {!triviaFailed && (
+          <div
+            className={`announcements-loading-indicator${triviaUpdating ? '' : ' is-hidden'}`}
+            role={triviaUpdating ? 'status' : undefined}
+            aria-hidden={!triviaUpdating}
+          >
+            {triviaUpdating && (
+              <>
+                <span className="announcements-loading-spinner" aria-hidden="true" />
+                Updating trivia challenges...
+              </>
+            )}
+          </div>
+          {triviaTotalItems !== null && (
             <Pagination
               currentPage={triviaCurrentPage}
               totalItems={triviaTotalItems}
               pageSize={triviaPageSize}
-              pageSizeOptions={[5, 10, 20]}
+              pageSizeOptions={[4, 10, 20]}
               onPageChange={handleTriviaPageChange}
               onPageSizeChange={handleTriviaPageSizeChange}
               displayName="challenges"

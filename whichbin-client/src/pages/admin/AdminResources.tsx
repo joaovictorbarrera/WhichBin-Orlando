@@ -1,3 +1,4 @@
+import CollectionState from '../../components/CollectionState'
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import {
         FiAlertTriangle,
@@ -230,7 +231,6 @@ export default function AdminResources() {
                                 if (result === null) {
                                         setTriviaError(true)
                                         setTriviaChallenges([])
-                                        setTriviaTotalItems(null)
                                 } else {
                                         setTriviaChallenges(result.items ?? [])
                                         setTriviaTotalItems(result.totalItems)
@@ -258,7 +258,6 @@ export default function AdminResources() {
 
                                 setTriviaError(true)
                                 setTriviaChallenges([])
-                                setTriviaTotalItems(null)
                         } finally {
                                 if (!controller.signal.aborted) {
                                         setTriviaLoading(false)
@@ -293,7 +292,6 @@ export default function AdminResources() {
                         if (result === null) {
                                 setError(true)
                                 setResources([])
-                                setTotalItems(null)
                         } else {
                                 setResources(result.items ?? [])
                                 setTotalItems(result.totalItems)
@@ -1012,29 +1010,23 @@ export default function AdminResources() {
                                         </div>
 
                                         {loading && (
-                                                <p className="admin-resource-status">
-                                                        Loading resources...
-                                                </p>
+                                                <CollectionState state="loading" name="resources" />
                                         )}
 
                                         {!loading && error && (
-                                                <p className="admin-resource-status admin-resource-error">
-                                                        Unable to load resources.
-                                                </p>
+                                                <CollectionState state="error" name="resources" onRetry={() => setResourceRefresh((key) => key + 1)} />
                                         )}
 
                                         {!loading &&
                                                 !error &&
                                                 resources.length === 0 && (
-                                                        <p className="admin-resource-status">
-                                                                No resources have been created yet.
-                                                        </p>
+                                                        <CollectionState state="empty" name="resources" description="No resources have been created yet." />
                                                 )}
 
                                         {!loading &&
                                                 !error &&
                                                 resources.length > 0 && (
-                                                        <div className="admin-resource-list">
+                                                        <div className="admin-resource-list collection-list">
                                                                 {resources.map((resource) => {
                                                                         const isEditing =
                                                                                 editingResource?.id ===
@@ -1107,7 +1099,7 @@ export default function AdminResources() {
                                                         </div>
                                                 )}
 
-                                        {!loading && !error && (
+                                        {totalItems !== null && (
                                                 <Pagination
                                                         currentPage={currentPage}
                                                         totalItems={totalItems}
@@ -1159,30 +1151,23 @@ export default function AdminResources() {
                                         )}
 
                                         {triviaLoading && (
-                                                <p className="admin-resource-status">
-                                                        Loading trivia challenges...
-                                                </p>
+                                                <CollectionState state="loading" name="trivia challenges" />
                                         )}
 
                                         {!triviaLoading && triviaError && (
-                                                <p className="admin-resource-status admin-resource-error">
-                                                        Unable to load trivia challenges.
-                                                </p>
+                                                <CollectionState state="error" name="trivia challenges" onRetry={() => setTriviaRefresh((key) => key + 1)} />
                                         )}
 
                                         {!triviaLoading &&
                                                 !triviaError &&
                                                 triviaChallenges.length === 0 && (
-                                                        <p className="admin-resource-status">
-                                                                No trivia challenges have been created
-                                                                yet.
-                                                        </p>
+                                                        <CollectionState state="empty" name="trivia challenges" description="No trivia challenges have been created yet." />
                                                 )}
 
                                         {!triviaLoading &&
                                                 !triviaError &&
                                                 triviaChallenges.length > 0 && (
-                                                        <div className="admin-resource-list">
+                                                        <div className="admin-resource-list collection-list">
                                                                 {triviaChallenges.map((challenge) => {
                                                                         const isExpanded =
                                                                                 expandedTriviaChallengeId ===
@@ -1388,7 +1373,7 @@ export default function AdminResources() {
                                                                                                                         challenge yet.
                                                                                                                 </p>
                                                                                                         ) : (
-                                                                                                                <div className="admin-resource-list">
+                                                                                                                <div className="admin-resource-list collection-list">
                                                                                                                         {challenge.questions.map(
                                                                                                                                 (
                                                                                                                                         question
@@ -1490,7 +1475,7 @@ export default function AdminResources() {
                                                         </div>
                                                 )}
 
-                                        {!triviaLoading && !triviaError && (
+                                        {triviaTotalItems !== null && (
                                                         <Pagination
                                                                 currentPage={triviaCurrentPage}
                                                                 totalItems={triviaTotalItems}

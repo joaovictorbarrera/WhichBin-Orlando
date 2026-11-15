@@ -1,3 +1,4 @@
+import CollectionState from '../../components/CollectionState'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FiBell, FiChevronRight } from 'react-icons/fi'
@@ -33,9 +34,11 @@ function Announcements() {
   const [pageSize, setPageSize] = useState(5)
   const [totalItems, setTotalItems] = useState<number>()
   const [error, setError] = useState<string>()
-  const queryKey = `${currentPage}:${pageSize}:${filterType}`
+  const [refreshKey, setRefreshKey] = useState(0)
+  const queryKey = `${currentPage}:${pageSize}:${filterType}:${refreshKey}`
   const [loadedQueryKey, setLoadedQueryKey] = useState<string | null>(null)
   const loading = loadedQueryKey !== queryKey
+  const updating = loading && loadedQueryKey !== null
   const paginationAnchorRef = useRef<HTMLDivElement>(null)
   const pendingPaginationTop = useRef<number | null>(null)
 
@@ -112,8 +115,16 @@ function handlePageSizeChange(nextPageSize: number) {
 }
 
 function handleFilterChange(nextFilter: AnnouncementType | '') {
+  if (nextFilter === filterType) {
+    return
+  }
+
   setFilterType(nextFilter)
   setCurrentPage(1)
+  setAnnouncements([])
+  setTotalItems(undefined)
+  setError(undefined)
+  setLoadedQueryKey(null)
 }
 
   return (
@@ -150,28 +161,19 @@ function handleFilterChange(nextFilter: AnnouncementType | '') {
         </select>
       </div>
 
-      {loading && (
-        <p className="announcements-loading">
-          Loading announcements...
-        </p>
-      )}
-
-      {!loading && error && (
-        <p className="announcements-empty-message" role="alert">
-          Unable to load announcements right now. Please try again later.
-      </p>
-      )}
+      {loading && loadedQueryKey === null && <CollectionState state="loading" name="announcements" />}
+      {!loading && error && <CollectionState state="error" name="announcements" onRetry={() => setRefreshKey((key) => key + 1)} />}
 
       {!loading && !error && announcements.length === 0 && (
-        <p className="announcements-empty-message">
+        <CollectionState state="empty" name="announcements" description={null}><p>
           {filterType
             ? 'No announcements of this type are available right now.'
             : 'No announcements are available right now.'}
-        </p>
+        </p></CollectionState>
       )}
 
       {!error && announcements.length > 0 && (
-        <div className="announcements-list">
+        <div className="announcements-list collection-list">
           {announcements.map((announcement) => (
             <Link
               to={`/announcements/${announcement.id}`}
@@ -216,20 +218,18 @@ function handleFilterChange(nextFilter: AnnouncementType | '') {
         ref={paginationAnchorRef}
       >
         <div
-          className={`announcements-loading-indicator${loading ? '' : ' is-hidden'}`}
-          role={loading ? 'status' : undefined}
-          aria-hidden={!loading}
+          className={`announcements-loading-indicator${updating ? '' : ' is-hidden'}`}
+          role={updating ? 'status' : undefined}
+          aria-hidden={!updating}
         >
-          {loading && (
+          {updating && (
             <>
               <span className="announcements-loading-spinner" aria-hidden="true" />
-              {loadedQueryKey === null
-                ? 'Loading announcements...'
-                : 'Updating announcements...'}
+              Updating announcements...
             </>
           )}
         </div>
-        {!error && totalItems !== undefined && (
+        {totalItems !== undefined && (
           <Pagination
             currentPage={currentPage}
             totalItems={totalItems}
@@ -237,7 +237,6 @@ function handleFilterChange(nextFilter: AnnouncementType | '') {
             pageSizeOptions={[5, 10, 20]}
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
-            siblingCount={1}
           />
         )}
       </div>
