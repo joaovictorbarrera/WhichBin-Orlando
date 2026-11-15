@@ -37,6 +37,7 @@ function AdminAnnouncements() {
   const [loading, setLoading] = useState(true)
   const [hasLoaded, setHasLoaded] = useState(false)
   const [error, setError] = useState(false)
+  const updating = loading && hasLoaded
   const announcementLoadRequest = useRef(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(5)
@@ -146,8 +147,17 @@ function handlePageSizeChange(nextPageSize: number) {
 }
 
 function handleFilterChange(nextFilter: AnnouncementType | '') {
+  if (nextFilter === announcementFilter) {
+    return
+  }
+
   setAnnouncementFilter(nextFilter)
   setCurrentPage(1)
+  setAnnouncements([])
+  setTotalItems(undefined)
+  setHasLoaded(false)
+  setLoading(true)
+  setError(false)
 }
 
   function resetForm() {
@@ -615,14 +625,14 @@ async function handleConfirmDelete() {
         )}
         <div ref={paginationAnchorRef}>
           <div
-            className={`admin-announcements-loading-indicator${loading ? '' : ' is-hidden'}`}
-            role={loading ? 'status' : undefined}
-            aria-hidden={!loading}
+            className={`admin-announcements-loading-indicator${updating ? '' : ' is-hidden'}`}
+            role={updating ? 'status' : undefined}
+            aria-hidden={!updating}
           >
-            {loading && (
+            {updating && (
               <>
                 <span className="admin-announcements-loading-spinner" aria-hidden="true" />
-                {hasLoaded ? 'Updating announcements...' : 'Loading announcements...'}
+                Updating announcements...
               </>
             )}
           </div>
@@ -634,7 +644,6 @@ async function handleConfirmDelete() {
               pageSizeOptions={[5, 10, 20]}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
-              siblingCount={1}
             />
           )}
         </div>

@@ -20,7 +20,7 @@ type FilterOption = 'all' | 'recyclable' | 'non-recyclable'
 function ItemSearch() {
   const [searchText, setSearchText] = useState('')
   const [debouncedSearchText, setDebouncedSearchText] = useState('')
-  const [filter, setFilter] = useState<FilterOption>('recyclable')
+  const [filter, setFilter] = useState<FilterOption>('all')
   const [items, setItems] = useState<Item[]>([])
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
@@ -30,10 +30,19 @@ function ItemSearch() {
   const [hasLoaded, setHasLoaded] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
+  const updating = loading && hasLoaded
 
   function changeFilter(value: FilterOption) {
+    if (value === filter) {
+      return
+    }
+
     setFilter(value)
     setPage(1)
+    setItems([])
+    setHasLoaded(false)
+    setLoading(true)
+    setError(null)
   }
 
   function changePageSize(value: number) {
@@ -155,6 +164,14 @@ function ItemSearch() {
 
           <button
             type="button"
+            className={`item-filter-btn ${filter === 'all' ? 'active' : ''}`}
+            onClick={() => changeFilter('all')}
+            aria-pressed={filter === 'all'}
+          >
+            All Items
+          </button>
+          <button
+            type="button"
             className={`item-filter-btn ${filter === 'recyclable' ? 'active' : ''}`}
             onClick={() => changeFilter('recyclable')}
             aria-pressed={filter === 'recyclable'}
@@ -170,14 +187,6 @@ function ItemSearch() {
           >
             <FiTrash2 aria-hidden="true" />
             Non-Recyclable
-          </button>
-          <button
-            type="button"
-            className={`item-filter-btn ${filter === 'all' ? 'active' : ''}`}
-            onClick={() => changeFilter('all')}
-            aria-pressed={filter === 'all'}
-          >
-            All Items
           </button>
         </div>
       </section>
@@ -254,14 +263,14 @@ function ItemSearch() {
         </div>
       )}
       <div
-        className={`item-search-loading-indicator${loading ? '' : ' is-hidden'}`}
-        role={loading ? 'status' : undefined}
-        aria-hidden={!loading}
+        className={`item-search-loading-indicator${updating ? '' : ' is-hidden'}`}
+        role={updating ? 'status' : undefined}
+        aria-hidden={!updating}
       >
-        {loading && (
+        {updating && (
           <>
             <div className="loading-spinner" aria-hidden="true" />
-            <span>{hasLoaded ? 'Updating items...' : 'Loading items...'}</span>
+            <span>Updating items...</span>
           </>
         )}
       </div>

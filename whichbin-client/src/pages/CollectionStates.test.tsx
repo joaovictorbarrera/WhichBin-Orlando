@@ -112,3 +112,266 @@ describe.each(paginatedCases)('$label pagination failures', ({ Page, fetch, name
     expect(fetch.mock.lastCall?.[pageArg]).toBe(2)
   })
 })
+
+describe.each([
+  {
+    label: 'public items',
+    Page: ItemSearch,
+    fetch: vi.mocked(fetchItems),
+    updatingText: 'Updating items...',
+    indicator: '.item-search-loading-indicator',
+    page: {
+      ...emptyPage,
+      totalPages: 3,
+      totalItems: 15,
+      items: [{ id: 1, name: 'Test item', recyclable: true, largeItem: false, information: 'Test instructions' }],
+    },
+    staleItem: 'Test item',
+  },
+  {
+    label: 'admin items',
+    Page: AdminItems,
+    fetch: vi.mocked(fetchItems),
+    updatingText: 'Updating items...',
+    indicator: '.admin-items-loading',
+    page: {
+      ...emptyPage,
+      totalPages: 3,
+      totalItems: 15,
+      items: [{ id: 1, name: 'Test item', recyclable: true, largeItem: false, information: 'Test instructions' }],
+    },
+    staleItem: 'Test item',
+  },
+  {
+    label: 'public announcements',
+    Page: Announcements,
+    fetch: vi.mocked(getAnnouncementsPaged),
+    updatingText: 'Updating announcements...',
+    indicator: '.announcements-loading-indicator',
+    page: {
+      ...emptyPage,
+      totalPages: 3,
+      totalItems: 15,
+      items: [{ id: 1, title: 'Test announcement', message: 'Test message', type: 'GENERAL', startDate: '2026-01-01T00:00:00Z', endDate: null, active: true }],
+    },
+    staleItem: 'Test announcement',
+  },
+  {
+    label: 'admin announcements',
+    Page: AdminAnnouncements,
+    fetch: vi.mocked(getAllAnnouncementsPaged),
+    updatingText: 'Updating announcements...',
+    indicator: '.admin-announcements-loading-indicator',
+    page: {
+      ...emptyPage,
+      totalPages: 3,
+      totalItems: 15,
+      items: [{ id: 1, title: 'Test announcement', message: 'Test message', type: 'GENERAL', startDate: '2026-01-01T00:00:00Z', endDate: null, active: true }],
+    },
+    staleItem: 'Test announcement',
+  },
+])('$label loading states', ({ Page, fetch, updatingText, indicator, page, staleItem }) => {
+  it('uses the collection state on first load and keeps stale items during later fetches', async () => {
+    let resolveInitialPage: (value: never) => void = () => {}
+    let resolveNextPage: (value: never) => void = () => {}
+    fetch.mockImplementationOnce(() => new Promise((resolve) => {
+      resolveInitialPage = resolve
+    }) as never)
+    const { container } = render(<MemoryRouter><Page /></MemoryRouter>)
+
+    await waitFor(() => expect(container.querySelector('.collection-state--loading')).toBeInTheDocument())
+    expect(container.querySelector(indicator)).toHaveClass('is-hidden')
+    resolveInitialPage(page as never)
+    await screen.findByText(staleItem)
+    expect(container.querySelector('.collection-state--loading')).not.toBeInTheDocument()
+
+    fetch.mockImplementationOnce(() => new Promise((resolve) => {
+      resolveNextPage = resolve
+    }) as never)
+    fireEvent.click(screen.getByRole('button', { name: 'Go to next page' }))
+
+    expect(await screen.findByText(updatingText)).toBeInTheDocument()
+    expect(screen.getByText(staleItem)).toBeInTheDocument()
+    expect(container.querySelector('.collection-state--loading')).not.toBeInTheDocument()
+    const loadingIndicator = container.querySelector<HTMLElement>(indicator)
+    const pagination = screen.getByRole('navigation', { name: 'Pagination Navigation' })
+    expect(loadingIndicator?.compareDocumentPosition(pagination)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    if (indicator === '.admin-items-loading') {
+      const card = container.querySelector<HTMLElement>('.admin-items-list-section')
+      expect(card).toContainElement(loadingIndicator)
+      expect(card).toContainElement(pagination)
+      expect(pagination).toHaveClass('pagination-container')
+      expect(pagination).toHaveClass('admin-items-pagination')
+      expect(pagination.querySelector('.pagination-info')?.compareDocumentPosition(
+        pagination.querySelector('.pagination-controls')!
+      )).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+      expect(pagination.querySelector('.pagination-controls')?.compareDocumentPosition(
+        pagination.querySelector('.pagination-size-wrapper')!
+      )).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    }
+
+    resolveNextPage(page as never)
+  })
+})
+
+describe('admin items filter loading', () => {
+  it('shows the collection loading state instead of updating stale results', async () => {
+    let resolveFilteredItems: (value: never) => void = () => {}
+    vi.mocked(fetchItems).mockResolvedValueOnce({
+      ...emptyPage,
+      totalPages: 3,
+      totalItems: 15,
+      items: [{ id: 1, name: 'Old item', recyclable: false, largeItem: false, information: 'Old instructions' }],
+    })
+    const { container } = render(<MemoryRouter><AdminItems /></MemoryRouter>)
+
+    await screen.findByText('Old item')
+    vi.mocked(fetchItems).mockImplementationOnce(() => new Promise((resolve) => {
+      resolveFilteredItems = resolve
+    }) as never)
+    fireEvent.click(screen.getByRole('button', { name: 'Recyclable' }))
+
+    expect(await screen.findByText('Loading items...')).toBeInTheDocument()
+    expect(screen.queryByText('Updating items...')).not.toBeInTheDocument()
+    expect(screen.queryByText('Old item')).not.toBeInTheDocument()
+
+    resolveFilteredItems({
+      ...emptyPage,
+      totalItems: 1,
+      items: [{ id: 2, name: 'New item', recyclable: true, largeItem: false, information: 'New instructions' }],
+    } as never)
+    expect(await screen.findByText('New item')).toBeInTheDocument()
+    expect(container.querySelector('.collection-state--loading')).not.toBeInTheDocument()
+  })
+})
+
+describe('public item search default filter', () => {
+  it('selects All Items first and requests without a recyclability filter', async () => {
+    render(<MemoryRouter><ItemSearch /></MemoryRouter>)
+
+    expect(screen.getByRole('button', { name: 'All Items' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: 'Recyclable' })).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.getByRole('button', { name: 'Non-Recyclable' })).toHaveAttribute('aria-pressed', 'false')
+    await waitFor(() => expect(fetchItems).toHaveBeenCalled())
+    expect(vi.mocked(fetchItems).mock.calls[0]?.[1]).toBeUndefined()
+  })
+})
+
+describe.each([
+  {
+    label: 'articles',
+    fetch: vi.mocked(getResources),
+    navigationIndex: 0,
+    title: 'Test resource',
+    updatingText: 'Updating resources...',
+    page: {
+      ...emptyPage,
+      pageSize: 6,
+      totalPages: 3,
+      totalItems: 15,
+      items: [{ id: 1, title: 'Test resource', description: 'Test description', styleType: 'resource-style-green' }],
+    },
+  },
+  {
+    label: 'trivia challenges',
+    fetch: vi.mocked(getPaginatedTriviaChallenges),
+    navigationIndex: 1,
+    title: 'Test challenge',
+    updatingText: 'Updating trivia challenges...',
+    page: {
+      ...emptyPage,
+      pageSize: 4,
+      totalPages: 3,
+      totalItems: 15,
+      items: [{ id: 1, title: 'Test challenge', description: 'Test description' }],
+    },
+  },
+])('public educational resources $label pagination loading', ({ fetch, navigationIndex, title, updatingText, page }) => {
+  it('keeps the previous page visible and shows an updating state before pagination', async () => {
+    let resolveNextPage: (value: never) => void = () => {}
+    fetch.mockResolvedValueOnce(page as never)
+    const { container } = render(<MemoryRouter><EducationalResources /></MemoryRouter>)
+
+    await screen.findByText(title)
+    await waitFor(() => expect(screen.getAllByRole('navigation', { name: 'Pagination Navigation' })).toHaveLength(2))
+    const nav = screen.getAllByRole('navigation', { name: 'Pagination Navigation' })[navigationIndex]
+
+    fetch.mockImplementationOnce(() => new Promise((resolve) => {
+      resolveNextPage = resolve
+    }) as never)
+    fireEvent.click(within(nav).getByRole('button', { name: 'Go to next page' }))
+
+    expect(await screen.findByText(updatingText)).toBeInTheDocument()
+    expect(screen.getByText(title)).toBeInTheDocument()
+    expect(container.querySelector('.collection-state--loading')).not.toBeInTheDocument()
+    const indicators = container.querySelectorAll('.announcements-loading-indicator')
+    const indicator = indicators[navigationIndex] as HTMLElement
+    expect(indicator.compareDocumentPosition(nav)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+
+    resolveNextPage(page as never)
+  })
+})
+
+describe.each([
+  {
+    label: 'public items',
+    Page: ItemSearch,
+    fetch: vi.mocked(fetchItems),
+    staleItem: 'Old item',
+    loadingText: 'Loading items...',
+    indicator: '.item-search-loading-indicator',
+    filter: () => fireEvent.click(screen.getByRole('button', { name: 'Non-Recyclable' })),
+    page: {
+      ...emptyPage,
+      totalPages: 3,
+      totalItems: 15,
+      items: [{ id: 1, name: 'Old item', recyclable: true, largeItem: false, information: 'Old instructions' }],
+    },
+  },
+  {
+    label: 'public announcements',
+    Page: Announcements,
+    fetch: vi.mocked(getAnnouncementsPaged),
+    staleItem: 'Old announcement',
+    loadingText: 'Loading announcements...',
+    indicator: '.announcements-loading-indicator',
+    filter: () => fireEvent.change(screen.getByLabelText('Filter by type'), { target: { value: 'EMERGENCY' } }),
+    page: {
+      ...emptyPage,
+      items: [{ id: 1, title: 'Old announcement', message: 'Old message', type: 'GENERAL', startDate: '2026-01-01T00:00:00Z', endDate: null, active: true }],
+    },
+  },
+  {
+    label: 'admin announcements',
+    Page: AdminAnnouncements,
+    fetch: vi.mocked(getAllAnnouncementsPaged),
+    staleItem: 'Old announcement',
+    loadingText: 'Loading announcements...',
+    indicator: '.admin-announcements-loading-indicator',
+    filter: () => fireEvent.change(screen.getByLabelText('Type'), { target: { value: 'EMERGENCY' } }),
+    page: {
+      ...emptyPage,
+      items: [{ id: 1, title: 'Old announcement', message: 'Old message', type: 'GENERAL', startDate: '2026-01-01T00:00:00Z', endDate: null, active: true }],
+    },
+  },
+])('$label filter loading', ({ Page, fetch, staleItem, loadingText, indicator, filter, page }) => {
+  it('shows the collection loading state without stale results or updating indicator', async () => {
+    let resolveFilteredPage: (value: never) => void = () => {}
+    fetch.mockResolvedValueOnce(page as never)
+    const { container } = render(<MemoryRouter><Page /></MemoryRouter>)
+
+    await screen.findByText(staleItem)
+    fetch.mockImplementationOnce(() => new Promise((resolve) => {
+      resolveFilteredPage = resolve
+    }) as never)
+    filter()
+
+    expect(await screen.findByText(loadingText)).toBeInTheDocument()
+    expect(screen.queryByText(staleItem)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Updating/)).not.toBeInTheDocument()
+    expect(container.querySelector('.collection-state--loading')).toBeInTheDocument()
+    expect(container.querySelector(indicator)).toHaveClass('is-hidden')
+
+    resolveFilteredPage(emptyPage as never)
+  })
+})

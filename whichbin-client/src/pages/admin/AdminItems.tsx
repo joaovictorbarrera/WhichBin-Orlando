@@ -52,10 +52,18 @@ function AdminItems() {
   const [keywordInput, setKeywordInput] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Item | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const updating = loading && hasLoaded
 
   function changeFilter(value: FilterOption) {
+    if (value === filter) {
+      return
+    }
+
     setFilter(value)
     setPage(1)
+    setItems([])
+    setHasLoaded(false)
+    setLoading(true)
   }
 
   function changePageSize(value: number) {
@@ -589,6 +597,18 @@ function AdminItems() {
           </div>
         )}
 
+        <div
+          className={`admin-items-loading${updating ? '' : ' is-hidden'}`}
+          role={updating ? 'status' : undefined}
+          aria-hidden={!updating}
+        >
+          {updating && (
+            <>
+              <span className="admin-items-loading-spinner" aria-hidden="true" />
+              Updating items...
+            </>
+          )}
+        </div>
         {hasLoaded && (
           <Pagination
             currentPage={page}
@@ -597,6 +617,7 @@ function AdminItems() {
             onPageChange={setPage}
             onPageSizeChange={changePageSize}
             pageSizeOptions={[5, 10, 20, 50]}
+            className="admin-items-pagination"
           />
         )}
       </section>
@@ -612,18 +633,6 @@ function AdminItems() {
           onConfirm={handleConfirmDelete}
         />
       )}
-      <div
-        className={`admin-items-loading${loading ? '' : ' is-hidden'}`}
-        role={loading ? 'status' : undefined}
-        aria-hidden={!loading}
-      >
-        {loading && (
-          <>
-            <span className="admin-items-loading-spinner" aria-hidden="true" />
-            {hasLoaded ? 'Updating items...' : 'Loading items...'}
-          </>
-        )}
-      </div>
     </PageLayout>
   )
 }

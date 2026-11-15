@@ -38,6 +38,7 @@ function Announcements() {
   const queryKey = `${currentPage}:${pageSize}:${filterType}:${refreshKey}`
   const [loadedQueryKey, setLoadedQueryKey] = useState<string | null>(null)
   const loading = loadedQueryKey !== queryKey
+  const updating = loading && loadedQueryKey !== null
   const paginationAnchorRef = useRef<HTMLDivElement>(null)
   const pendingPaginationTop = useRef<number | null>(null)
 
@@ -114,8 +115,16 @@ function handlePageSizeChange(nextPageSize: number) {
 }
 
 function handleFilterChange(nextFilter: AnnouncementType | '') {
+  if (nextFilter === filterType) {
+    return
+  }
+
   setFilterType(nextFilter)
   setCurrentPage(1)
+  setAnnouncements([])
+  setTotalItems(undefined)
+  setError(undefined)
+  setLoadedQueryKey(null)
 }
 
   return (
@@ -209,16 +218,14 @@ function handleFilterChange(nextFilter: AnnouncementType | '') {
         ref={paginationAnchorRef}
       >
         <div
-          className={`announcements-loading-indicator${loading ? '' : ' is-hidden'}`}
-          role={loading ? 'status' : undefined}
-          aria-hidden={!loading}
+          className={`announcements-loading-indicator${updating ? '' : ' is-hidden'}`}
+          role={updating ? 'status' : undefined}
+          aria-hidden={!updating}
         >
-          {loading && (
+          {updating && (
             <>
               <span className="announcements-loading-spinner" aria-hidden="true" />
-              {loadedQueryKey === null
-                ? 'Loading announcements...'
-                : 'Updating announcements...'}
+              Updating announcements...
             </>
           )}
         </div>
@@ -230,7 +237,6 @@ function handleFilterChange(nextFilter: AnnouncementType | '') {
             pageSizeOptions={[5, 10, 20]}
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
-            siblingCount={1}
           />
         )}
       </div>

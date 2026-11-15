@@ -44,11 +44,11 @@ function EducationalResources() {
 
   // Article pagination
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(6)
 
   // Trivia pagination
   const [triviaCurrentPage, setTriviaCurrentPage] = useState(1)
-  const [triviaPageSize, setTriviaPageSize] = useState(5)
+  const [triviaPageSize, setTriviaPageSize] = useState(4)
 
   // Load paginated educational articles
   useEffect(() => {
@@ -197,16 +197,24 @@ function EducationalResources() {
       : null
   const resourcesLoading = currentResourcesResult === null
   const triviaLoading = currentTriviaResult === null
+  const resourcesUpdating =
+    resourcesLoading && resourcesResult?.status === 'success'
+  const triviaUpdating =
+    triviaLoading && triviaResult?.status === 'success'
   const resourcesFailed = currentResourcesResult?.status === 'error'
   const triviaFailed = currentTriviaResult?.status === 'error'
   const resources =
     currentResourcesResult?.status === 'success'
       ? currentResourcesResult.items
-      : []
+      : resourcesUpdating && resourcesResult?.status === 'success'
+        ? resourcesResult.items
+        : []
   const triviaChallenges =
     currentTriviaResult?.status === 'success'
       ? currentTriviaResult.items
-      : []
+      : triviaUpdating && triviaResult?.status === 'success'
+        ? triviaResult.items
+        : []
   const totalItems =
     currentResourcesResult?.status === 'success'
       ? currentResourcesResult.totalItems
@@ -251,7 +259,7 @@ function EducationalResources() {
         <section className="resources-section">
           {filter === 'all' && <h2>Articles</h2>}
 
-          {resourcesLoading && <CollectionState state="loading" name="resources" />}
+          {resourcesLoading && !resourcesUpdating && <CollectionState state="loading" name="resources" />}
           {!resourcesLoading && resourcesFailed && <CollectionState state="error" name="resources" onRetry={() => setResourceRefresh((key) => key + 1)} />}
           {!resourcesLoading && !resourcesFailed && resources.length === 0 && (
             <CollectionState state="empty" name="resources" description="No articles are available right now." />
@@ -283,12 +291,24 @@ function EducationalResources() {
             ))}
           </div>
 
+          <div
+            className={`announcements-loading-indicator${resourcesUpdating ? '' : ' is-hidden'}`}
+            role={resourcesUpdating ? 'status' : undefined}
+            aria-hidden={!resourcesUpdating}
+          >
+            {resourcesUpdating && (
+              <>
+                <span className="announcements-loading-spinner" aria-hidden="true" />
+                Updating resources...
+              </>
+            )}
+          </div>
           {totalItems !== null && (
             <Pagination
               currentPage={currentPage}
               totalItems={totalItems}
               pageSize={pageSize}
-              pageSizeOptions={[5, 10, 20]}
+              pageSizeOptions={[6, 10, 20]}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
               displayName="resources"
@@ -302,7 +322,7 @@ function EducationalResources() {
         <section className="resources-section">
           {filter === 'all' && <h2>Trivia</h2>}
 
-          {triviaLoading && <CollectionState state="loading" name="trivia challenges" />}
+          {triviaLoading && !triviaUpdating && <CollectionState state="loading" name="trivia challenges" />}
           {!triviaLoading && triviaFailed && <CollectionState state="error" name="trivia challenges" onRetry={() => setTriviaRefresh((key) => key + 1)} />}
           {!triviaLoading && !triviaFailed && triviaChallenges.length === 0 && (
             <CollectionState state="empty" name="trivia challenges" description="No trivia challenges are available right now." />
@@ -332,12 +352,24 @@ function EducationalResources() {
             ))}
           </div>
 
+          <div
+            className={`announcements-loading-indicator${triviaUpdating ? '' : ' is-hidden'}`}
+            role={triviaUpdating ? 'status' : undefined}
+            aria-hidden={!triviaUpdating}
+          >
+            {triviaUpdating && (
+              <>
+                <span className="announcements-loading-spinner" aria-hidden="true" />
+                Updating trivia challenges...
+              </>
+            )}
+          </div>
           {triviaTotalItems !== null && (
             <Pagination
               currentPage={triviaCurrentPage}
               totalItems={triviaTotalItems}
               pageSize={triviaPageSize}
-              pageSizeOptions={[5, 10, 20]}
+              pageSizeOptions={[4, 10, 20]}
               onPageChange={handleTriviaPageChange}
               onPageSizeChange={handleTriviaPageSizeChange}
               displayName="challenges"

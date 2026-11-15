@@ -1,6 +1,6 @@
 # Reusable Pagination Component (`Pagination.tsx`)
 
-The `Pagination` component is an accessible, WCAG 2.1 AA compliant, responsive pagination control built for WhichBin Orlando (`whichbin-client`). It provides navigation controls, smart numeric ranges with ellipsis truncation, optional page size selection, and feedback status text.
+The `Pagination` component is an accessible, WCAG 2.1 AA compliant, responsive pagination control built for WhichBin Orlando (`whichbin-client`). It provides navigation controls, smart numeric ranges with ellipsis truncation, optional page size selection, and feedback status text. Page numbers and ellipses use at most seven slots; page 1 of 10 shows `1, 2, 3, 4, 5, …, 10`, while page 5 shows `1, …, 4, 5, 6, …, 10`.
 
 ---
 
@@ -28,7 +28,6 @@ The `Pagination` component is an accessible, WCAG 2.1 AA compliant, responsive p
 | `pageSizeOptions` | `number[]` | Optional | `[10, 20, 50]` | Dropdown choices for rows per page. |
 | `onPageSizeChange`| `(pageSize: number) => void` | Optional | — | Callback fired when the user selects a new page size. |
 | `displayName` | `string` | Optional | `'items'` | Plural entity name used in status text (e.g. `"resources"`, `"announcements"`). |
-| `siblingCount` | `number` | Optional | `1` | Number of sibling page numbers to show on each side of the active page before displaying an ellipsis (`...`). |
 | `className` | `string` | Optional | `''` | Additional custom CSS classes applied to the root `<nav>` element. |
 
 ---
