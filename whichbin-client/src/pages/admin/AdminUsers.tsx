@@ -55,6 +55,7 @@ function AdminUsers() {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(5)
   const [totalItems, setTotalItems] = useState<number>()
+  const [hasLoaded, setHasLoaded] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [reloadCount, setReloadCount] = useState(0)
@@ -70,6 +71,7 @@ function AdminUsers() {
   const [resetTarget, setResetTarget] = useState<ManagedUser | null>(null)
   const [shareLink, setShareLink] = useState<ShareLink | null>(null)
   const [copied, setCopied] = useState(false)
+  const isUpdating = isLoading && hasLoaded
 
   useEffect(() => {
     let isMounted = true
@@ -82,6 +84,7 @@ function AdminUsers() {
         if (isMounted) {
           setUsers(result.items)
           setTotalItems(result.totalItems)
+          setHasLoaded(true)
         }
       } catch (error) {
         if (isMounted && !controller.signal.aborted) {
@@ -318,19 +321,19 @@ function AdminUsers() {
 
         <div className="admin-users-list-heading">
           <h2>Users</h2>
-          {!isLoading && !loadError && totalItems !== undefined && (
+          {hasLoaded && !loadError && totalItems !== undefined && (
             <span>{totalItems} {totalItems === 1 ? 'account' : 'accounts'}</span>
           )}
         </div>
 
-        {isLoading ? (
+        {isLoading && !hasLoaded ? (
           <CollectionState state="loading" name="users" />
-        ) : loadError ? (
+        ) : !isLoading && loadError ? (
           <CollectionState state="error" name="users" onRetry={() => setReloadCount((count) => count + 1)} />
-        ) : users.length === 0 ? (
+        ) : hasLoaded && !loadError && users.length === 0 ? (
           <CollectionState state="empty" name="users" description="No users have been created yet." />
-        ) : (
-          <div className="admin-users-list collection-list">
+        ) : hasLoaded && !loadError && users.length > 0 ? (
+          <div className="admin-users-list collection-list" aria-busy={isLoading}>
             {users.map((managedUser) => (
               <article className="admin-user-card" key={managedUser.id}>
                 <div className="admin-user-summary">
@@ -399,6 +402,20 @@ function AdminUsers() {
                 )}
               </article>
             ))}
+          </div>
+        ) : null}
+        {hasLoaded && (
+          <div
+            className={`admin-section-loading-indicator${isUpdating ? '' : ' is-hidden'}`}
+            role={isUpdating ? 'status' : undefined}
+            aria-hidden={!isUpdating}
+          >
+            {isUpdating && (
+              <>
+                <span className="admin-section-loading-spinner" aria-hidden="true" />
+                Updating users...
+              </>
+            )}
           </div>
         )}
         {totalItems !== undefined && !loadError && (

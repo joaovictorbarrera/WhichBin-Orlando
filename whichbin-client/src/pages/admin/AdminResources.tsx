@@ -131,7 +131,9 @@ const emptyTriviaChallenge: CreateTriviaChallengeRequest = {
 export default function AdminResources() {
         const [resources, setResources] = useState<Resource[]>([])
         const [loading, setLoading] = useState(true)
+        const [resourcesHasLoaded, setResourcesHasLoaded] = useState(false)
         const [error, setError] = useState(false)
+        const resourcesUpdating = loading && resourcesHasLoaded
 
         const [currentPage, setCurrentPage] = useState(1)
         const [pageSize, setPageSize] = useState(10)
@@ -157,7 +159,9 @@ export default function AdminResources() {
                 TriviaChallenge[]
         >([])
         const [triviaLoading, setTriviaLoading] = useState(true)
+        const [triviaHasLoaded, setTriviaHasLoaded] = useState(false)
         const [triviaError, setTriviaError] = useState(false)
+        const triviaUpdating = triviaLoading && triviaHasLoaded
 
         const [triviaCurrentPage, setTriviaCurrentPage] = useState(1)
         const [triviaPageSize, setTriviaPageSize] = useState(5)
@@ -234,6 +238,7 @@ export default function AdminResources() {
                                 } else {
                                         setTriviaChallenges(result.items ?? [])
                                         setTriviaTotalItems(result.totalItems)
+                                        setTriviaHasLoaded(true)
 
                                         const lastPage = Math.max(
                                                 1,
@@ -295,6 +300,7 @@ export default function AdminResources() {
                         } else {
                                 setResources(result.items ?? [])
                                 setTotalItems(result.totalItems)
+                                setResourcesHasLoaded(true)
                         }
 
                         setLoading(false)
@@ -1009,7 +1015,7 @@ export default function AdminResources() {
                                                 )}
                                         </div>
 
-                                        {loading && (
+                                        {loading && !resourcesHasLoaded && (
                                                 <CollectionState state="loading" name="resources" />
                                         )}
 
@@ -1017,16 +1023,16 @@ export default function AdminResources() {
                                                 <CollectionState state="error" name="resources" onRetry={() => setResourceRefresh((key) => key + 1)} />
                                         )}
 
-                                        {!loading &&
+                                        {resourcesHasLoaded &&
                                                 !error &&
                                                 resources.length === 0 && (
                                                         <CollectionState state="empty" name="resources" description="No resources have been created yet." />
                                                 )}
 
-                                        {!loading &&
+                                        {resourcesHasLoaded &&
                                                 !error &&
                                                 resources.length > 0 && (
-                                                        <div className="admin-resource-list collection-list">
+                                                        <div className="admin-resource-list collection-list" aria-busy={loading}>
                                                                 {resources.map((resource) => {
                                                                         const isEditing =
                                                                                 editingResource?.id ===
@@ -1099,6 +1105,21 @@ export default function AdminResources() {
                                                         </div>
                                                 )}
 
+                                        {resourcesHasLoaded && (
+                                                <div
+                                                        className={`admin-section-loading-indicator${resourcesUpdating ? '' : ' is-hidden'}`}
+                                                        role={resourcesUpdating ? 'status' : undefined}
+                                                        aria-hidden={!resourcesUpdating}
+                                                >
+                                                        {resourcesUpdating && (
+                                                                <>
+                                                                        <span className="admin-section-loading-spinner" aria-hidden="true" />
+                                                                        Updating resources...
+                                                                </>
+                                                        )}
+                                                </div>
+                                        )}
+
                                         {totalItems !== null && (
                                                 <Pagination
                                                         currentPage={currentPage}
@@ -1150,7 +1171,7 @@ export default function AdminResources() {
                                                 </div>
                                         )}
 
-                                        {triviaLoading && (
+                                        {triviaLoading && !triviaHasLoaded && (
                                                 <CollectionState state="loading" name="trivia challenges" />
                                         )}
 
@@ -1158,16 +1179,16 @@ export default function AdminResources() {
                                                 <CollectionState state="error" name="trivia challenges" onRetry={() => setTriviaRefresh((key) => key + 1)} />
                                         )}
 
-                                        {!triviaLoading &&
+                                        {triviaHasLoaded &&
                                                 !triviaError &&
                                                 triviaChallenges.length === 0 && (
                                                         <CollectionState state="empty" name="trivia challenges" description="No trivia challenges have been created yet." />
                                                 )}
 
-                                        {!triviaLoading &&
+                                        {triviaHasLoaded &&
                                                 !triviaError &&
                                                 triviaChallenges.length > 0 && (
-                                                        <div className="admin-resource-list collection-list">
+                                                        <div className="admin-resource-list collection-list" aria-busy={triviaLoading}>
                                                                 {triviaChallenges.map((challenge) => {
                                                                         const isExpanded =
                                                                                 expandedTriviaChallengeId ===
@@ -1474,6 +1495,21 @@ export default function AdminResources() {
                                                                 })}
                                                         </div>
                                                 )}
+
+                                        {triviaHasLoaded && (
+                                                <div
+                                                        className={`admin-section-loading-indicator${triviaUpdating ? '' : ' is-hidden'}`}
+                                                        role={triviaUpdating ? 'status' : undefined}
+                                                        aria-hidden={!triviaUpdating}
+                                                >
+                                                        {triviaUpdating && (
+                                                                <>
+                                                                        <span className="admin-section-loading-spinner" aria-hidden="true" />
+                                                                        Updating trivia challenges...
+                                                                </>
+                                                        )}
+                                                </div>
+                                        )}
 
                                         {triviaTotalItems !== null && (
                                                         <Pagination
