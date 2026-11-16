@@ -86,9 +86,45 @@ class UserControllerTest {
         String email = uniqueEmail();
         createUser(email);
 
+        mockMvc.perform(get("/users")
+                        .param("pageSize", "100")
+                        .with(bearerAuth))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[?(@.email == '" + email + "')]").exists())
+                .andExpect(jsonPath("$.currentPage").value(1))
+                .andExpect(jsonPath("$.pageSize").value(100));
+
         mockMvc.perform(get("/users").with(bearerAuth))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.email == '" + email + "')]").exists());
+                .andExpect(jsonPath("$.pageSize").value(5));
+    }
+
+    @Test
+    void shouldReturnRequestedUserPage() throws Exception {
+        createUser(uniqueEmail());
+
+        mockMvc.perform(get("/users")
+                        .param("page", "2")
+                        .param("pageSize", "1")
+                        .with(bearerAuth))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.currentPage").value(2))
+                .andExpect(jsonPath("$.pageSize").value(1))
+                .andExpect(jsonPath("$.totalItems").isNumber())
+                .andExpect(jsonPath("$.items.length()").value(1));
+    }
+
+    @Test
+    void shouldRejectInvalidUserPaginationParameters() throws Exception {
+        mockMvc.perform(get("/users")
+                        .param("page", "0")
+                        .with(bearerAuth))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(get("/users")
+                        .param("pageSize", "101")
+                        .with(bearerAuth))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

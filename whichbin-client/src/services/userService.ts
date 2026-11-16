@@ -1,4 +1,5 @@
 import { apiFetch } from './apiClient'
+import type { PaginatedResponse } from '../types/PaginatedResponse'
 
 export type ManagedUser = {
   id: number
@@ -39,10 +40,18 @@ async function requireSuccessfulResponse(response: Response, fallback: string) {
   }
 }
 
-export async function fetchUsers(): Promise<ManagedUser[]> {
-  const response = await apiFetch('users')
+export async function fetchUsers(
+  page: number,
+  pageSize: number,
+  signal?: AbortSignal
+): Promise<PaginatedResponse<ManagedUser>> {
+  const params = new URLSearchParams({
+    page: String(page),
+    pageSize: String(pageSize),
+  })
+  const response = await apiFetch(`users?${params}`, { signal })
   await requireSuccessfulResponse(response, 'Unable to load users.')
-  return (await response.json()) as ManagedUser[]
+  return (await response.json()) as PaginatedResponse<ManagedUser>
 }
 
 export async function createUser(input: UserInput): Promise<CreatedUser> {
