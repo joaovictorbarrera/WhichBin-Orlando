@@ -1,13 +1,16 @@
 package com.whichbin.whichbin_api.service;
 
+import com.whichbin.whichbin_api.dto.PaginatedResponse;
+import com.whichbin.whichbin_api.dto.auth.RegisterRequest;
 import com.whichbin.whichbin_api.dto.user.CreateUserRequest;
 import com.whichbin.whichbin_api.dto.user.CreateUserResponse;
 import com.whichbin.whichbin_api.dto.user.UpdateUserRequest;
 import com.whichbin.whichbin_api.dto.user.UserResponse;
-import com.whichbin.whichbin_api.dto.auth.RegisterRequest;
 import com.whichbin.whichbin_api.model.User;
 import com.whichbin.whichbin_api.repository.AuthorizationTokenRepository;
 import com.whichbin.whichbin_api.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,7 +21,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.List;
 
 @Service
 public class UserService {
@@ -41,17 +43,27 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserResponse> getAllUsers() {
-        return userRepository.findAll(
-                        Sort.by(
-                                Sort.Order.asc("lastName"),
-                                Sort.Order.asc("firstName"),
-                                Sort.Order.asc("id")
+    public PaginatedResponse<UserResponse> getUsers(int page, int pageSize) {
+        Page<UserResponse> users = userRepository.findAll(
+                        PageRequest.of(
+                                page - 1,
+                                pageSize,
+                                Sort.by(
+                                        Sort.Order.asc("lastName"),
+                                        Sort.Order.asc("firstName"),
+                                        Sort.Order.asc("id")
+                                )
                         )
                 )
-                .stream()
-                .map(this::toResponse)
-                .toList();
+                .map(this::toResponse);
+
+        return new PaginatedResponse<>(
+                users.getNumber() + 1,
+                users.getTotalPages(),
+                users.getSize(),
+                users.getTotalElements(),
+                users.getContent()
+        );
     }
 
     @Transactional(readOnly = true)

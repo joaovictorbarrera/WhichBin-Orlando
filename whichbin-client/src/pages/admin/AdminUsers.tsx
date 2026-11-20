@@ -14,6 +14,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import PageLayout from '../../components/PageLayout'
 import { useAuth } from '../../context/useAuth'
 import DeleteConfirmModal from '../../components/DeleteConfirmModal'
+import Pagination from '../../components/Pagination/Pagination'
 import {
   createPasswordResetLink,
   createUser,
@@ -51,6 +52,10 @@ function AdminUsers() {
   const { user: currentUser, logout } = useAuth()
   const navigate = useNavigate()
   const [users, setUsers] = useState<ManagedUser[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(5)
+  const [totalItems, setTotalItems] = useState<number>()
+  const [hasLoaded, setHasLoaded] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [reloadCount, setReloadCount] = useState(0)
@@ -66,6 +71,7 @@ function AdminUsers() {
   const [resetTarget, setResetTarget] = useState<ManagedUser | null>(null)
   const [shareLink, setShareLink] = useState<ShareLink | null>(null)
   const [copied, setCopied] = useState(false)
+  const isUpdating = isLoading && hasLoaded
 
   useEffect(() => {
     let isMounted = true
@@ -74,22 +80,33 @@ function AdminUsers() {
       setIsLoading(true)
       setLoadError('')
       try {
-        const loadedUsers = await fetchUsers()
-        if (isMounted) setUsers(loadedUsers)
-      } catch (error) {
+        const result = await fetchUsers(currentPage, pageSize, controller.signal)
         if (isMounted) {
+          setUsers(result.items)
+          setTotalItems(result.totalItems)
+          setHasLoaded(true)
+        }
+      } catch (error) {
+        if (isMounted && !controller.signal.aborted) {
           setLoadError(error instanceof Error ? error.message : 'Unable to load users.')
         }
       } finally {
-        if (isMounted) setIsLoading(false)
+        if (isMounted && !controller.signal.aborted) setIsLoading(false)
       }
     }
 
+    const controller = new AbortController()
     void loadUsers()
     return () => {
       isMounted = false
+      controller.abort()
     }
-  }, [reloadCount])
+  }, [currentPage, pageSize, reloadCount])
+
+  function handlePageSizeChange(nextPageSize: number) {
+    setPageSize(nextPageSize)
+    setCurrentPage(1)
+  }
 
   function beginCreate() {
     setCreateInput(emptyUserInput)
@@ -122,7 +139,6 @@ function AdminUsers() {
         lastName: createInput.lastName.trim(),
         email: createInput.email.trim(),
       })
-      setUsers((currentUsers) => [...currentUsers, createdUser])
       setShareLink({
         userId: createdUser.id,
         email: createdUser.email,
@@ -131,6 +147,8 @@ function AdminUsers() {
       setCopied(false)
       setIsCreating(false)
       setCreateInput(emptyUserInput)
+      setCurrentPage(1)
+      setReloadCount((count) => count + 1)
     } catch (error) {
       setPageError(error instanceof Error ? error.message : 'Unable to create this user.')
     } finally {
@@ -145,18 +163,14 @@ function AdminUsers() {
     setPageError('')
     setIsSaving(true)
     try {
-      const updatedUser = await updateUser(editingUserId, {
+      await updateUser(editingUserId, {
         firstName: editInput.firstName.trim(),
         lastName: editInput.lastName.trim(),
         email: editInput.email.trim(),
       })
-      setUsers((currentUsers) =>
-        currentUsers.map((currentUser) =>
-          currentUser.id === updatedUser.id ? updatedUser : currentUser
-        )
-      )
       setEditingUserId(null)
       setEditInput(emptyUserInput)
+      setReloadCount((count) => count + 1)
     } catch (error) {
       setPageError(error instanceof Error ? error.message : 'Unable to update this user.')
     } finally {
@@ -180,13 +194,16 @@ function AdminUsers() {
         navigate('/admin/login', { replace: true })
         return
       }
-      setUsers((currentUsers) =>
-        currentUsers.filter((currentUser) => currentUser.id !== deleteTarget.id)
-      )
       setShareLink((currentLink) =>
         currentLink?.userId === deleteTarget.id ? null : currentLink
       )
       setDeleteTarget(null)
+      const totalAfterDelete = Math.max(0, (totalItems ?? users.length) - 1)
+      const lastPage = Math.max(1, Math.ceil(totalAfterDelete / pageSize))
+      if (currentPage > lastPage) {
+        setCurrentPage(lastPage)
+      }
+      setReloadCount((count) => count + 1)
     } catch (error) {
       setPageError(error instanceof Error ? error.message : 'Unable to delete this user.')
       setDeleteTarget(null)
@@ -304,17 +321,19 @@ function AdminUsers() {
 
         <div className="admin-users-list-heading">
           <h2>Users</h2>
-          {!isLoading && !loadError && <span>{users.length} {users.length === 1 ? 'account' : 'accounts'}</span>}
+          {hasLoaded && !loadError && totalItems !== undefined && (
+            <span>{totalItems} {totalItems === 1 ? 'account' : 'accounts'}</span>
+          )}
         </div>
 
-        {isLoading ? (
+        {isLoading && !hasLoaded ? (
           <CollectionState state="loading" name="users" />
-        ) : loadError ? (
+        ) : !isLoading && loadError ? (
           <CollectionState state="error" name="users" onRetry={() => setReloadCount((count) => count + 1)} />
-        ) : users.length === 0 ? (
+        ) : hasLoaded && !loadError && users.length === 0 ? (
           <CollectionState state="empty" name="users" description="No users have been created yet." />
-        ) : (
-          <div className="admin-users-list collection-list">
+        ) : hasLoaded && !loadError && users.length > 0 ? (
+          <div className="admin-users-list collection-list" aria-busy={isLoading}>
             {users.map((managedUser) => (
               <article className="admin-user-card" key={managedUser.id}>
                 <div className="admin-user-summary">
@@ -384,6 +403,31 @@ function AdminUsers() {
               </article>
             ))}
           </div>
+        ) : null}
+        {hasLoaded && (
+          <div
+            className={`admin-section-loading-indicator${isUpdating ? '' : ' is-hidden'}`}
+            role={isUpdating ? 'status' : undefined}
+            aria-hidden={!isUpdating}
+          >
+            {isUpdating && (
+              <>
+                <span className="admin-section-loading-spinner" aria-hidden="true" />
+                Updating users...
+              </>
+            )}
+          </div>
+        )}
+        {totalItems !== undefined && !loadError && (
+          <Pagination
+            currentPage={currentPage}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            pageSizeOptions={[5, 10, 20]}
+            displayName="users"
+            onPageChange={setCurrentPage}
+            onPageSizeChange={handlePageSizeChange}
+          />
         )}
       </section>
 

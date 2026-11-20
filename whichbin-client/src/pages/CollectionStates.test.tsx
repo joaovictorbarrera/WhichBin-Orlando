@@ -57,7 +57,7 @@ beforeEach(() => {
   vi.mocked(getResources).mockResolvedValue(emptyPage)
   vi.mocked(getPaginatedTriviaChallenges).mockResolvedValue(emptyPage)
   vi.mocked(getAllTriviaChallenges).mockResolvedValue(emptyPage)
-  vi.mocked(fetchUsers).mockResolvedValue([])
+  vi.mocked(fetchUsers).mockResolvedValue(emptyPage)
 })
 
 describe.each(allCases)('$label collection failures', ({ Page, fetch, name, throws }) => {
@@ -67,7 +67,7 @@ describe.each(allCases)('$label collection failures', ({ Page, fetch, name, thro
     const { container } = render(<MemoryRouter><Page /></MemoryRouter>)
     await waitFor(() => expect(container.querySelector('.collection-state--loading')).toBeInTheDocument())
     expect(screen.queryByText(errorText(name))).not.toBeInTheDocument()
-    resolveRequest((name === 'Users' ? [] : emptyPage) as never)
+    resolveRequest(emptyPage as never)
     await screen.findByRole('heading', { name: `No ${name.toLowerCase()} found` })
     expect(container.querySelector('.collection-state--loading')).not.toBeInTheDocument()
   })
@@ -85,6 +85,137 @@ describe.each(allCases)('$label collection failures', ({ Page, fetch, name, thro
     fireEvent.click(within(alert as HTMLElement).getByRole('button', { name: 'Try Again' }))
     await waitFor(() => expect(fetch.mock.calls.length).toBeGreaterThan(beforeRetry))
     await waitFor(() => expect(screen.queryByText(errorText(name))).not.toBeInTheDocument())
+  })
+})
+
+describe('admin users pagination', () => {
+  it('requests the selected page and page size', async () => {
+    vi.mocked(fetchUsers).mockImplementation(async (page, pageSize) => ({
+      currentPage: page,
+      totalPages: Math.ceil(6 / pageSize),
+      pageSize,
+      totalItems: 6,
+      items: [{
+        id: page,
+        firstName: 'Page',
+        lastName: String(page),
+        email: `page${page}@example.com`,
+        createdAt: '',
+        updatedAt: '',
+      }],
+    }))
+
+    render(<MemoryRouter><AdminUsers /></MemoryRouter>)
+
+    const pagination = await screen.findByRole('navigation', { name: 'Pagination Navigation' })
+    expect(await screen.findByText('page1@example.com')).toBeInTheDocument()
+
+    fireEvent.click(within(pagination).getByRole('button', { name: 'Go to next page' }))
+    await waitFor(() => {
+      expect(fetchUsers).toHaveBeenCalledWith(2, 5, expect.any(AbortSignal))
+    })
+    expect(await screen.findByText('page2@example.com')).toBeInTheDocument()
+
+    fireEvent.change(within(pagination).getByRole('combobox', { name: 'Select page size' }), {
+      target: { value: '10' },
+    })
+    await waitFor(() => {
+      expect(fetchUsers).toHaveBeenCalledWith(1, 10, expect.any(AbortSignal))
+    })
+  })
+
+  it('keeps the previous page visible and shows updating before pagination', async () => {
+    let resolveNextPage: (value: never) => void = () => {}
+    vi.mocked(fetchUsers).mockResolvedValueOnce({
+      ...emptyPage,
+      totalItems: 6,
+      totalPages: 2,
+      items: [{
+        id: 1,
+        firstName: 'First',
+        lastName: 'User',
+        email: 'first@example.com',
+        createdAt: '',
+        updatedAt: '',
+      }],
+    } as never)
+    const { container } = render(<MemoryRouter><AdminUsers /></MemoryRouter>)
+    expect(await screen.findByText('first@example.com')).toBeInTheDocument()
+
+    const pagination = screen.getByRole('navigation', { name: 'Pagination Navigation' })
+    vi.mocked(fetchUsers).mockImplementationOnce(() => new Promise((resolve) => {
+      resolveNextPage = resolve
+    }) as never)
+    fireEvent.click(within(pagination).getByRole('button', { name: 'Go to next page' }))
+
+    const updating = await screen.findByText('Updating users...')
+    expect(screen.getByText('first@example.com')).toBeInTheDocument()
+    expect(container.querySelector('.collection-state--loading')).not.toBeInTheDocument()
+    expect(updating.compareDocumentPosition(pagination)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+
+    resolveNextPage({
+      ...emptyPage,
+      currentPage: 2,
+      totalItems: 6,
+      totalPages: 2,
+    } as never)
+  })
+})
+
+describe.each([
+  {
+    label: 'resources',
+    fetch: vi.mocked(getResources),
+    title: 'Test resource',
+    updatingText: 'Updating resources...',
+    page: {
+      ...emptyPage,
+      totalItems: 15,
+      totalPages: 2,
+      items: [{ id: 1, title: 'Test resource', description: 'Test description', styleType: 'resource-style-green' }],
+    },
+  },
+  {
+    label: 'trivia challenges',
+    fetch: vi.mocked(getAllTriviaChallenges),
+    title: 'Test challenge',
+    updatingText: 'Updating trivia challenges...',
+    page: {
+      ...emptyPage,
+      totalItems: 15,
+      totalPages: 3,
+      items: [{
+        id: 1,
+        title: 'Test challenge',
+        description: 'Test description',
+        active: true,
+        questions: [],
+      }],
+    },
+  },
+])('admin resources $label pagination loading', ({ fetch, title, updatingText, page }) => {
+  it('keeps the previous page visible and shows updating before pagination', async () => {
+    let resolveNextPage: (value: never) => void = () => {}
+    fetch.mockResolvedValueOnce(page as never)
+    render(<MemoryRouter><AdminResources /></MemoryRouter>)
+
+    expect(await screen.findByText(title)).toBeInTheDocument()
+    const paginations = await screen.findAllByRole('navigation', { name: 'Pagination Navigation' })
+    const pagination = fetch === vi.mocked(getResources) ? paginations[0] : paginations[1]
+
+    fetch.mockImplementationOnce(() => new Promise((resolve) => {
+      resolveNextPage = resolve
+    }) as never)
+    fireEvent.click(within(pagination).getByRole('button', { name: 'Go to next page' }))
+
+    const updating = await screen.findByText(updatingText)
+    expect(screen.getByText(title)).toBeInTheDocument()
+    expect(updating.compareDocumentPosition(pagination)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+
+    resolveNextPage({
+      ...page,
+      currentPage: 2,
+    } as never)
   })
 })
 

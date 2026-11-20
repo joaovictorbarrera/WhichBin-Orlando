@@ -119,6 +119,38 @@
 	line-height: 1.6;
 }
 
+.admin-section-loading-indicator {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	width: 100%;
+	min-height: 1.25rem;
+	margin: 0.5rem 0 1.5rem;
+	color: var(--color-text-muted);
+	font-size: 0.875rem;
+	font-weight: 700;
+}
+
+.admin-section-loading-indicator.is-hidden {
+	visibility: hidden;
+}
+
+.admin-section-loading-spinner {
+	width: 1rem;
+	height: 1rem;
+	border: 0.15rem solid var(--color-surface-green);
+	border-top-color: var(--color-brand);
+	border-radius: 50%;
+	animation: admin-section-spin 0.8s linear infinite;
+}
+
+@keyframes admin-section-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 @media (max-width: 700px) {
 	.admin-management-header {
 		align-items: stretch;

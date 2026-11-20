@@ -94,6 +94,70 @@ pipeline {
             }
         }
 
+        stage('Register GitHub deployment') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'github-deployments-token', variable: 'GITHUB_TOKEN')
+                ]) {
+                    script {
+                        env.GITHUB_DEPLOYMENT_ID = powershell(
+                            script: '''
+                                $PSNativeCommandUseErrorActionPreference = $false
+                                $headers = @{
+                                    Authorization = "Bearer $env:GITHUB_TOKEN"
+                                    Accept = 'application/vnd.github+json'
+                                    'X-GitHub-Api-Version' = '2022-11-28'
+                                }
+                                $payload = @{
+                                    ref = $env:GIT_COMMIT
+                                    environment = 'Production (Backend)'
+                                    description = "Jenkins build $env:BUILD_NUMBER ($env:APP_VERSION)"
+                                    auto_merge = $false
+                                    required_contexts = @()
+                                    production_environment = $true
+                                } | ConvertTo-Json -Depth 5
+                                $deployment = Invoke-RestMethod `
+                                    -Uri 'https://api.github.com/repos/joaovictorbarrera/WhichBin-Orlando/deployments' `
+                                    -Method Post `
+                                    -Headers $headers `
+                                    -ContentType 'application/json' `
+                                    -Body $payload
+                                if (-not $deployment.id) {
+                                    throw 'GitHub did not return a deployment ID.'
+                                }
+                                Write-Output $deployment.id
+                            ''',
+                            returnStdout: true
+                        ).trim()
+                        if (-not env.GITHUB_DEPLOYMENT_ID) {
+                            error('GitHub deployment registration returned an empty deployment ID.')
+                        }
+                        echo "Registered GitHub deployment ${env.GITHUB_DEPLOYMENT_ID}"
+                        powershell '''
+                            $PSNativeCommandUseErrorActionPreference = $false
+                            $headers = @{
+                                Authorization = "Bearer $env:GITHUB_TOKEN"
+                                Accept = 'application/vnd.github+json'
+                                'X-GitHub-Api-Version' = '2022-11-28'
+                            }
+                            $payload = @{
+                                state = 'in_progress'
+                                description = "Jenkins build $env:BUILD_NUMBER is deploying"
+                                environment_url = 'https://api.whichbin-orlando.org/api/'
+                                log_url = $env:BUILD_URL
+                            } | ConvertTo-Json -Depth 5
+                            $null = Invoke-RestMethod `
+                                -Uri "https://api.github.com/repos/joaovictorbarrera/WhichBin-Orlando/deployments/$env:GITHUB_DEPLOYMENT_ID/statuses" `
+                                -Method Post `
+                                -Headers $headers `
+                                -ContentType 'application/json' `
+                                -Body $payload
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('Build and deploy') {
             steps {
                 withCredentials([
@@ -122,6 +186,56 @@ pipeline {
                         }
                     '''
                 }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                env.BUILD_RESULT = currentBuild.currentResult
+                if (currentBuild.currentResult == 'SUCCESS') {
+                    env.GITHUB_DEPLOYMENT_STATE = 'success'
+                } else if (currentBuild.currentResult == 'FAILURE') {
+                    env.GITHUB_DEPLOYMENT_STATE = 'failure'
+                } else {
+                    env.GITHUB_DEPLOYMENT_STATE = 'error'
+                }
+
+                if (env.GITHUB_DEPLOYMENT_ID) {
+                    try {
+                        withCredentials([
+                            string(credentialsId: 'github-deployments-token', variable: 'GITHUB_TOKEN')
+                        ]) {
+                            powershell '''
+                                $PSNativeCommandUseErrorActionPreference = $false
+                                $headers = @{
+                                    Authorization = "Bearer $env:GITHUB_TOKEN"
+                                    Accept = 'application/vnd.github+json'
+                                    'X-GitHub-Api-Version' = '2022-11-28'
+                                }
+                                $payload = @{
+                                    state = $env:GITHUB_DEPLOYMENT_STATE
+                                    description = "Jenkins build finished with $env:BUILD_RESULT"
+                                    environment_url = 'https://api.whichbin-orlando.org/api/'
+                                    log_url = $env:BUILD_URL
+                                } | ConvertTo-Json -Depth 5
+                                $null = Invoke-RestMethod `
+                                    -Uri "https://api.github.com/repos/joaovictorbarrera/WhichBin-Orlando/deployments/$env:GITHUB_DEPLOYMENT_ID/statuses" `
+                                    -Method Post `
+                                    -Headers $headers `
+                                    -ContentType 'application/json' `
+                                    -Body $payload
+                            '''
+                        }
+                    } catch (Exception exception) {
+                        echo "Could not update the GitHub deployment status: ${exception.message}"
+                        if (currentBuild.currentResult == 'SUCCESS') {
+                            currentBuild.result = 'UNSTABLE'
+                        }
+                    }
+                }
+
             }
         }
     }
