@@ -98,7 +98,8 @@ The frontend and backend deploy independently:
 2. **Jenkins** polls the configured Git branch every minute.
 3. Jenkins runs backend tests using a temporary MySQL 8.4 container.
 4. Jenkins generates the production version from the nearest reachable `vMAJOR.MINOR.PATCH` Git tag plus the repository's total commit count.
-5. Jenkins builds and deploys the API and MySQL using the root `compose.yaml`.
+5. Jenkins registers a deployment for the GitHub `Production (Backend)` environment and marks it in progress.
+6. Jenkins builds and deploys the API and MySQL using the root `compose.yaml`, then reports the final deployment state to GitHub. The GitHub Actions `discord-deployments.yml` workflow sends Discord notifications for completed frontend and backend deployments.
 
 The Jenkins pipeline is in the root `Jenkinsfile`. It requires an agent labeled `whichbin-deploy`, and each pipeline run has a 10-minute timeout.
 
@@ -128,8 +129,11 @@ Create these credentials in Jenkins with the exact IDs below, in a scope availab
 | `whichbin-db-root-password` | Secret text | Production MySQL root password |
 | `whichbin-tls-keystore-password` | Secret text | Password for the PFX |
 | `whichbin-client-url` | Secret text | Exact Vercel/custom-domain origin, e.g. `https://www.whichbin-orlando.org` |
+| `github-deployments-token` | Secret text | GitHub token for this repository with **Deployments: read and write** permission |
 
 The pipeline stages the Jenkins certificate credential at `secrets/whichbin-orlando.org-fullchain.pfx` in the Jenkins workspace so Docker Desktop can bind-mount it reliably. The file is Git-ignored and excluded from the Docker build context. It must remain on the host while the API container uses it, including across container restarts; restrict access to the Jenkins account and do not clean this workspace while the deployment is running. Update the Jenkins secret-file credential before the certificate expires.
+
+The GitHub token is used to create and update deployments for `Production (Backend)` at the checked-out commit. Configure the GitHub credential as a fine-grained token or GitHub App token with deployment write access to this repository. Configure the `DISCORD_DEPLOYMENT_WEBHOOK` Actions secret for the `discord-deployments.yml` workflow; Jenkins reports deployment status to GitHub, and the workflow sends the Discord notification.
 
 ### Configure Vercel and HTTPS
 

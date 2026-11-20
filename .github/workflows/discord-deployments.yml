@@ -8,8 +8,13 @@ permissions: {}
 jobs:
   notify:
     if: >-
-      github.event.deployment.creator.login == 'vercel[bot]' &&
-      github.event.deployment.environment == 'Production' &&
+      (
+        (
+          github.event.deployment.creator.login == 'vercel[bot]' &&
+          github.event.deployment.environment == 'Production'
+        ) ||
+        github.event.deployment.environment == 'Production (Backend)'
+      ) &&
       (
         github.event.deployment_status.state == 'success' ||
         github.event.deployment_status.state == 'failure' ||
@@ -35,7 +40,8 @@ jobs:
           status = event["deployment_status"]
           repository = event["repository"]
 
-          service = "Vercel"
+          environment = deployment["environment"]
+          service = "Vercel" if environment == "Production" else "Backend"
 
           succeeded = status["state"] == "success"
           result = "Deployed successfully" if succeeded else "Deployment failed"
@@ -47,7 +53,7 @@ jobs:
 
           embed = {
               "title": f"{icon} {service} · {result}",
-              "description": f"**WhichBin Orlando** · Production",
+              "description": f"**WhichBin Orlando** · {environment}",
               "color": color,
               "fields": [
                   {
@@ -63,6 +69,13 @@ jobs:
               ],
               "footer": {"text": "WhichBin Orlando deployments"},
           }
+
+          if status.get("environment_url"):
+              embed["fields"].append({
+                  "name": "Environment URL",
+                  "value": f"[Open deployment]({status['environment_url']})",
+                  "inline": False,
+              })
 
           homepage = repository.get("homepage")
           if homepage:
