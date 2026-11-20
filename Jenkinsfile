@@ -129,7 +129,7 @@ pipeline {
                             ''',
                             returnStdout: true
                         ).trim()
-                        if (-not env.GITHUB_DEPLOYMENT_ID) {
+                        if (!env.GITHUB_DEPLOYMENT_ID) {
                             error('GitHub deployment registration returned an empty deployment ID.')
                         }
                         echo "Registered GitHub deployment ${env.GITHUB_DEPLOYMENT_ID}"
