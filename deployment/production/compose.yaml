@@ -43,7 +43,7 @@ services:
 
 volumes:
   mysql_data:
-    name: whichbin-orlando_mysql_data
+    name: whichbinorlando_mysql_data
     external: true
 
 networks:

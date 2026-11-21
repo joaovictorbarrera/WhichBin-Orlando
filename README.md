@@ -105,7 +105,7 @@ The deployment files are split into three Compose projects:
 - `deployment/staging/compose.yaml`: staging API and a separate MySQL container/volume.
 - `deployment/nginx/compose.yaml`: standalone NGINX, independent of both API deployments.
 
-The API stacks use four pre-created Docker networks: each API and its database share their environment's `*-internal` network; NGINX and the corresponding API share their `*-proxy` network. Consequently, deploying one API Compose project does not restart the other API or NGINX. Production reuses the existing `whichbin-orlando_mysql_data` volume; staging gets its own `whichbin-staging-mysql-data` volume.
+The API stacks use four pre-created Docker networks: each API and its database share their environment's `*-internal` network; NGINX and the corresponding API share their `*-proxy` network. Consequently, deploying one API Compose project does not restart the other API or NGINX. Production reuses the existing `whichbinorlando_mysql_data` volume; staging gets its own `whichbin-staging-mysql-data` volume.
 
 ### One-time Docker host setup
 
