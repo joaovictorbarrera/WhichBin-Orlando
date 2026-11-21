@@ -27,6 +27,14 @@ export type CreateQuestionRequest = {
   question: CreateTriviaQuestionRequest
 }
 
+// Lightweight challenge data used by the public list.
+export type TriviaChallengeListItem = {
+  id: number
+  title: string
+  description: string
+}
+
+// Full challenge data used by admin and detail pages.
 export type TriviaChallenge = {
   id: number
   title: string
@@ -117,8 +125,10 @@ export async function deleteTriviaQuestion(
   }
 }
 
-// Public list: returns active challenges only.
-export async function getTriviaChallenges(): Promise<TriviaChallenge[] | null> {
+// Public list: returns active challenges with pagination.
+export async function getTriviaChallenges(): Promise<
+  PaginatedResponse<TriviaChallengeListItem> | null
+> {
   try {
     const response = await apiFetch('resources/trivia/challenges')
 
@@ -126,7 +136,7 @@ export async function getTriviaChallenges(): Promise<TriviaChallenge[] | null> {
       return null
     }
 
-    return (await response.json()) as TriviaChallenge[]
+    return (await response.json()) as PaginatedResponse<TriviaChallengeListItem>
   } catch {
     return null
   }
@@ -137,7 +147,7 @@ export async function getPaginatedTriviaChallenges(
   page: number,
   pageSize: number,
   signal?: AbortSignal
-): Promise<PaginatedResponse<TriviaChallenge> | null> {
+): Promise<PaginatedResponse<TriviaChallengeListItem> | null> {
   try {
     const response = await apiFetch(
       `resources/trivia/challenges?page=${page}&pageSize=${pageSize}`,
@@ -150,7 +160,7 @@ export async function getPaginatedTriviaChallenges(
       return null
     }
 
-    return (await response.json()) as PaginatedResponse<TriviaChallenge>
+    return (await response.json()) as PaginatedResponse<TriviaChallengeListItem>
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
       throw error
@@ -160,7 +170,7 @@ export async function getPaginatedTriviaChallenges(
   }
 }
 
-// Admin list: returns active and inactive challenges with pagination.
+// Admin list: returns active and inactive challenges with full data and pagination.
 export async function getAllTriviaChallenges(
   page: number,
   pageSize: number,
