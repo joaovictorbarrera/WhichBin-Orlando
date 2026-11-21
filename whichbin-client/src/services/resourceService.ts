@@ -1,3 +1,4 @@
+
 import { apiFetch } from './apiClient'
 import { ApiResponseError } from '../helpers/ErrorHelper'
 import type { PaginatedResponse } from '../types/PaginatedResponse'
@@ -8,6 +9,15 @@ export type ResourceSection = {
   items: string
 }
 
+// Lightweight resource data used by the public list.
+export type ResourceListItem = {
+  id: number
+  title: string
+  description: string
+  styleType: string
+}
+
+// Full resource data used by admin and detail pages.
 export type Resource = {
   id: number
   title: string
@@ -27,11 +37,12 @@ export type CreateResourceRequest = {
   sections?: ResourceSection[]
 }
 
+// Public list: returns lightweight resources with pagination.
 export async function getResources(
   page: number,
   pageSize: number,
   signal?: AbortSignal
-): Promise<PaginatedResponse<Resource> | null> {
+): Promise<PaginatedResponse<ResourceListItem> | null> {
   try {
     const params = new URLSearchParams({
       page: String(page),
@@ -46,8 +57,42 @@ export async function getResources(
       return null
     }
 
+    return (await response.json()) as PaginatedResponse<ResourceListItem>
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error
+    }
+
+    return null
+  }
+}
+
+// Admin list: returns full resources with pagination.
+export async function getAdminResources(
+  page: number,
+  pageSize: number,
+  signal?: AbortSignal
+): Promise<PaginatedResponse<Resource> | null> {
+  try {
+    const params = new URLSearchParams({
+      page: String(page),
+      pageSize: String(pageSize),
+    })
+
+    const response = await apiFetch(`resources/all?${params.toString()}`, {
+      signal,
+    })
+
+    if (!response.ok) {
+      return null
+    }
+
     return (await response.json()) as PaginatedResponse<Resource>
-  } catch {
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error
+    }
+
     return null
   }
 }

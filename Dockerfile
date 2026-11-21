@@ -30,8 +30,8 @@ WORKDIR /app
 
 COPY --from=build /app/app.jar ./app.jar
 
-ENV PORT=443
+ENV PORT=5000
 
-EXPOSE 443
+EXPOSE 5000
 
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
