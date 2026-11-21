@@ -1,6 +1,7 @@
 package com.whichbin.whichbin_api.repository;
 
 import com.whichbin.whichbin_api.model.TriviaChallenge;
+import com.whichbin.whichbin_api.model.TriviaChallengeListProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

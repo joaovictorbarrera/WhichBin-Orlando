@@ -1,4 +1,4 @@
-package com.whichbin.whichbin_api.repository;
+package com.whichbin.whichbin_api.model;
 
 public interface ResourceListProjection {
 
