@@ -197,10 +197,10 @@ pipeline {
                             $env:CLIENT_URL = $env:PRODUCTION_CLIENT_URL
                         }
 
-                        $nginxDirectory = 'C:\WhichBin\nginx'
+                        $nginxDirectory = 'C:/WhichBin/nginx'
                         $nginxCertsDirectory = Join-Path $nginxDirectory 'certs'
-                        $nginxConfigSource = Join-Path $env:WORKSPACE 'deployment\nginx\nginx.conf'
-                        $nginxComposeSource = Join-Path $env:WORKSPACE 'deployment\nginx\compose.yaml'
+                        $nginxConfigSource = Join-Path $env:WORKSPACE 'deployment/nginx/nginx.conf'
+                        $nginxComposeSource = Join-Path $env:WORKSPACE 'deployment/nginx/compose.yaml'
                         $nginxConfigPath = Join-Path $nginxDirectory 'nginx.conf'
                         $nginxComposePath = Join-Path $nginxDirectory 'compose.yaml'
                         $nginxConfigHashPath = Join-Path $nginxDirectory 'nginx.conf.sha256'
@@ -250,7 +250,7 @@ pipeline {
                             Set-Content -LiteralPath $nginxConfigHashPath -Value $nginxConfigHash -NoNewline
                             Set-Content -LiteralPath $certificateHashPath -Value $pfxHash -NoNewline
 
-                            $composeFile = Join-Path $env:WORKSPACE "deployment\$($env:DEPLOYMENT_ENVIRONMENT)\compose.yaml"
+                            $composeFile = Join-Path $env:WORKSPACE "deployment/$($env:DEPLOYMENT_ENVIRONMENT)/compose.yaml"
                             $env:IMAGE_TAG = "$($env:DEPLOYMENT_ENVIRONMENT)-$env:APP_VERSION"
                             docker compose --project-name "whichbin-$env:DEPLOYMENT_ENVIRONMENT" --file $composeFile up -d --build --remove-orphans
                             if ($LASTEXITCODE -ne 0) {
