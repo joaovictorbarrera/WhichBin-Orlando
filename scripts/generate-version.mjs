@@ -7,8 +7,6 @@ const tagArgs = [
   '--abbrev=0',
   '--match',
   'v[0-9]*',
-  '--match',
-  'staging/[0-9]*',
 ];
 
 function getFetchRemote() {
@@ -54,13 +52,11 @@ try {
   tag = git(tagArgs);
 }
 
-const match =
-  /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.exec(tag) ??
-  /^staging\/(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)-rc\.(0|[1-9]\d*)$/.exec(tag);
+const match = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.exec(tag);
 
 if (!match) {
   throw new Error(
-    `Nearest reachable Git tag "${tag}" must use vMAJOR.MINOR.PATCH or staging/MAJOR.MINOR.PATCH-rc.N format.`,
+    `Nearest reachable Git tag "${tag}" must use vMAJOR.MINOR.PATCH format.`,
   );
 }
 

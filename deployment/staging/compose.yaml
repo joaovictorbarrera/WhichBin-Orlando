@@ -2,8 +2,6 @@ services:
   mysql:
     image: mysql:8.4
     restart: unless-stopped
-    ports:
-      - "127.0.0.1:3307:3306"
     environment:
       MYSQL_DATABASE: whichbin_db
       MYSQL_USER: ${DB_USERNAME}
@@ -11,6 +9,8 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - staging-internal
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
       interval: 10s
@@ -19,9 +19,9 @@ services:
       start_period: 30s
 
   whichbin-api:
-    image: whichbin-api:${APP_VERSION:-0.0.0}
+    image: whichbin-api:${IMAGE_TAG:-staging-latest}
     build:
-      context: .
+      context: ../..
       dockerfile: Dockerfile
       args:
         APP_VERSION: ${APP_VERSION:-0.0.0}
@@ -29,22 +29,26 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-    ports:
-      - "443:443"
-    cap_add:
-      - NET_BIND_SERVICE
     environment:
-      PORT: "443"
+      PORT: "5000"
       DB_URL: jdbc:mysql://mysql:3306/whichbin_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
-      TLS_KEYSTORE_PASSWORD: ${TLS_KEYSTORE_PASSWORD}
       CLIENT_URL: ${CLIENT_URL}
-    volumes:
-      - type: bind
-        source: ${TLS_CERT_FILE:-./secrets/whichbin-orlando.org-fullchain.pfx}
-        target: /run/secrets/whichbin-orlando.org-fullchain.pfx
-        read_only: true
+    networks:
+      staging-internal: {}
+      staging-proxy:
+        aliases:
+          - whichbin-staging-api
 
 volumes:
   mysql_data:
+    name: whichbin-staging-mysql-data
+
+networks:
+  staging-internal:
+    name: whichbin-staging-internal
+    external: true
+  staging-proxy:
+    name: whichbin-staging-proxy
+    external: true
