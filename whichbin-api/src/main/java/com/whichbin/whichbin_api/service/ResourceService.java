@@ -1,6 +1,7 @@
 
 package com.whichbin.whichbin_api.service;
 
+import com.whichbin.whichbin_api.dto.ResourceListItemResponse;
 import com.whichbin.whichbin_api.model.Resource;
 import com.whichbin.whichbin_api.repository.ResourceRepository;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,20 @@ public class ResourceService {
         this.resourceRepository = resourceRepository;
     }
 
+    // Returns only the fields needed for the public resource list.
+    public Page<ResourceListItemResponse> getPublicResourceList(
+            Pageable pageable) {
+
+        return resourceRepository.findAllProjectedBy(pageable)
+                .map(resource -> new ResourceListItemResponse(
+                        resource.getId(),
+                        resource.getTitle(),
+                        resource.getDescription(),
+                        resource.getStyleType()
+                ));
+    }
+
+    // Returns full resources for the admin page.
     public Page<Resource> getAllResources(Pageable pageable) {
         return resourceRepository.findAll(pageable);
     }

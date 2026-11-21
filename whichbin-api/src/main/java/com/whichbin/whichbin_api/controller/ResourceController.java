@@ -4,6 +4,8 @@ package com.whichbin.whichbin_api.controller;
 import com.whichbin.whichbin_api.auth.Authenticated;
 import com.whichbin.whichbin_api.dto.CreateQuestionRequest;
 import com.whichbin.whichbin_api.dto.PaginatedResponse;
+import com.whichbin.whichbin_api.dto.ResourceListItemResponse;
+import com.whichbin.whichbin_api.dto.TriviaChallengeListItemResponse;
 import com.whichbin.whichbin_api.model.Resource;
 import com.whichbin.whichbin_api.model.TriviaChallenge;
 import com.whichbin.whichbin_api.model.TriviaQuestion;
@@ -38,9 +40,41 @@ public class ResourceController {
         this.triviaChallengeService = triviaChallengeService;
     }
 
-    // Returns educational resources with pagination.
+    // Public route: returns lightweight educational resources with pagination.
     @GetMapping
-    public PaginatedResponse<Resource> getAllResources(
+    public PaginatedResponse<ResourceListItemResponse> getAllResources(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
+
+        if (page < 1 || pageSize < 1) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Page and pageSize must be greater than zero"
+            );
+        }
+
+        Pageable pageable = PageRequest.of(
+                page - 1,
+                pageSize,
+                Sort.by(Sort.Direction.ASC, "id")
+        );
+
+        Page<ResourceListItemResponse> resourcePage =
+                resourceService.getPublicResourceList(pageable);
+
+        return new PaginatedResponse<>(
+                resourcePage.getNumber() + 1,
+                resourcePage.getTotalPages(),
+                resourcePage.getSize(),
+                resourcePage.getTotalElements(),
+                resourcePage.getContent()
+        );
+    }
+
+    // Admin route: returns full educational resources with pagination.
+    @Authenticated
+    @GetMapping("/all")
+    public PaginatedResponse<Resource> getAllAdminResources(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize) {
 
@@ -69,7 +103,7 @@ public class ResourceController {
         );
     }
 
-    // Returns one educational resource.
+    // Returns one educational resource with full details.
     @GetMapping("/{id}")
     public ResponseEntity<Resource> getResourceById(
             @PathVariable Long id) {
@@ -106,9 +140,10 @@ public class ResourceController {
         return ResponseEntity.noContent().build();
     }
 
-    // Public route: returns active trivia challenges with pagination.
+    // Public route: returns lightweight active trivia challenges with pagination.
     @GetMapping("/trivia/challenges")
-    public PaginatedResponse<TriviaChallenge> getActiveTriviaChallenges(
+    public PaginatedResponse<TriviaChallengeListItemResponse>
+    getActiveTriviaChallenges(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int pageSize) {
 
@@ -125,8 +160,8 @@ public class ResourceController {
                 Sort.by(Sort.Direction.ASC, "id")
         );
 
-        Page<TriviaChallenge> challengePage =
-                triviaChallengeService.getActiveChallenges(pageable);
+        Page<TriviaChallengeListItemResponse> challengePage =
+                triviaChallengeService.getActiveChallengeList(pageable);
 
         return new PaginatedResponse<>(
                 challengePage.getNumber() + 1,
@@ -137,7 +172,7 @@ public class ResourceController {
         );
     }
 
-    // Admin route: returns active and inactive challenges with pagination.
+    // Admin route: returns active and inactive challenges with full data.
     @Authenticated
     @GetMapping("/trivia/challenges/all")
     public PaginatedResponse<TriviaChallenge> getAllTriviaChallenges(

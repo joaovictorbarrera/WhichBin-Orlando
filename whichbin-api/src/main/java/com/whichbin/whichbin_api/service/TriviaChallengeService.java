@@ -1,6 +1,7 @@
 
 package com.whichbin.whichbin_api.service;
 
+import com.whichbin.whichbin_api.dto.TriviaChallengeListItemResponse;
 import com.whichbin.whichbin_api.model.TriviaChallenge;
 import com.whichbin.whichbin_api.repository.TriviaChallengeRepository;
 import org.springframework.data.domain.Page;
@@ -21,12 +22,24 @@ public class TriviaChallengeService {
         this.triviaChallengeRepository = triviaChallengeRepository;
     }
 
+    // Returns active challenges with only the fields needed for the public list.
+    public Page<TriviaChallengeListItemResponse> getActiveChallengeList(
+            Pageable pageable) {
+
+        return triviaChallengeRepository.findProjectedByActiveTrue(pageable)
+                .map(challenge -> new TriviaChallengeListItemResponse(
+                        challenge.getId(),
+                        challenge.getTitle(),
+                        challenge.getDescription()
+                ));
+    }
+
     // Returns active challenges only.
     public List<TriviaChallenge> getActiveChallenges() {
         return triviaChallengeRepository.findByActiveTrueOrderByIdAsc();
     }
 
-    // Returns active challenges only, with pagination.
+    // Returns active challenges with full data.
     public Page<TriviaChallenge> getActiveChallenges(Pageable pageable) {
         return triviaChallengeRepository.findByActiveTrue(pageable);
     }
@@ -36,7 +49,7 @@ public class TriviaChallengeService {
         return triviaChallengeRepository.findAll();
     }
 
-    // Returns all challenges with pagination.
+    // Returns all challenges with full data and pagination.
     public Page<TriviaChallenge> getAllChallenges(Pageable pageable) {
         return triviaChallengeRepository.findAll(pageable);
     }

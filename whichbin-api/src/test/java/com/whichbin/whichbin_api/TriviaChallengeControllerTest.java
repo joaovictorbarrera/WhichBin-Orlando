@@ -65,7 +65,15 @@ class TriviaChallengeControllerTest {
                 .andExpect(jsonPath("$.items[*].id",
                         hasItem(active.getId().intValue())))
                 .andExpect(jsonPath("$.items[*].id",
-                        not(hasItem(inactive.getId().intValue()))));
+                        not(hasItem(inactive.getId().intValue()))))
+                // Verify the simplified public response fields.
+                .andExpect(jsonPath("$.items[0].title")
+                        .value("Active Test Challenge"))
+                .andExpect(jsonPath("$.items[0].description")
+                        .value("Test challenge description"))
+                // Verify full challenge fields are excluded.
+                .andExpect(jsonPath("$.items[0].active").doesNotExist())
+                .andExpect(jsonPath("$.items[0].questions").doesNotExist());
     }
 
     @Test
@@ -80,6 +88,8 @@ class TriviaChallengeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(challenge.getId()))
                 .andExpect(jsonPath("$.title").value("Visible Challenge"))
+                .andExpect(jsonPath("$.description")
+                        .value("Test challenge description"))
                 .andExpect(jsonPath("$.active").value(true));
     }
 
@@ -127,7 +137,14 @@ class TriviaChallengeControllerTest {
                 .andExpect(jsonPath("$.totalItems").value(1))
                 .andExpect(jsonPath("$.items[*].id").value(
                         hasItem(challenge.getId().intValue())
-                ));
+                ))
+                // Admin response must retain full challenge fields.
+                .andExpect(jsonPath("$.items[0].title")
+                        .value("Admin Visible Challenge"))
+                .andExpect(jsonPath("$.items[0].description")
+                        .value("Test challenge description"))
+                .andExpect(jsonPath("$.items[0].active").value(false))
+                .andExpect(jsonPath("$.items[0].questions").exists());
     }
 
     @Test
