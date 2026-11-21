@@ -143,8 +143,8 @@ The Jenkins pipeline is the root `Jenkinsfile`; it requires an agent labeled `wh
 
 | Job | Branch Specifier | Deployment |
 | --- | --- | --- |
-| Production API | `*/main` | `whichbin-production` Compose project |
-| Staging API | `*/staging` | `whichbin-staging` Compose project |
+| Production API | `origin/main` | `whichbin-production` Compose project |
+| Staging API | `origin/staging` | `whichbin-staging` Compose project |
 
 Jenkins rejects deployment from other branches. Tags do not trigger deployment or select an environment: the staging and production jobs deploy only their configured branches. Each job tests using a temporary MySQL container, builds an environment-qualified image tag (`production-<version>` or `staging-<version>`), and updates its corresponding GitHub deployment environment.
 
