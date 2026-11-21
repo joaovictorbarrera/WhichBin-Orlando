@@ -1,0 +1,25 @@
+services:
+  nginx:
+    image: nginx:1.28-alpine
+    container_name: whichbin-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - type: bind
+        source: ${NGINX_CERTS_PATH:-C:/WhichBin/nginx/certs}
+        target: /etc/nginx/certs
+        read_only: true
+    networks:
+      - production-proxy
+      - staging-proxy
+
+networks:
+  production-proxy:
+    name: whichbin-production-proxy
+    external: true
+  staging-proxy:
+    name: whichbin-staging-proxy
+    external: true

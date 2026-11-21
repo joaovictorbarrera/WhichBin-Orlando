@@ -18,7 +18,7 @@ import Pagination from '../../components/Pagination/Pagination'
 import {
         createResource,
         deleteResource,
-        getResources,
+        getAdminResources,
         updateResource,
         type Resource,
         type ResourceSection,
@@ -284,7 +284,7 @@ export default function AdminResources() {
                         setLoading(true)
                         setError(false)
 
-                        const result = await getResources(
+                        const result = await getAdminResources(
                                 currentPage,
                                 pageSize,
                                 controller.signal

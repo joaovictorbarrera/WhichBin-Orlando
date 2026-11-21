@@ -66,7 +66,47 @@ class ResourceControllerTest {
                         hasItems(
                                 "Test Resource One",
                                 "Test Resource Two"
-                        )));
+                        )))
+                // Verify the simplified public response fields.
+                .andExpect(jsonPath("$.items[0].id").isNumber())
+                .andExpect(jsonPath("$.items[0].description")
+                        .value("Test description"))
+                .andExpect(jsonPath("$.items[0].styleType")
+                        .value("resource-style-green"))
+                // Verify full resource fields are excluded.
+                .andExpect(jsonPath("$.items[0].content").doesNotExist())
+                .andExpect(jsonPath("$.items[0].pdfUrl").doesNotExist())
+                .andExpect(jsonPath("$.items[0].sections").doesNotExist());
+    }
+
+    @Test
+    void shouldRequireAuthenticationToListAllResources()
+            throws Exception {
+
+        mockMvc.perform(get("/resources/all"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldReturnAllResourcesWithValidToken() throws Exception {
+        Resource resource = saveResource("Admin Resource Test");
+
+        mockMvc.perform(get("/resources/all")
+                        .with(bearerAuth))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.currentPage").value(1))
+                .andExpect(jsonPath("$.totalItems").value(1))
+                .andExpect(jsonPath("$.items[0].id")
+                        .value(resource.getId()))
+                .andExpect(jsonPath("$.items[0].title")
+                        .value("Admin Resource Test"))
+                // Admin response must retain full resource fields.
+                .andExpect(jsonPath("$.items[0].content")
+                        .value("Test educational content."))
+                .andExpect(jsonPath("$.items[0].styleType")
+                        .value("resource-style-green"))
+                .andExpect(jsonPath("$.items[0].sections.length()")
+                        .value(4));
     }
 
     @Test
@@ -108,6 +148,8 @@ class ResourceControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(resource.getId()))
                 .andExpect(jsonPath("$.title").value("Resource Details Test"))
+                .andExpect(jsonPath("$.content")
+                        .value("Test educational content."))
                 .andExpect(jsonPath("$.sections.length()").value(4));
     }
 
@@ -149,7 +191,8 @@ class ResourceControllerTest {
                         .content(resourceJson("Updated Recycling Basics")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(resource.getId()))
-                .andExpect(jsonPath("$.title").value("Updated Recycling Basics"));
+                .andExpect(jsonPath("$.title")
+                        .value("Updated Recycling Basics"));
     }
 
     @Test

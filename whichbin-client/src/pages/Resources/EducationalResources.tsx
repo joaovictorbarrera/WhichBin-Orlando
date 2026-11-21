@@ -12,11 +12,11 @@ import {
 import { FaRecycle } from 'react-icons/fa'
 import {
   getResources,
-  type Resource,
+  type ResourceListItem,
 } from '../../services/resourceService'
 import {
   getPaginatedTriviaChallenges,
-  type TriviaChallenge,
+  type TriviaChallengeListItem,
 } from '../../services/triviaService'
 import PageLayout from '../../components/PageLayout'
 import Pagination from '../../components/Pagination/Pagination'
@@ -30,10 +30,10 @@ type PageResult<T> =
   | { key: string; status: 'error' }
 
 function EducationalResources() {
-  const [resourcesResult, setResourcesResult] =
-    useState<PageResult<Resource> | null>(null)
-  const [triviaResult, setTriviaResult] =
-    useState<PageResult<TriviaChallenge> | null>(null)
+    const [resourcesResult, setResourcesResult] =
+    useState<PageResult<ResourceListItem> | null>(null)
+    const [triviaResult, setTriviaResult] =
+    useState<PageResult<TriviaChallengeListItem> | null>(null)
 
   const [resourceRefresh, setResourceRefresh] = useState(0)
   const [triviaRefresh, setTriviaRefresh] = useState(0)
@@ -146,7 +146,7 @@ function EducationalResources() {
     setTriviaCurrentPage(1)
   }
 
-  function getIcon(resource: Resource) {
+    function getIcon(resource: ResourceListItem) {
     if (resource.styleType === 'resource-style-green') {
       return <FaRecycle />
     }

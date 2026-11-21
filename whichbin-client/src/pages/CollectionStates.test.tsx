@@ -1,3 +1,4 @@
+
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
@@ -11,7 +12,7 @@ import AdminResources from './admin/AdminResources'
 import AdminUsers from './admin/AdminUsers'
 import { getAnnouncementsPaged, getAllAnnouncementsPaged } from '../services/announcementService'
 import { fetchItems } from '../services/itemService'
-import { getResources } from '../services/resourceService'
+import { getResources, getAdminResources } from '../services/resourceService'
 import { getPaginatedTriviaChallenges, getAllTriviaChallenges } from '../services/triviaService'
 import { fetchUsers } from '../services/userService'
 
@@ -24,7 +25,9 @@ vi.mock('../services/itemService', async (importOriginal) => ({
   ...await importOriginal<typeof import('../services/itemService')>(), fetchItems: vi.fn(),
 }))
 vi.mock('../services/resourceService', async (importOriginal) => ({
-  ...await importOriginal<typeof import('../services/resourceService')>(), getResources: vi.fn(),
+  ...await importOriginal<typeof import('../services/resourceService')>(),
+  getResources: vi.fn(),
+  getAdminResources: vi.fn(),
 }))
 vi.mock('../services/triviaService', async (importOriginal) => ({
   ...await importOriginal<typeof import('../services/triviaService')>(),
@@ -41,7 +44,7 @@ const paginatedCases = [
   { label: 'public items', Page: ItemSearch, fetch: vi.mocked(fetchItems), name: 'Items', navigationIndex: 0, pageArg: 3, throws: false },
   { label: 'admin items', Page: AdminItems, fetch: vi.mocked(fetchItems), name: 'Items', navigationIndex: 0, pageArg: 3, throws: false },
   { label: 'public resources', Page: EducationalResources, fetch: vi.mocked(getResources), name: 'Resources', navigationIndex: 0, pageArg: 0, throws: false },
-  { label: 'admin resources', Page: AdminResources, fetch: vi.mocked(getResources), name: 'Resources', navigationIndex: 0, pageArg: 0, throws: false },
+  { label: 'admin resources', Page: AdminResources, fetch: vi.mocked(getAdminResources), name: 'Resources', navigationIndex: 0, pageArg: 0, throws: false },
   { label: 'public trivia', Page: EducationalResources, fetch: vi.mocked(getPaginatedTriviaChallenges), name: 'Trivia challenges', navigationIndex: 1, pageArg: 0, throws: false },
   { label: 'admin trivia', Page: AdminResources, fetch: vi.mocked(getAllTriviaChallenges), name: 'Trivia challenges', navigationIndex: 1, pageArg: 0, throws: false },
 ]
@@ -55,6 +58,7 @@ beforeEach(() => {
   vi.mocked(getAllAnnouncementsPaged).mockResolvedValue(emptyPage)
   vi.mocked(fetchItems).mockResolvedValue(emptyPage)
   vi.mocked(getResources).mockResolvedValue(emptyPage)
+  vi.mocked(getAdminResources).mockResolvedValue(emptyPage)
   vi.mocked(getPaginatedTriviaChallenges).mockResolvedValue(emptyPage)
   vi.mocked(getAllTriviaChallenges).mockResolvedValue(emptyPage)
   vi.mocked(fetchUsers).mockResolvedValue(emptyPage)
@@ -165,7 +169,7 @@ describe('admin users pagination', () => {
 describe.each([
   {
     label: 'resources',
-    fetch: vi.mocked(getResources),
+    fetch: vi.mocked(getAdminResources),
     title: 'Test resource',
     updatingText: 'Updating resources...',
     page: {
@@ -201,7 +205,7 @@ describe.each([
 
     expect(await screen.findByText(title)).toBeInTheDocument()
     const paginations = await screen.findAllByRole('navigation', { name: 'Pagination Navigation' })
-    const pagination = fetch === vi.mocked(getResources) ? paginations[0] : paginations[1]
+    const pagination = fetch === vi.mocked(getAdminResources) ? paginations[0] : paginations[1]
 
     fetch.mockImplementationOnce(() => new Promise((resolve) => {
       resolveNextPage = resolve
