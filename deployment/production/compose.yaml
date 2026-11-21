@@ -1,0 +1,55 @@
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: whichbin_db
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - production-internal
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  whichbin-api:
+    image: whichbin-api:${IMAGE_TAG:-production-latest}
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      args:
+        APP_VERSION: ${APP_VERSION:-0.0.0}
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PORT: "5000"
+      DB_URL: jdbc:mysql://mysql:3306/whichbin_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      CLIENT_URL: ${CLIENT_URL}
+    networks:
+      production-internal: {}
+      production-proxy:
+        aliases:
+          - whichbin-production-api
+
+volumes:
+  mysql_data:
+    name: whichbin-orlando_mysql_data
+    external: true
+
+networks:
+  production-internal:
+    name: whichbin-production-internal
+    external: true
+  production-proxy:
+    name: whichbin-production-proxy
+    external: true

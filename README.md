@@ -90,67 +90,104 @@ npm run build
 
 ## Production deployment
 
-### Deployment flow
+### Deployment layout
 
-The frontend and backend deploy independently:
+The API is plain HTTP on container port `5000`; TLS terminates at the independent NGINX reverse proxy. NGINX routes by TLS SNI:
 
-1. **Vercel** builds and deploys `whichbin-client`.
-2. **Jenkins** polls the configured Git branch every minute.
-3. Jenkins runs backend tests using a temporary MySQL 8.4 container.
-4. Jenkins generates the production version from the nearest reachable `vMAJOR.MINOR.PATCH` Git tag plus the repository's total commit count.
-5. Jenkins registers a deployment for the GitHub `Production (Backend)` environment and marks it in progress.
-6. Jenkins builds and deploys the API and MySQL using the root `compose.yaml`, then reports the final deployment state to GitHub. The GitHub Actions `discord-deployments.yml` workflow sends Discord notifications for completed frontend and backend deployments.
+| Hostname | Destination |
+| --- | --- |
+| `api.whichbin-orlando.org` | Production API |
+| `betaapi.whichbin-orlando.org` | Staging API |
 
-The Jenkins pipeline is in the root `Jenkinsfile`. It requires an agent labeled `whichbin-deploy`, and each pipeline run has a 10-minute timeout.
+The deployment files are split into three Compose projects:
 
-### Set up the Jenkins host and job
+- `deployment/production/compose.yaml`: production API and its private MySQL container/volume.
+- `deployment/staging/compose.yaml`: staging API and a separate MySQL container/volume.
+- `deployment/nginx/compose.yaml`: standalone NGINX, independent of both API deployments.
 
-The Jenkins agent must run on the Windows deployment host and use Docker Desktop in **Linux containers** mode. Install Git, Java 21, Node.js, Docker Compose v2, and the Jenkins Pipeline, Git, Credentials Binding, and PowerShell plugins. Run the agent as the same Windows account that runs Docker Desktop, and keep Docker Desktop running during builds.
+The API stacks use four pre-created Docker networks: each API and its database share their environment's `*-internal` network; NGINX and the corresponding API share their `*-proxy` network. Consequently, deploying one API Compose project does not restart the other API or NGINX. Production reuses the existing `whichbin-orlando_mysql_data` volume; staging gets its own `whichbin-staging-mysql-data` volume.
 
-Create a Pipeline job:
+### One-time Docker host setup
 
-1. Select **Pipeline script from SCM** and choose **Git**.
-2. Enter the GitHub repository URL and credentials if the repository is private.
-3. Set **Branch Specifier** to `*/main`.
-4. Set **Script Path** to `Jenkinsfile`.
-5. Save. The Jenkinsfile defines the polling schedule; no separate trigger is needed.
+#### Host requirements
 
-Give the Jenkins agent the `whichbin-deploy` label. The first Docker image build may exceed the current 10-minute timeout; if it does, increase the `timeout` in the Jenkinsfile and rerun.
+Install Jenkins on the Windows deployment host and install the **Pipeline**, **Git**, **Credentials Binding**, and **PowerShell** plugins. Install Docker Desktop and configure it for **Linux containers**; make sure Docker Compose v2 is available. Also install Git, Java 21, and Node.js on the host so the Jenkins agent can check out the repository, run the version script, and build/test the API.
 
-### Add Jenkins credentials
+Run the Jenkins agent as the same Windows account that runs Docker Desktop, and keep Docker Desktop running during builds.
 
-Create these credentials in Jenkins with the exact IDs below, in a scope available to the job:
+#### Docker and network setup
+
+From the repository root in an elevated PowerShell terminal, create the external networks once:
+
+```powershell
+docker network create --internal whichbin-production-internal
+docker network create whichbin-production-proxy
+docker network create --internal whichbin-staging-internal
+docker network create whichbin-staging-proxy
+New-Item -ItemType Directory -Force -Path 'C:\WhichBin\nginx\certs'
+```
+
+Allow inbound TCP ports `80` and `443` in the Windows firewall. Point both API DNS A records (`api.whichbin-orlando.org` and `betaapi.whichbin-orlando.org`) at the host's public IP. The website records are configured separately to point to Vercel.
+
+The Jenkins pipeline copies `deployment\nginx\compose.yaml` and `nginx.conf` from its checkout into the persistent `C:\WhichBin\nginx` directory, so the host does not need a permanent clone of the repository. It converts the `whichbin-tls-pfx` credential into `fullchain.pem` and `privkey.pem` in `C:\WhichBin\nginx\certs`. NGINX mounts these persistent paths read-only. Restrict the certificate directory ACLs to the Jenkins/Docker host accounts; the private key is unencrypted PEM. Jenkins compares the config and PFX hashes and validates/reloads NGINX only when either changes. Update the PFX credential before expiry.
+
+Run either API pipeline once to stage the persistent NGINX files and create the certificate files. Then, in PowerShell on the Docker host, start the standalone proxy using the copy staged by Jenkins:
+
+```powershell
+docker compose --project-name whichbin-nginx --file C:\WhichBin\nginx\compose.yaml up -d
+```
+
+### Jenkins jobs and credentials
+
+The Jenkins pipeline is the root `Jenkinsfile`; it requires an agent labeled `whichbin-deploy` and has a 10-minute timeout. Create two **Pipeline script from SCM** jobs for this repository, both using `Jenkinsfile` and the Jenkinsfile's polling schedule:
+
+| Job | Branch Specifier | Deployment |
+| --- | --- | --- |
+| Production API | `*/main` | `whichbin-production` Compose project |
+| Staging API | `*/staging` | `whichbin-staging` Compose project |
+
+Jenkins rejects deployment from other branches. Tags do not trigger deployment or select an environment: the staging and production jobs deploy only their configured branches. Each job tests using a temporary MySQL container, builds an environment-qualified image tag (`production-<version>` or `staging-<version>`), and updates its corresponding GitHub deployment environment.
+
+Create these Jenkins credentials in a scope available to both jobs:
 
 | Credential ID | Jenkins type | Value |
 | --- | --- | --- |
-| `whichbin-tls-pfx` | Secret file | Full-chain `.pfx` certificate |
+| `whichbin-tls-pfx` | Secret file | Full-chain wildcard `.pfx` certificate |
+| `whichbin-tls-keystore-password` | Secret text | Password for the PFX |
 | `whichbin-db-username` | Secret text | Production MySQL application username |
 | `whichbin-db-password` | Secret text | Production MySQL application password |
 | `whichbin-db-root-password` | Secret text | Production MySQL root password |
-| `whichbin-tls-keystore-password` | Secret text | Password for the PFX |
-| `whichbin-client-url` | Secret text | Exact Vercel/custom-domain origin, e.g. `https://www.whichbin-orlando.org` |
-| `github-deployments-token` | Secret text | GitHub token for this repository with **Deployments: read and write** permission |
+| `whichbin-client-url` | Secret text | Production frontend origin, e.g. `https://www.whichbin-orlando.org` |
+| `github-deployments-token` | Secret text | GitHub token with **Deployments: read and write** permission |
 
-The pipeline stages the Jenkins certificate credential at `secrets/whichbin-orlando.org-fullchain.pfx` in the Jenkins workspace so Docker Desktop can bind-mount it reliably. The file is Git-ignored and excluded from the Docker build context. It must remain on the host while the API container uses it, including across container restarts; restrict access to the Jenkins account and do not clean this workspace while the deployment is running. Update the Jenkins secret-file credential before the certificate expires.
+Add these separate staging credentials as well:
 
-The GitHub token is used to create and update deployments for `Production (Backend)` at the checked-out commit. Configure the GitHub credential as a fine-grained token or GitHub App token with deployment write access to this repository. Configure the `DISCORD_DEPLOYMENT_WEBHOOK` Actions secret for the `discord-deployments.yml` workflow; Jenkins reports deployment status to GitHub, and the workflow sends the Discord notification.
+| Credential ID | Jenkins type | Value |
+| --- | --- | --- |
+| `whichbin-staging-db-username` | Secret text | Staging MySQL application username |
+| `whichbin-staging-db-password` | Secret text | Staging MySQL application password |
+| `whichbin-staging-db-root-password` | Secret text | Staging MySQL root password |
+| `whichbin-staging-client-url` | Secret text | Staging frontend origin, `https://beta.whichbin-orlando.org` |
 
-### Configure Vercel and HTTPS
+Set the `DISCORD_DEPLOYMENT_WEBHOOK` Actions secret for the `discord-deployments.yml` workflow in GitHub's Secrets and variables. The GitHub token registers and updates `Production (Backend)` and `Staging (Backend)` deployment statuses.
 
-In Vercel, set the project **Root Directory** to `whichbin-client`, enable **Include files outside the root directory** so the shared root version script and Maven file are available during builds, and use `npm run build` as the build command. Set this environment variable for Production (and Preview if previews should call the production API):
+### Configure Vercel and API URLs
 
-| Variable | Value |
+The production and staging frontend projects are deployed independently on Vercel. Set each project's **Root Directory** to `whichbin-client`, enable **Include files outside the root directory**, and use `npm run build` as the build command. Configure:
+
+| Vercel project | `VITE_API_URL` |
 | --- | --- |
-| `VITE_API_URL` | `https://<api-domain>/api/` |
+| Production | `https://api.whichbin-orlando.org/api/` |
+| Staging | `https://betaapi.whichbin-orlando.org/api/` |
 
 Production builds on Vercel use the shared version script; when Vercel's checkout is shallow or lacks tags, it uses Vercel's repository and branch metadata to fetch the reachable release tag and full commit history. The local Vite dev server uses the POM version instead.
 
-The API serves HTTPS directly on port `443` using the Jenkins-managed PFX. Point the API domain's DNS to the Docker host and allow inbound TCP port `443` in the host firewall. Set `whichbin-client`'s `VITE_API_URL` to that API domain. Set the Jenkins `whichbin-client-url` credential to the frontend's exact origin (scheme and hostname only, no path or trailing slash) for API CORS.
-
 ### Release versions
 
-For a staging candidate, create a tag such as `staging/1.0.0-rc.1`. The version script reads its `1.0.0` base and appends the full commit count, for example `1.0.0.324`; the `rc.1` suffix is not included in the application version. Only create the production `v1.0.0` GitHub Release/tag when version `1.0.0` goes live.
+Use `vMAJOR.MINOR.PATCH` tags for every release, including versions being prepared for staging (for example, `v1.3.0`). Create a `release/MAJOR.MINOR.PATCH` branch and its `vMAJOR.MINOR.PATCH` tag, and mark the corresponding GitHub Release as a pre-release while it is under test. When closed, merge the release branch into `staging`. The version script uses the nearest reachable `vMAJOR.MINOR.PATCH` tag and appends the full commit count to produce the application/image version.
 
-Before merging a release branch into `main`, create the GitHub Release and its `vMAJOR.MINOR.PATCH` tag on that release branch. Then merge the release branch. Jenkins uses the nearest reachable version tag and appends the full commit count. Ensure the tag is pushed and reachable from `main` for the deployment build.
+If a staging pipeline fails to build or deploy, fix the pipeline issue on the same release branch and merge the fix into `staging`; do not create a patch release just for a broken pipeline.
 
-The Compose stack keeps MySQL data in the persistent `mysql_data` volume across deployments. Do not remove that volume unless you intend to delete the production database.
+If the build succeeds but reveals a logic issue or bug, create a patch release (for example, `v1.3.1`) and follow the release flow for that version.
+
+Once the selected release is merged into `main` and deployed to production, update its GitHub Release from pre-release to the latest production release, and add the full changelog since the last production release.
