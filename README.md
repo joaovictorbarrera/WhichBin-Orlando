@@ -115,6 +115,15 @@ Install Jenkins on the Windows deployment host and install the **Pipeline**, **G
 
 Run the Jenkins agent as the same Windows account that runs Docker Desktop, and keep Docker Desktop running during builds.
 
+Git must support Windows long paths. The Jenkins SCM checkout happens before the Jenkinsfile runs, so this cannot be fixed in a pipeline step. In an elevated PowerShell terminal on the host, enable long paths in the Git installation Jenkins uses:
+
+```powershell
+git config --system core.longpaths true
+git config --system --get core.longpaths
+```
+
+The second command should print `true`. If multiple Git installations are present, configure the one used by the Jenkins service (the path shown by `where.exe git`) and restart the Jenkins service before retrying the checkout.
+
 #### Docker and network setup
 
 From the repository root in an elevated PowerShell terminal, create the external networks once:

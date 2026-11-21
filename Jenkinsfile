@@ -121,7 +121,7 @@ pipeline {
                                 }
                                 $payload = @{
                                     ref = $env:GIT_COMMIT
-                                    environment = "$env:DEPLOYMENT_ENVIRONMENT (Backend)"
+                                    environment = "$($env:DEPLOYMENT_ENVIRONMENT.Substring(0, 1).ToUpper())$($env:DEPLOYMENT_ENVIRONMENT.Substring(1)) (Backend)"
                                     description = "Jenkins build $env:BUILD_NUMBER ($env:APP_VERSION)"
                                     auto_merge = $false
                                     required_contexts = @()
