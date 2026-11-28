@@ -55,6 +55,42 @@ Create a Spring Boot run configuration through **Run → Edit Configurations →
 
 The API is available at <http://localhost:5000/api/> and its documentation at <http://localhost:5000/api/swagger-ui/index.html>.
 
+### Default development administrator
+
+The API includes a DEV-only data initializer that automatically
+creates the default administrator account when it does not already
+exist.
+
+To enable administrator initialization during local development:
+
+1. Open the Spring Boot run configuration in IntelliJ IDEA.
+2. Set the active profile to `dev`.
+3. Add the following environment variables using the administrator
+   credentials provided in the team's Text → creds channel.
+
+   | Name | Value |
+   | --- | --- |
+   | `APP_DEV_ADMIN_EMAIL` | Default administrator email |
+   | `APP_DEV_ADMIN_PASSWORD` | Default administrator password |
+
+4. Start the API and check the console for one of the following messages:
+
+   - `DEV administrator account created successfully.`
+   - `DEV administrator account already exists.`
+
+The initializer preserves existing accounts and securely hashes
+passwords before saving new accounts.
+
+If credentials are missing, administrator initialization is skipped.
+To disable initialization explicitly, set `APP_DEV_ADMIN_ENABLED`
+to `false`.
+
+The initializer requires the `dev` profile and is excluded when
+the `prod`, `production`, or `test` profile is active.
+
+Never activate the DEV profile against a production or staging
+database. Do not commit administrator credentials to the repository.
+
 ### Run the frontend
 
 Open the `whichbin-client` folder in Visual Studio Code. In **Terminal → New Terminal**, run:
